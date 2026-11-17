@@ -1,21 +1,66 @@
+import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { AuthCard } from "@/components/auth-card";
 import { RoleDashboardSkeleton } from "@/components/role-dashboard-skeleton";
+import { StudentDashboard } from "@/components/student/student-dashboard";
 import { logoutAction } from "@/app/actions/auth";
 import { 
   Building2, 
   GraduationCap, 
-  FileText, 
-  Clock, 
-  CheckCircle2, 
-  GitBranch,
-  ShieldCheck,
-  LogOut,
-  Sparkles
+  ShieldCheck, 
+  LogOut, 
+  Sparkles 
 } from "lucide-react";
+import { UserRole } from "@prisma/client";
 
 export default async function Home() {
   const currentUser = await getCurrentUser();
+
+  // Date necesare pentru Dashboard Student
+  let studentData = null;
+  if (currentUser && currentUser.role === UserRole.STUDENT && currentUser.studentProfile) {
+    const [availableTags, offers, preferences] = await Promise.all([
+      prisma.tag.findMany({
+        orderBy: { name: "asc" },
+        select: { id: true, name: true, domain: true, isPredefined: true },
+      }),
+      prisma.internshipOffer.findMany({
+        where: { status: "ACTIVE" },
+        include: {
+          company: {
+            select: { id: true, companyName: true, city: true, website: true },
+          },
+          offerTags: {
+            include: {
+              tag: { select: { name: true, domain: true } },
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.studentPreference.findMany({
+        where: { studentId: currentUser.studentProfile.id },
+        include: {
+          offer: {
+            select: {
+              id: true,
+              title: true,
+              location: true,
+              slotsAvailable: true,
+              company: { select: { companyName: true } },
+            },
+          },
+        },
+        orderBy: { rank: "asc" },
+      }),
+    ]);
+
+    studentData = {
+      availableTags,
+      offers,
+      preferences,
+    };
+  }
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -65,7 +110,7 @@ export default async function Home() {
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-semibold">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  Săptămâna 1: Skeleton & Auth
+                  Partea 1A: Modul Student Activ
                 </span>
               </div>
             )}
@@ -75,11 +120,22 @@ export default async function Home() {
 
       <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-12">
         {currentUser ? (
-          /* VEDERE UTILIZATOR AUTENTIFICAT */
-          <RoleDashboardSkeleton
-            role={currentUser.role}
-            userName={`${currentUser.firstName} ${currentUser.lastName}`}
-          />
+          currentUser.role === UserRole.STUDENT && currentUser.studentProfile && studentData ? (
+            /* VEDERE COMPLETĂ DASHBOARD STUDENT (PARTEA 1A) */
+            <StudentDashboard
+              user={currentUser}
+              profile={currentUser.studentProfile}
+              availableTags={studentData.availableTags}
+              offers={studentData.offers}
+              preferences={studentData.preferences}
+            />
+          ) : (
+            /* VEDERE SKELETON PENTRU CELELALTE ROLURI (Firme, Coordonator) */
+            <RoleDashboardSkeleton
+              role={currentUser.role}
+              userName={`${currentUser.firstName} ${currentUser.lastName}`}
+            />
+          )
         ) : (
           /* VEDERE LANDING PAGE & AUTENTIFICARE */
           <>
@@ -104,10 +160,10 @@ export default async function Home() {
               <AuthCard />
             </section>
 
-            {/* Overview Skeleton Grid */}
+            {/* Overview Grid */}
             <section className="space-y-6 pt-8 border-t border-slate-200">
               <div className="text-center space-y-1">
-                <h2 className="text-xl font-bold text-slate-900">Modulele Platformei (Skeleton Preview)</h2>
+                <h2 className="text-xl font-bold text-slate-900">Modulele Platformei P14</h2>
                 <p className="text-xs text-slate-500">Fluxul complet de lucru conform calendarului de dezvoltare</p>
               </div>
 
@@ -116,12 +172,16 @@ export default async function Home() {
                   <div className="w-10 h-10 bg-blue-100 text-blue-700 rounded-xl flex items-center justify-center font-bold">
                     <GraduationCap className="w-5 h-5" />
                   </div>
-                  <h3 className="font-bold text-slate-900 text-base">Modul Studenți</h3>
+                  <h3 className="font-bold text-slate-900 text-base">Modul Studenți (Activ)</h3>
                   <p className="text-xs text-slate-500 leading-relaxed">
-                    Profil cu bio și competențe pe domenii inginerești (CTI, Electronică, Mecatronică), 
-                    feed de oferte cu scor de compatibilitate și protecție strictă a CV-ului.
+                    Profil social cu headline, bio și date academice oficiale ULBS, 
+                    catalog de 41 competențe cu nivel, upload CV protejat prin Privacy Gate 
+                    și exprimare preferințe ordonate Gale-Shapley.
                   </p>
                   <div className="pt-2 flex gap-1.5 flex-wrap">
+                    <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200 rounded text-[11px]">
+                      Partea 1A Implementată
+                    </span>
                     <span className="px-2 py-0.5 bg-slate-100 rounded text-[11px] text-slate-600">CV protejat</span>
                     <span className="px-2 py-0.5 bg-slate-100 rounded text-[11px] text-slate-600">Preferințe Gale-Shapley</span>
                   </div>

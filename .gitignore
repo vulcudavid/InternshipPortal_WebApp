@@ -11,6 +11,11 @@
 # Next.js build output
 /.next/
 /out/
+*.tsbuildinfo
+
+# Uploads
+/public/uploads/cvs/*
+!/public/uploads/cvs/.gitkeep
 
 # Production
 /build
