@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ro" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DS-007 · Coordinator Dashboard · Mock [approved]</title>
+  <style>
+    /*
+     * DS-007 — Coordinator Dashboard Mock
+     * Status: APPROVED | Creat: 2026-11-17 | Aprobat: 2026-11-17
+     * Design tokens: docs/design/DESIGN.md
+     * Acoperă stările: empty | loading | error | success | long-text
+     * Moduri: light (default) | dark (.dark pe <html>)
+     *
+     * NU folosiți Tailwind CDN în producție — tokens sunt replicate manual
+     * pentru ca mock-ul să fie standalone (fără dependențe externe).
+     */
+
+    /* ── Reset ──────────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    img { display: block; max-width: 100%; }
+    button { cursor: pointer; font-family: inherit; }
+
+    /* ── Design Tokens (Custom Properties) — Light ──────────────────────── */
+    :root {
+      /* Culori primare */
+      --color-primary-50:  #eff6ff;
+      --color-primary-100: #dbeafe;
+      --color-primary-500: #3b82f6;
+      --color-primary-600: #2563eb;
+      --color-primary-700: #1d4ed8;
+      --color-primary-900: #1e3a8a;
+      /* Suprafețe & text */
+      --color-bg-page:     #f8fafc;
+      --color-bg-card:     #ffffff;
+      --color-bg-sidebar:  #f1f5f9;
+      --color-border:      #e2e8f0;
+      --color-text-primary:   #0f172a;
+      --color-text-secondary: #475569;
+      --color-text-muted:     #94a3b8;
+      /* Status semantic */
+      --color-success-bg:  #f0fdf4;
+      --color-success:     #16a34a;
+      --color-warning-bg:  #fffbeb;
+      --color-warning:     #d97706;
+      --color-error-bg:    #fef2f2;
+      --color-error:       #dc2626;
+      --color-info-bg:     #eff6ff;
+      --color-info:        #2563eb;
+      /* Status plasamente */
+      --badge-pending-bg:   #fef9c3; --badge-pending-text:   #854d0e;
+      --badge-confirmed-bg: #dcfce7; --badge-confirmed-text: #166534;
+      --badge-cancelled-bg: #fee2e2; --badge-cancelled-text: #991b1b;
+      /* Tipografie */
+      --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      /* Spațieri */
+      --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+      --space-6: 24px; --space-8: 32px; --space-12: 48px;
+      /* Border radius */
+      --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px;
+      --radius-xl: 16px; --radius-full: 9999px;
+      /* Umbre */
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,.07), 0 2px 4px -2px rgba(0,0,0,.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.08), 0 4px 6px -4px rgba(0,0,0,.05);
+    }
+
+    /* ── Dark Mode Tokens ───────────────────────────────────────────────── */
+    html.dark {
+      --color-bg-page:     #0f172a;
+      --color-bg-card:     #1e293b;
+      --color-bg-sidebar:  #1e293b;
+      --color-border:      #334155;
+      --color-text-primary:   #f8fafc;
+      --color-text-secondary: #94a3b8;
+      --color-text-muted:     #64748b;
+      --color-primary-500: #60a5fa;
+      --color-primary-600: #3b82f6;
+      --color-primary-50:  #172554;
+      --color-primary-100: #1e3a8a;
+      --color-success-bg:  #052e16; --color-success: #4ade80;
+      --color-warning-bg:  #1c1400; --color-warning: #fbbf24;
+      --color-error-bg:    #1f0a0a; --color-error:   #f87171;
+      --color-info-bg:     #0d1b3e; --color-info:    #60a5fa;
+      --badge-pending-bg:  #2d2200; --badge-pending-text:   #fde68a;
+      --badge-confirmed-bg:#062013; --badge-confirmed-text: #86efac;
+      --badge-cancelled-bg:#1f0a0a; --badge-cancelled-text: #fca5a5;
+    }
+
+    /* ── Base ───────────────────────────────────────────────────────────── */
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-bg-page);
+      color: var(--color-text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* ── Layout ─────────────────────────────────────────────────────────── */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ─────────────────────────────────────────────────────────── */
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      background: var(--color-bg-sidebar);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-6);
+    }
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-8);
+    }
+    .sidebar-logo-icon {
+      width: 36px; height: 36px;
+      background: var(--color-primary-600);
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 14px;
+    }
+    .sidebar-logo-text { font-weight: 700; font-size: 15px; color: var(--color-text-primary); }
+    .sidebar-logo-sub  { font-size: 11px; color: var(--color-text-muted); }
+    .nav-label {
+      font-size: 11px; font-weight: 600; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--color-text-muted);
+      margin-bottom: var(--space-2); padding: 0 var(--space-2);
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-md);
+      font-size: 14px; font-weight: 500;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      transition: background .15s, color .15s;
+      margin-bottom: 2px;
+    }
+    .nav-item:hover { background: var(--color-border); color: var(--color-text-primary); }
+    .nav-item.active {
+      background: var(--color-primary-100);
+      color: var(--color-primary-700);
+    }
+    html.dark .nav-item.active {
+      background: var(--color-primary-50);
+      color: var(--color-primary-500);
+    }
+    .nav-icon { width: 18px; height: 18px; opacity: .8; flex-shrink: 0; }
+    .sidebar-spacer { flex: 1; }
+    .sidebar-user {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: var(--space-3);
+      border-top: 1px solid var(--color-border);
+      margin-top: var(--space-4);
+    }
+    .avatar {
+      width: 32px; height: 32px; border-radius: var(--radius-full);
+      background: var(--color-primary-600);
+      color: white; font-weight: 700; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .user-name { font-size: 13px; font-weight: 600; color: var(--color-text-primary); }
+    .user-role { font-size: 11px; color: var(--color-text-muted); }
+
+    /* ── Main Content ────────────────────────────────────────────────────── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .topbar {
+      background: var(--color-bg-card);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-4) var(--space-6);
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+    }
+    .topbar-title { font-size: 20px; font-weight: 700; color: var(--color-text-primary); }
+    .topbar-sub   { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; }
+    .topbar-actions { display: flex; gap: var(--space-3); align-items: center; }
+
+    .content {
+      flex: 1;
+      padding: var(--space-6);
+      overflow-y: auto;
+      display: flex; flex-direction: column; gap: var(--space-6);
+    }
+
+    /* ── Buttons ─────────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: var(--space-2);
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-size: 14px; font-weight: 600;
+      border: none; transition: background .15s, color .15s, border-color .15s;
+    }
+    .btn-primary {
+      background: var(--color-primary-600); color: #fff;
+    }
+    .btn-primary:hover { background: var(--color-primary-700); }
+    .btn-secondary {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-secondary);
+    }
+    .btn-secondary:hover { background: var(--color-bg-page); }
+    .btn-danger { background: #dc2626; color: #fff; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
+
+    /* ── Cards ───────────────────────────────────────────────────────────── */
+    .card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      padding: var(--space-6);
+    }
+    .card-title {
+      font-size: 16px; font-weight: 700;
+      color: var(--color-text-primary); margin-bottom: var(--space-4);
+      display: flex; align-items: center; gap: var(--space-2);
+    }
+
+    /* ── Stat Cards Grid ─────────────────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-4);
+    }
+    .stat-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .stat-card.success::before { background: var(--color-success); }
+    .stat-card.warning::before { background: var(--color-warning); }
+    .stat-card.error::before   { background: var(--color-error); }
+    .stat-card.info::before    { background: var(--color-info); }
+    .stat-label { font-size: 12px; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .06em; }
+    .stat-value { font-size: 32px; font-weight: 800; color: var(--color-text-primary); margin: var(--space-2) 0; line-height: 1; }
+    .stat-sub   { font-size: 13px; color: var(--color-text-secondary); }
+    .stat-icon  {
+      position: absolute; right: var(--space-4); top: 50%;
+      transform: translateY(-50%);
+      opacity: .08; font-size: 48px; line-height: 1;
+    }
+
+    /* ── Badge ───────────────────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 2px 10px;
+      border-radius: var(--radius-full);
+      font-size: 11px; font-weight: 600;
+    }
+    .badge-pending   { background: var(--badge-pending-bg);   color: var(--badge-pending-text); }
+    .badge-confirmed { background: var(--badge-confirmed-bg); color: var(--badge-confirmed-text); }
+    .badge-cancelled { background: var(--badge-cancelled-bg); color: var(--badge-cancelled-text); }
+
+    /* ── Table ───────────────────────────────────────────────────────────── */
+    .table-wrapper { overflow-x: auto; border-radius: var(--radius-lg); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead th {
+      background: var(--color-bg-page);
+      color: var(--color-text-muted);
+      font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+      padding: var(--space-3) var(--space-4);
+      text-align: left; border-bottom: 1px solid var(--color-border);
+    }
+    tbody td {
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text-primary);
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--color-bg-page); }
+
+    /* ── State Panels ────────────────────────────────────────────────────── */
+    .state-panel {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: var(--space-12) var(--space-6);
+      text-align: center; gap: var(--space-4);
+    }
+    .state-icon-wrap {
+      width: 64px; height: 64px;
+      border-radius: var(--radius-full);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+    }
+    .state-icon-wrap.empty   { background: var(--color-bg-sidebar); }
+    .state-icon-wrap.loading { background: var(--color-info-bg); }
+    .state-icon-wrap.error   { background: var(--color-error-bg); }
+    .state-icon-wrap.success { background: var(--color-success-bg); }
+    .state-title { font-size: 18px; font-weight: 700; color: var(--color-text-primary); }
+    .state-desc  { font-size: 14px; color: var(--color-text-secondary); max-width: 400px; }
+
+    /* Skeleton animation */
+    @keyframes shimmer {
+      0% { background-position: -600px 0; }
+      100% { background-position: 600px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg,
+        var(--color-border) 25%,
+        var(--color-bg-sidebar) 50%,
+        var(--color-border) 75%
+      );
+      background-size: 1200px 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: var(--radius-md);
+    }
+    .sk-line { height: 14px; margin-bottom: var(--space-2); }
+    .sk-line.w-full { width: 100%; }
+    .sk-line.w-3-4  { width: 75%; }
+    .sk-line.w-1-2  { width: 50%; }
+    .sk-line.w-1-4  { width: 25%; }
+    .sk-block { height: 80px; }
+
+    /* Alert Banner */
+    .alert {
+      display: flex; align-items: flex-start; gap: var(--space-3);
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      font-size: 14px;
+    }
+    .alert-error { background: var(--color-error-bg); color: var(--color-error); border: 1px solid var(--color-error); border-opacity: .3; }
+    .alert-warning { background: var(--color-warning-bg); color: var(--color-warning); }
+    .alert-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .alert-text { flex: 1; }
+    .alert-title { font-weight: 700; margin-bottom: 2px; }
+
+    /* Long text truncate */
+    .text-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+
+    /* Toggle Dark Mode Button (demo only) */
+    .mode-toggle {
+      position: fixed; bottom: var(--space-6); right: var(--space-6);
+      background: var(--color-primary-600); color: white;
+      border: none; border-radius: var(--radius-full);
+      padding: var(--space-3) var(--space-4);
+      font-size: 13px; font-weight: 600;
+      box-shadow: var(--shadow-lg); z-index: 100;
+    }
+
+    /* Section separator label */
+    .section-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+      color: var(--color-text-muted);
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-sm);
+      background: var(--color-bg-sidebar);
+      margin-bottom: var(--space-2);
+      display: inline-block;
+    }
+
+    /* Progress bar */
+    .progress-bar-wrap {
+      background: var(--color-border);
+      border-radius: var(--radius-full);
+      height: 8px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; border-radius: var(--radius-full);
+      background: var(--color-primary-500);
+      transition: width .4s;
+    }
+    .progress-bar-fill.warning { background: var(--color-warning); }
+    .progress-bar-fill.success { background: var(--color-success); }
+
+    /* Spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--color-border);
+      border-top-color: var(--color-primary-500);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     MOCK DS-007 — Coordinator Dashboard (Stare: SUCCESS / Normal)
+     Comutare stări: schimbați clasa pe <section class="content-state ...">
+     sau consultați secțiunile STATE-* de mai jos.
+     ════════════════════════════════════════════════════════════════════════ -->
+
+<div class="layout">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">P14</div>
+      <div>
+        <div class="sidebar-logo-text">Portal Practică</div>
+        <div class="sidebar-logo-sub">ULBS · Inginerie</div>
+      </div>
+    </div>
+
+    <div class="nav-label">Coordonator</div>
+
+    <a href="#" class="nav-item active">
+      <!-- icon: LayoutDashboard -->
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="#" class="nav-item">
+      <!-- icon: Link2 -->
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 0 10h-3"/><path d="M9 17H6A5 5 0 0 1 6 7h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Plasamente
+    </a>
+    <a href="#" class="nav-item">
+      <!-- icon: FileText -->
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Convenții PDF
+    </a>
+    <a href="#" class="nav-item">
+      <!-- icon: Clock -->
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Jurnal Ore
+    </a>
+    <a href="#" class="nav-item">
+      <!-- icon: Users -->
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Studenți
+    </a>
+
+    <div class="sidebar-spacer"></div>
+
+    <div class="sidebar-user">
+      <div class="avatar">MC</div>
+      <div>
+        <div class="user-name">Maria Constantin</div>
+        <div class="user-role">Coordonator Academic</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main ────────────────────────────────────────────────────────── -->
+  <div class="main">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Dashboard Coordonator</div>
+        <div class="topbar-sub">An academic 2025–2026 · Sesiunea: Noiembrie 2026</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary btn-sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
+        <button class="btn btn-primary btn-sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Run Matching
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         STAREA: SUCCESS (Normal — cu date)
+         ════════════════════════════════════════════════════════════════ -->
+    <div class="content" id="state-success">
+
+      <!-- Alert atenție: plasamente în așteptare -->
+      <div class="alert alert-warning">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-text">
+          <div class="alert-title">12 plasamente în așteptare de confirmare</div>
+          Matching-ul a rulat pe 17 Nov 2026 la 14:32. Revizuiți și confirmați plasamentele generate.
+        </div>
+        <button class="btn btn-secondary btn-sm" style="margin-left: auto; flex-shrink:0;">
+          Vezi Plasamente →
+        </button>
+      </div>
+
+      <!-- Statistici principale -->
+      <div>
+        <div class="section-label">Statistici Sesiune</div>
+        <div class="stats-grid" style="margin-top: var(--space-3);">
+
+          <div class="stat-card success">
+            <div class="stat-label">Plasați Confirmat</div>
+            <div class="stat-value">47</div>
+            <div class="stat-sub">din 89 studenți eligibili</div>
+            <div class="stat-icon">✅</div>
+          </div>
+
+          <div class="stat-card warning">
+            <div class="stat-label">Pending Confirmare</div>
+            <div class="stat-value">12</div>
+            <div class="stat-sub">generate de algoritm, neconfirmate</div>
+            <div class="stat-icon">⏳</div>
+          </div>
+
+          <div class="stat-card error">
+            <div class="stat-label">Fără Plasament</div>
+            <div class="stat-value">30</div>
+            <div class="stat-sub">studenți fără ofertă potrivită</div>
+            <div class="stat-icon">📭</div>
+          </div>
+
+          <div class="stat-card info">
+            <div class="stat-label">Convenții Lipsă</div>
+            <div class="stat-value">19</div>
+            <div class="stat-sub">nesemnate sau negenerator</div>
+            <div class="stat-icon">📄</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Progres general -->
+      <div class="card">
+        <div class="card-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Progres Sesiune de Practică
+        </div>
+        <div style="display:flex; flex-direction:column; gap: var(--space-4);">
+
+          <div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <span style="font-size:13px; font-weight:600; color:var(--color-text-secondary);">Rata de plasare</span>
+              <span style="font-size:13px; font-weight:700; color:var(--color-text-primary);">52.8% · 47/89</span>
+            </div>
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-fill warning" style="width:52.8%"></div>
+            </div>
+          </div>
+
+          <div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <span style="font-size:13px; font-weight:600; color:var(--color-text-secondary);">Convenții semnate</span>
+              <span style="font-size:13px; font-weight:700; color:var(--color-text-primary);">28/47 · 59.6%</span>
+            </div>
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-fill" style="width:59.6%"></div>
+            </div>
+          </div>
+
+          <div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <span style="font-size:13px; font-weight:600; color:var(--color-text-secondary);">Ore validate (săpt. curentă)</span>
+              <span style="font-size:13px; font-weight:700; color:var(--color-text-primary);">312/560 h · 55.7%</span>
+            </div>
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-fill success" style="width:55.7%"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tabel plasamente recente -->
+      <div class="card" style="padding: var(--space-6) 0;">
+        <div class="card-title" style="padding: 0 var(--space-6); margin-bottom: var(--space-4);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 0 10h-3"/><path d="M9 17H6A5 5 0 0 1 6 7h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Plasamente Recente
+          <span class="badge badge-pending" style="margin-left: auto; margin-right: var(--space-6);">12 pending</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Specializare</th>
+                <th>Firmă</th>
+                <th>Ofertă</th>
+                <th>Status</th>
+                <th>Acțiuni</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <!-- Row 1: PENDING -->
+              <tr>
+                <td><strong>Alexandru Popescu</strong><br><span style="font-size:12px;color:var(--color-text-muted);">an III · gr. 311</span></td>
+                <td style="font-size:13px;">Calculatoare</td>
+                <td>
+                  <div class="text-truncate" title="Continental Automotive Romania SRL">Continental Automotive Romania SRL</div>
+                </td>
+                <td style="font-size:13px;">Embedded Software Intern</td>
+                <td><span class="badge badge-pending">PENDING</span></td>
+                <td>
+                  <div style="display:flex; gap:6px;">
+                    <button class="btn btn-secondary btn-sm">Confirmă</button>
+                    <button class="btn btn-sm" style="background:var(--color-error-bg);color:var(--color-error);border:1px solid var(--color-error);">Anulează</button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 2: PENDING — long text test -->
+              <tr>
+                <td><strong>Ioana-Maria Alexandrescu-Dumitrescu</strong><br><span style="font-size:12px;color:var(--color-text-muted);">an IV · gr. 412</span></td>
+                <td style="font-size:13px;">Informatică Aplicată</td>
+                <td>
+                  <div class="text-truncate" title="Siemens Industry Software Romania SRL">Siemens Industry Software Romania SRL</div>
+                </td>
+                <td style="font-size:13px; max-width:160px;">
+                  <div class="text-truncate" title="Full-Stack Web Development Internship Program 2026">Full-Stack Web Development Internship Program 2026</div>
+                </td>
+                <td><span class="badge badge-pending">PENDING</span></td>
+                <td>
+                  <div style="display:flex; gap:6px;">
+                    <button class="btn btn-secondary btn-sm">Confirmă</button>
+                    <button class="btn btn-sm" style="background:var(--color-error-bg);color:var(--color-error);border:1px solid var(--color-error);">Anulează</button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 3: CONFIRMED -->
+              <tr>
+                <td><strong>Radu Constantin</strong><br><span style="font-size:12px;color:var(--color-text-muted);">an III · gr. 321</span></td>
+                <td style="font-size:13px;">Electronică Aplicată</td>
+                <td>
+                  <div class="text-truncate">Bosch Rexroth Romania</div>
+                </td>
+                <td style="font-size:13px;">Hardware Testing Intern</td>
+                <td><span class="badge badge-confirmed">CONFIRMED</span></td>
+                <td>
+                  <span style="font-size:12px;color:var(--color-text-muted);">blocat (confirmat)</span>
+                </td>
+              </tr>
+
+              <!-- Row 4: CONFIRMED -->
+              <tr>
+                <td><strong>Elena Munteanu</strong><br><span style="font-size:12px;color:var(--color-text-muted);">an II · gr. 312</span></td>
+                <td style="font-size:13px;">Calculatoare</td>
+                <td>
+                  <div class="text-truncate">Softvision (Cognizant)</div>
+                </td>
+                <td style="font-size:13px;">React Frontend Intern</td>
+                <td><span class="badge badge-confirmed">CONFIRMED</span></td>
+                <td>
+                  <span style="font-size:12px;color:var(--color-text-muted);">blocat (confirmat)</span>
+                </td>
+              </tr>
+
+              <!-- Row 5: CANCELLED -->
+              <tr>
+                <td><strong>Mihai Georgescu</strong><br><span style="font-size:12px;color:var(--color-text-muted);">an III · gr. 331</span></td>
+                <td style="font-size:13px;">Mecatronică</td>
+                <td>
+                  <div class="text-truncate">Hella Romania</div>
+                </td>
+                <td style="font-size:13px;">Robotics Intern</td>
+                <td><span class="badge badge-cancelled">CANCELLED_BY_COMPANY</span></td>
+                <td>
+                  <button class="btn btn-secondary btn-sm">Re-alocare</button>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+        <div style="padding: var(--space-4) var(--space-6); display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--color-border);">
+          <span style="font-size:13px; color:var(--color-text-muted);">Afișând 5 din 59 plasamente</span>
+          <button class="btn btn-secondary btn-sm">Vezi toate →</button>
+        </div>
+      </div>
+
+    </div><!-- /#state-success -->
+
+  </div><!-- /.main -->
+</div><!-- /.layout -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     STĂRILE ALTERNATIVE (dezactivate vizual, doar documentație inline)
+     Copiați blocul relevant în .content pentru a testa starea.
+     ════════════════════════════════════════════════════════════════════════
+
+── STARE: EMPTY (nicio sesiune de matching rulată) ─────────────────────────
+<div class="content">
+  <div class="card">
+    <div class="state-panel">
+      <div class="state-icon-wrap empty">📭</div>
+      <div class="state-title">Niciun matching rulat încă</div>
+      <div class="state-desc">
+        Nu există plasamente pentru sesiunea curentă. Apăsați „Run Matching" pentru a porni
+        algoritmul Gale-Shapley pe preferințele curente ale studenților și firmelor.
+      </div>
+      <button class="btn btn-primary">
+        ⚡ Run Matching
+      </button>
+    </div>
+  </div>
+</div>
+
+── STARE: LOADING (matching în curs) ───────────────────────────────────────
+<div class="content">
+  <div class="card">
+    <div class="state-panel">
+      <div class="state-icon-wrap loading"><div class="spinner"></div></div>
+      <div class="state-title">Matching în curs...</div>
+      <div class="state-desc">
+        Algoritmul Gale-Shapley procesează 89 studenți și 34 oferte.
+        Vă rugăm așteptați.
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="skeleton sk-line w-1-4"></div>
+      <div class="skeleton sk-block"></div>
+      <div class="skeleton sk-line w-full"></div>
+      <div class="skeleton sk-line w-3-4"></div>
+      <div class="skeleton sk-line w-1-2"></div>
+    </div>
+  </div>
+</div>
+
+── STARE: ERROR (eroare la rularea matching-ului) ───────────────────────────
+<div class="content">
+  <div class="alert alert-error">
+    <div class="alert-icon">❌</div>
+    <div class="alert-text">
+      <div class="alert-title">Eroare la rularea matching-ului</div>
+      Server Action a eșuat: UniqueConstraintViolation la inserarea Placement #442.
+      Niciun plasament nou nu a fost salvat (tranzacție rollback complet).
+      Verificați datele de intrare și reîncercați.
+    </div>
+  </div>
+  <div class="card">
+    <div class="state-panel">
+      <div class="state-icon-wrap error">⛔</div>
+      <div class="state-title">Matching eșuat</div>
+      <div class="state-desc">
+        Plasamentele anterioare (CONFIRMED) rămân neafectate. Corectați configurația
+        (studenți fără preferințe, oferte fără locuri disponibile) și reîncercați.
+      </div>
+      <div style="display:flex;gap:12px;">
+        <button class="btn btn-secondary">Detalii eroare</button>
+        <button class="btn btn-primary">Reîncearcă</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+═══════════════════════════════════════════════════════════════════════════ -->
+
+
+<!-- Toggle Dark Mode (demo) -->
+<button class="mode-toggle" onclick="document.documentElement.classList.toggle('dark')">
+  🌙 Toggle Dark
+</button>
+
+</body>
+</html>

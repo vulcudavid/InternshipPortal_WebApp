@@ -123,3 +123,45 @@ Pentru a formaliza fluxul de lucru în Antigravity/Gemini pe baza regulilor din 
 1. `.agents/skills/plan/SKILL.md`: Guvernează faza de cercetare și planificare fără modificări în cod până la aprobarea explicită.
 2. `.agents/skills/build/SKILL.md`: Guvernează implementarea tehnică, testarea automată obligatorie, actualizarea registrului și interdicția strictă de `git push` fără acordul utilizatorului.
 
+## D-005: Politica Stărilor Plasamentelor și Acțiunea `cancelPlacementByCompany`
+
+- **Data**: 2026-11-17
+- **Status**: approved
+- **Autor**: Agent AI & David Vulcu
+
+### 1. Context
+Algoritmul Gale-Shapley produce plasamente (`Placement`) pentru perechi student-ofertă. Trebuie definit comportamentul la re-rulare și la excepții umane (retragere firmă, refuz student).
+
+### 2. Decizii Aprobate
+
+#### 2.1 Status inițial al plasamentelor: `PENDING_CONFIRMATION`
+- La prima rulare a matching-ului, toate plasamentele produse de Gale-Shapley primesc statusul **`PENDING_CONFIRMATION`**.
+- Coordonatorul Academic poate vizualiza lista și confirma individual sau în bulk.
+- Plasamentul trece la `CONFIRMED` exclusiv prin acțiunea explicită a coordonatorului.
+
+#### 2.2 Protecția plasamentelor `CONFIRMED` la re-rulare
+- La o re-rulare a matching-ului (ex: adăugare ofertă nouă sau student nou), plasamentele cu status **`CONFIRMED` nu sunt modificate, șterse sau perturbate**.
+- Re-rularea produce doar plasamente noi sau actualizări pentru perechile care nu sunt încă `CONFIRMED`.
+- Garanție: un student `CONFIRMED` nu poate fi mutat de algoritm la altă ofertă.
+
+#### 2.3 Acțiunea separată `cancelPlacementByCompany`
+- Firma (tutore) poate apela acțiunea **`cancelPlacementByCompany(placementId)`** pentru a retrage un plasament `PENDING_CONFIRMATION` sau `CONFIRMED`.
+- Acțiunea **nu re-rulează automat** algoritmul; ea marchează plasamentul ca `CANCELLED_BY_COMPANY` și eliberează locul.
+- Coordonatorul este notificat (in-app) și decide dacă inițiază o realocare minimală manuală sau o re-rulare parțială.
+- Un student al cărui plasament a fost anulat de firmă revine la statusul „neplasat" și devine eligibil pentru re-alocare.
+
+### 3. Enum `PlacementStatus` (Prisma)
+```prisma
+enum PlacementStatus {
+  PENDING_CONFIRMATION   // Generat de algoritm, neconfirmat încă
+  CONFIRMED              // Aprobat explicit de coordonator
+  CANCELLED_BY_STUDENT   // Studentul a refuzat locul
+  CANCELLED_BY_COMPANY   // Firma a retras oferta/plasamentul
+  CANCELLED_BY_COORDINATOR // Excepție administrativă
+}
+```
+
+### 4. Consecințe
+- Dashboard-ul Coordonator filtrează plasamentele pe status și permite acțiuni bulk de confirmare.
+- Firma vede statusul plasamentului pentru ofertele sale, dar nu poate confirma — doar anula.
+- Studentul vede statusul plasamentului său în read-only.
