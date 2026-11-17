@@ -11,16 +11,24 @@ import { PreferencesManager, PreferenceItem } from "./preferences-manager";
 import { 
   GraduationCap, 
   Sparkles, 
-  UserCheck, 
-  Code2, 
   Compass, 
   ListOrdered, 
+  User, 
   FileText, 
   BookOpen, 
   Calendar, 
   Users, 
   CheckCircle2, 
-  ShieldCheck 
+  ShieldCheck,
+  Edit3,
+  ExternalLink,
+  Globe,
+  Code2,
+  Phone,
+  Mail,
+  Tag as TagIcon,
+  Check,
+  ArrowRight
 } from "lucide-react";
 
 interface StudentDashboardProps {
@@ -74,7 +82,11 @@ export function StudentDashboard({
   offers,
   preferences,
 }: StudentDashboardProps) {
-  const [activeTab, setActiveTab] = useState<"profile" | "offers" | "preferences">("profile");
+  // 1. Implicit se deschide tabul de OFERTE DE PRACTICĂ (conform cerinței utilizatorului)
+  const [activeTab, setActiveTab] = useState<"offers" | "preferences" | "profile">("offers");
+  
+  // Stare pentru editare profil (implicit este în mod VIZUALIZARE curat)
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   // Formatare competențe pentru sub-componente
   const currentSkills = profile.tags.map((t) => ({
@@ -90,157 +102,171 @@ export function StudentDashboard({
     return acc;
   }, {});
 
+  const getProficiencyBadge = (level: ProficiencyLevel) => {
+    switch (level) {
+      case "ADVANCED":
+        return "bg-emerald-50 text-emerald-700 border-emerald-200";
+      case "INTERMEDIATE":
+        return "bg-blue-50 text-blue-700 border-blue-200";
+      default:
+        return "bg-slate-100 text-slate-600 border-slate-200";
+    }
+  };
+
+  const getProficiencyLabel = (level: ProficiencyLevel) => {
+    switch (level) {
+      case "ADVANCED":
+        return "Avansat";
+      case "INTERMEDIATE":
+        return "Intermediar";
+      default:
+        return "Începător";
+    }
+  };
+
   return (
-    <div className="space-y-8 animate-fadeIn">
-      {/* 1. Antet Social & Academic al Studentului */}
-      <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-lg space-y-6">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="flex items-center gap-5">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center font-bold text-3xl shadow-inner shrink-0">
-              <GraduationCap className="w-10 h-10 text-white" />
+    <div className="space-y-6">
+      {/* Antet Odihnitor și Elegant */}
+      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 rounded-3xl p-6 sm:p-7 text-white shadow-md relative overflow-hidden">
+        {/* Glow de fundal subtil */}
+        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute left-1/3 -top-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-4 sm:gap-5">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-2xl shadow-inner shrink-0">
+              {user.firstName.charAt(0)}{user.lastName.charAt(0)}
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-2">
-                {/* Badge Oficial Specializare ULBS */}
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-500/30 backdrop-blur border border-blue-400/40 text-blue-100">
-                  <BookOpen className="w-3.5 h-3.5" />
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/10 backdrop-blur border border-white/15 text-blue-200">
+                  <BookOpen className="w-3 h-3" />
                   {profile.specialization}
                 </span>
 
-                {/* Badge An de Studiu */}
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/30 backdrop-blur border border-indigo-400/40 text-indigo-100">
-                  <Calendar className="w-3.5 h-3.5" />
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/10 backdrop-blur border border-white/15 text-indigo-200">
+                  <Calendar className="w-3 h-3" />
                   Anul {profile.studyYear}
                 </span>
 
-                {/* Badge Grupa */}
                 {profile.group && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-white/10 backdrop-blur border border-white/20 text-white">
-                    <Users className="w-3 h-3" />
-                    {profile.group}
+                  <span className="text-[11px] text-slate-300 font-medium px-2 py-0.5 bg-white/5 rounded-full">
+                    Grupa {profile.group}
                   </span>
                 )}
               </div>
 
-              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
                 {user.firstName} {user.lastName}
-              </h2>
+              </h1>
 
-              <p className="text-xs sm:text-sm text-blue-100 max-w-xl">
-                {profile.headline || "Completează headline-ul profesional în secțiunea de editare profil."}
-              </p>
+              {profile.headline ? (
+                <p className="text-xs text-blue-200/90 italic max-w-xl line-clamp-1">
+                  &ldquo;{profile.headline}&rdquo;
+                </p>
+              ) : (
+                <p className="text-xs text-slate-400">
+                  Completează-ți profilul pentru un scor de compatibilitate optimizat.
+                </p>
+              )}
             </div>
           </div>
 
-          {/* Quick Stats Banner */}
-          <div className="flex flex-wrap md:flex-col gap-2.5 shrink-0 w-full md:w-auto">
-            <div className="px-4 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/15 flex items-center justify-between gap-3 text-xs">
-              <span className="text-blue-200">Domeniu Inginerie:</span>
-              <span className="font-bold text-white text-right">
-                {DOMAIN_LABELS[profile.domain]}
+          {/* Quick Metrics */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="px-3.5 py-2 rounded-2xl bg-white/10 backdrop-blur border border-white/10 text-center">
+              <span className="text-[10px] uppercase tracking-wider text-slate-300 block font-semibold">
+                Competențe
+              </span>
+              <span className="text-sm font-extrabold text-white">
+                {profile.tags.length}
               </span>
             </div>
 
-            <div className="px-4 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/15 flex items-center justify-between gap-3 text-xs">
-              <span className="text-blue-200">Preferințe Gale-Shapley:</span>
-              <span className="font-bold text-emerald-300">
+            <div className="px-3.5 py-2 rounded-2xl bg-white/10 backdrop-blur border border-white/10 text-center">
+              <span className="text-[10px] uppercase tracking-wider text-slate-300 block font-semibold">
+                Preferințe
+              </span>
+              <span className="text-sm font-extrabold text-emerald-300">
                 {preferences.length} alese
               </span>
             </div>
 
-            <div className="px-4 py-2 rounded-xl bg-white/10 backdrop-blur border border-white/15 flex items-center justify-between gap-3 text-xs">
-              <span className="text-blue-200">Status CV:</span>
-              <span className={`font-bold ${profile.cvUrl ? "text-emerald-300" : "text-amber-300"}`}>
-                {profile.cvUrl ? "Încărcat & Protejat" : "Neîncărcat"}
+            <div className="px-3.5 py-2 rounded-2xl bg-white/10 backdrop-blur border border-white/10 text-center">
+              <span className="text-[10px] uppercase tracking-wider text-slate-300 block font-semibold">
+                CV
+              </span>
+              <span className={`text-xs font-bold block ${profile.cvUrl ? "text-emerald-300" : "text-amber-300"}`}>
+                {profile.cvUrl ? "Activ" : "Lipsă"}
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. Meniu de Navigare Taburi */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
+      {/* Bară Navigare Taburi - Eye Friendly */}
+      <div className="flex bg-slate-200/70 p-1.5 rounded-2xl gap-1 overflow-x-auto">
+        {/* TAB 1: OFERTE (IMPLICIT) */}
         <button
           type="button"
-          onClick={() => setActiveTab("profile")}
-          className={`px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 ${
-            activeTab === "profile"
-              ? "bg-blue-600 text-white shadow-sm"
-              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-          }`}
-        >
-          <UserCheck className="w-4 h-4" />
-          <span>Profil, Competențe & CV</span>
-          <span className="px-1.5 py-0.2 bg-white/20 rounded-md text-[10px]">
-            {profile.tags.length}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("offers")}
-          className={`px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 ${
+          onClick={() => {
+            setActiveTab("offers");
+            setIsEditingProfile(false);
+          }}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             activeTab === "offers"
-              ? "bg-blue-600 text-white shadow-sm"
-              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+              ? "bg-white text-blue-700 shadow-sm"
+              : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
           }`}
         >
           <Compass className="w-4 h-4" />
-          <span>Explorare Oferte</span>
-          <span className="px-1.5 py-0.2 bg-white/20 rounded-md text-[10px]">
+          <span>Oferte de Practică Recomandate</span>
+          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">
             {offers.length}
           </span>
         </button>
 
+        {/* TAB 2: PREFERINȚE */}
         <button
           type="button"
-          onClick={() => setActiveTab("preferences")}
-          className={`px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 ${
+          onClick={() => {
+            setActiveTab("preferences");
+            setIsEditingProfile(false);
+          }}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             activeTab === "preferences"
-              ? "bg-purple-600 text-white shadow-sm"
-              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+              ? "bg-white text-purple-700 shadow-sm"
+              : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
           }`}
         >
           <ListOrdered className="w-4 h-4" />
           <span>Preferințele Mele Gale-Shapley</span>
-          <span className="px-1.5 py-0.2 bg-white/20 rounded-md text-[10px]">
-            {preferences.length}
-          </span>
+          {preferences.length > 0 && (
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-700">
+              {preferences.length}
+            </span>
+          )}
+        </button>
+
+        {/* TAB 3: PROFILUL MEU */}
+        <button
+          type="button"
+          onClick={() => setActiveTab("profile")}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            activeTab === "profile"
+              ? "bg-white text-indigo-700 shadow-sm"
+              : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+          }`}
+        >
+          <User className="w-4 h-4" />
+          <span>Profilul Meu & CV</span>
         </button>
       </div>
 
-      {/* 3. Conținut Tab Activ */}
-      {activeTab === "profile" && (
-        <div className="space-y-8">
-          <ProfileEditor
-            initialData={{
-              specialization: profile.specialization,
-              studyYear: profile.studyYear,
-              group: profile.group,
-              headline: profile.headline,
-              bio: profile.bio,
-              phone: profile.phone,
-              githubUrl: profile.githubUrl,
-              linkedinUrl: profile.linkedinUrl,
-              portfolioUrl: profile.portfolioUrl,
-              availableFrom: profile.availableFrom,
-              availableTo: profile.availableTo,
-            }}
-          />
+      {/* CONȚINUT TAB ACTIV */}
 
-          <TagSelector
-            availableTags={availableTags}
-            currentSkills={currentSkills}
-          />
-
-          <CvManager
-            studentProfileId={profile.id}
-            initialCvUrl={profile.cvUrl}
-          />
-        </div>
-      )}
-
+      {/* TAB 1: EXPLORARE OFERTE (IMPLICIT) */}
       {activeTab === "offers" && (
         <OffersExplorer
           offers={offers}
@@ -248,11 +274,265 @@ export function StudentDashboard({
           studentSkills={currentSkills}
           preferredOfferIds={preferredOfferIds}
           preferencesRankMap={preferencesRankMap}
+          currentStudentId={profile.id}
         />
       )}
 
+      {/* TAB 2: PREFERINȚE GALE-SHAPLEY */}
       {activeTab === "preferences" && (
         <PreferencesManager preferences={preferences} />
+      )}
+
+      {/* TAB 3: PROFILUL MEU (VIZUALIZARE CURATĂ + BUTON EDITARE) */}
+      {activeTab === "profile" && (
+        <div className="space-y-6">
+          {/* Header Profil cu buton de comutare Editare */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <User className="w-5 h-5 text-indigo-600" />
+                {isEditingProfile ? "Editare Profil & Competențe" : "Profilul Tău Profesional & Academic"}
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {isEditingProfile
+                  ? "Modifică informațiile academice, bio, link-urile sociale, catalogul de competențe și CV-ul tău."
+                  : "Așa este vizualizat profilul tău în platformă. Firmele la care aplici vor vedea aceste date."}
+              </p>
+            </div>
+
+            <button
+              onClick={() => setIsEditingProfile(!isEditingProfile)}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-sm ${
+                isEditingProfile
+                  ? "bg-slate-800 hover:bg-slate-900 text-white"
+                  : "bg-indigo-600 hover:bg-indigo-700 text-white"
+              }`}
+            >
+              {isEditingProfile ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  <span>Vezi Profilul Salvat</span>
+                </>
+              ) : (
+                <>
+                  <Edit3 className="w-4 h-4" />
+                  <span>Editează Profilul & Competențele</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* VIZUALIZARE PROFIL (CURATĂ, FĂRĂ FORMULARE ÎNCĂRCATE) */}
+          {!isEditingProfile && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Coloana 1: Date Personale & Social */}
+              <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-5">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Informații Contact & Social
+                </h3>
+
+                <div className="space-y-3 text-xs">
+                  <div className="flex items-center gap-2 text-slate-700">
+                    <Mail className="w-4 h-4 text-slate-400 shrink-0" />
+                    <span className="truncate">{user.email}</span>
+                  </div>
+
+                  {profile.phone ? (
+                    <div className="flex items-center gap-2 text-slate-700">
+                      <Phone className="w-4 h-4 text-slate-400 shrink-0" />
+                      <span>{profile.phone}</span>
+                    </div>
+                  ) : (
+                    <div className="text-slate-400 italic">Fără telefon adăugat</div>
+                  )}
+
+                  {profile.githubUrl && (
+                    <div className="flex items-center gap-2">
+                      <Code2 className="w-4 h-4 text-slate-600 shrink-0" />
+                      <a
+                        href={profile.githubUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-blue-600 hover:underline truncate"
+                      >
+                        {profile.githubUrl.replace("https://", "")}
+                      </a>
+                    </div>
+                  )}
+
+                  {profile.linkedinUrl && (
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-blue-600 shrink-0" />
+                      <a
+                        href={profile.linkedinUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-blue-600 hover:underline truncate"
+                      >
+                        {profile.linkedinUrl.replace("https://", "")}
+                      </a>
+                    </div>
+                  )}
+
+                  {profile.portfolioUrl && (
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-slate-500 shrink-0" />
+                      <a
+                        href={profile.portfolioUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-blue-600 hover:underline truncate"
+                      >
+                        {profile.portfolioUrl.replace("https://", "")}
+                      </a>
+                    </div>
+                  )}
+                </div>
+
+                {/* CV Status Card */}
+                <div className="pt-4 border-t border-slate-100">
+                  <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-2">
+                    Fișier CV (PDF)
+                  </span>
+
+                  {profile.cvUrl ? (
+                    <div className="p-3 bg-emerald-50/60 border border-emerald-200 rounded-xl space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                          <FileText className="w-4 h-4 text-emerald-600" />
+                          CV Încărcat
+                        </span>
+                        <span className="text-[10px] text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full font-semibold">
+                          Protejat GDPR
+                        </span>
+                      </div>
+                      <a
+                        href={profile.cvUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 hover:underline"
+                      >
+                        <span>Deschide CV-ul tău</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                      <p className="text-xs text-slate-500 mb-2">Nu ai încărcat niciun CV.</p>
+                      <button
+                        onClick={() => setIsEditingProfile(true)}
+                        className="text-xs font-bold text-indigo-600 hover:underline"
+                      >
+                        Încarcă CV acum
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Coloana 2 & 3: Bio & Competențe Declarate */}
+              <div className="md:col-span-2 space-y-6">
+                {/* Despre Mine / Bio */}
+                <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-3">
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                    Despre Mine & Obiective
+                  </h3>
+                  {profile.bio ? (
+                    <p className="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+                      {profile.bio}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-slate-400 italic">
+                      Nu ai adăugat încă o descriere bio. Apasă pe &ldquo;Editează Profilul&rdquo; pentru a scrie despre interesele tale inginerești.
+                    </p>
+                  )}
+                </div>
+
+                {/* Competențe Tehnice (Tag-uri cu nivel) */}
+                <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                        Competențe Inginerești ({profile.tags.length})
+                      </h3>
+                      <p className="text-[11px] text-slate-500">
+                        Aceste tag-uri determină scorul de compatibilitate la ofertele de practică.
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => setIsEditingProfile(true)}
+                      className="text-xs font-bold text-indigo-600 hover:underline inline-flex items-center gap-1"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span>Modifică</span>
+                    </button>
+                  </div>
+
+                  {profile.tags.length === 0 ? (
+                    <div className="p-6 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-center">
+                      <p className="text-xs text-slate-500 mb-2">Nu ai adăugat încă nicio competență.</p>
+                      <button
+                        onClick={() => setIsEditingProfile(true)}
+                        className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold shadow-xs"
+                      >
+                        Alege competențe din catalog
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {profile.tags.map((st) => (
+                        <div
+                          key={st.tagId}
+                          className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold ${getProficiencyBadge(
+                            st.proficiency
+                          )}`}
+                        >
+                          <TagIcon className="w-3 h-3 opacity-60" />
+                          <span>{st.tag.name}</span>
+                          <span className="text-[10px] font-bold opacity-75 border-l border-current/20 pl-1.5">
+                            {getProficiencyLabel(st.proficiency)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* FORMULARE DE EDITARE (DESCHISE DOAR DACĂ UTILIZATORUL APASĂ EDITARE) */}
+          {isEditingProfile && (
+            <div className="space-y-8 animate-in fade-in duration-150">
+              <ProfileEditor
+                initialData={{
+                  specialization: profile.specialization,
+                  studyYear: profile.studyYear,
+                  group: profile.group,
+                  headline: profile.headline,
+                  bio: profile.bio,
+                  phone: profile.phone,
+                  githubUrl: profile.githubUrl,
+                  linkedinUrl: profile.linkedinUrl,
+                  portfolioUrl: profile.portfolioUrl,
+                  availableFrom: profile.availableFrom,
+                  availableTo: profile.availableTo,
+                }}
+              />
+
+              <TagSelector
+                availableTags={availableTags}
+                currentSkills={currentSkills}
+              />
+
+              <CvManager
+                studentProfileId={profile.id}
+                initialCvUrl={profile.cvUrl}
+              />
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

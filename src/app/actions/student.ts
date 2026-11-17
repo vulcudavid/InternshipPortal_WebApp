@@ -315,3 +315,71 @@ export async function reorderStudentPreferences(orderedPreferenceIds: string[]) 
   revalidatePath("/");
   return { success: true };
 }
+
+/**
+ * 8. Rezervare slot de interviu de către student
+ */
+export async function bookInterviewSlot(slotId: string) {
+  const { profile } = await requireStudentProfile();
+
+  const slot = await prisma.interviewSlot.findUnique({
+    where: { id: slotId },
+  });
+
+  if (!slot) {
+    throw new Error("Slotul de interviu nu a fost găsit.");
+  }
+
+  if (slot.isBooked) {
+    throw new Error("Acest slot de interviu a fost deja rezervat.");
+  }
+
+  // Verifică dacă studentul are deja un alt slot rezervat pentru aceeași ofertă
+  const existingBooking = await prisma.interviewSlot.findFirst({
+    where: {
+      offerId: slot.offerId,
+      studentId: profile.id,
+    },
+  });
+
+  if (existingBooking) {
+    throw new Error("Ai deja un slot de interviu programat pentru această ofertă.");
+  }
+
+  await prisma.interviewSlot.update({
+    where: { id: slotId },
+    data: {
+      studentId: profile.id,
+      isBooked: true,
+    },
+  });
+
+  revalidatePath("/");
+  return { success: true };
+}
+
+/**
+ * 9. Anulare rezervare slot de interviu de către student
+ */
+export async function cancelInterviewBooking(slotId: string) {
+  const { profile } = await requireStudentProfile();
+
+  const slot = await prisma.interviewSlot.findUnique({
+    where: { id: slotId },
+  });
+
+  if (!slot || slot.studentId !== profile.id) {
+    throw new Error("Nu ai nicio rezervare activă pe acest slot de interviu.");
+  }
+
+  await prisma.interviewSlot.update({
+    where: { id: slotId },
+    data: {
+      studentId: null,
+      isBooked: false,
+    },
+  });
+
+  revalidatePath("/");
+  return { success: true };
+}

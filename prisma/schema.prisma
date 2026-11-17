@@ -234,6 +234,7 @@ model CompanyApplicantRank {
   updatedAt DateTime          @updatedAt @map("updated_at")
 
   @@unique([offerId, studentId])
+  @@unique([offerId, rank])
   @@map("company_applicant_ranks")
 }
 

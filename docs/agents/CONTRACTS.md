@@ -14,7 +14,7 @@ Acest document descrie schema bazei de date, taxonomiile și contractele de secu
 | `OfferTag` | `offer_tags` | Asociere N:M ofertă - tag cu obligativitate | UNIQUE(`offerId`, `tagId`), `isRequired`, `weight` |
 | `InternshipOffer` | `internship_offers` | Oferte de practică propuse de companii | FK `companyId`, `slotsTotal`, `slotsAvailable`, `status` |
 | `StudentPreference` | `student_preferences` | Lista ordonată de preferințe ale studentului | UNIQUE(`studentId`, `offerId`), UNIQUE(`studentId`, `rank`) |
-| `CompanyApplicantRank` | `company_applicant_ranks` | Clasamentul aplicanților stabilit de firmă | UNIQUE(`offerId`, `studentId`), `rank`, `status` |
+| `CompanyApplicantRank` | `company_applicant_ranks` | Clasamentul aplicanților stabilit de firmă | UNIQUE(`offerId`, `studentId`), UNIQUE(`offerId`, `rank`), `status` |
 | `Placement` | `placements` | Rezultatul stabil al algoritmului de matching | `studentId` UNIQUE (max 1 loc/student), FK `offerId`, status |
 | `InternshipConvention` | `internship_conventions` | Convenții de practică generate ca PDF | `placementId` UNIQUE, `conventionNumber` UNIQUE, `prefilledData` (JSONB) |
 | `WorkLog` | `work_logs` | Jurnal / pontaj săptămânal ore de practică | FK `placementId`, `date`, `hoursWorked`, `status`, validare tutore |
@@ -65,23 +65,31 @@ Tag-urile pot fi marcate ca:
 - `isPredefined = true`: Tag-uri standard din nomenclatorul facultății.
 - `isPredefined = false`: Custom tags adăugate de studenți sau firme.
 
-## 4. Contractul de Confidențialitate (CV Privacy Gate)
+## 4. Contractul de Confidențialitate (GDPR Privacy Gate)
 
-**Regulă de securitate**: *CV-ul detaliat (`cvUrl`) și datele de contact directe (telefon, adresă) ale unui student sunt accesibile reprezentanților companiei **DOAR DACĂ** studentul a aplicat explicit la poziția respectivă.*
+**Regulă de securitate strictă**: *CV-ul detaliat (`cvUrl`) și datele de contact directe (telefon) ale unui student sunt accesibile reprezentanților companiei **EXCLUSIV DACĂ** studentul a adăugat cel puțin o ofertă a acelei companii în preferințele sale (`StudentPreference`). Dacă studentul nu a aplicat / nu a inclus oferta în preferințe, CV-ul și datele de contact sunt strict blocate și anonimizate.*
 
-Interfață de verificare (în `src/lib/permissions.ts`):
+Interfață de verificare (în `src/lib/privacy.ts`):
 ```typescript
-export async function canCompanyViewStudentCv(
-  companyUserId: string,
+export async function canCompanyAccessStudentCv(
+  companyProfileId: string,
   studentId: string,
-  offerId?: string
+  targetOfferId?: string
 ): Promise<boolean> {
-  // 1. Găsește compania asociată user-ului curent
-  // 2. Verifică dacă există cel puțin o înregistrare în StudentPreference sau CompanyApplicantRank
-  //    prin care studentul a aplicat la o ofertă deținută de această companie.
-  // 3. Returnează true doar dacă există o aplicație activă.
+  // 1. Verifică dacă există cel puțin o înregistrare în StudentPreference
+  //    prin care studentul a selectat o ofertă deținută de această companie.
+  // 2. Returnează true doar dacă există o preferință activă exprimată de student.
+}
+
+export function sanitizeStudentProfileForCompany<T>(
+  studentProfile: T,
+  canAccessDetails: boolean
+): T {
+  // Maschează cvUrl și phone cu null când canAccessDetails este false
 }
 ```
+
+Endpoint descărcare securizată: `GET /api/cv/[studentId]` (returnează HTTP 403 Forbidden dacă Privacy Gate nu este îndeplinit).
 
 ## 5. Motorul de Recomandare & Scor de Compatibilitate
 
@@ -97,3 +105,26 @@ Unde:
 - $T_{opt}$ sunt tag-urile opționale (`isRequired: false`).
 - $T_{stud}$ sunt tag-urile din profilul studentului (ponderate opțional după nivelul de competență).
 - $DomainMatch$ este $1.0$ dacă domeniul de studiu corespunde categoriei ofertei, altfel $0.0$.
+
+## 6. Contracte Server Actions - Modul Firmă & Interviuri (Partea 1B)
+
+### 6.1 Gestiune Profil Companie (`src/app/actions/company.ts`)
+- `updateCompanyProfile(data)`: validare câmpuri obligatorii, unicitate CUI/CIF, salvare date juridice și date contact tutore.
+
+### 6.2 Gestiune Oferte de Practică & Competențe
+- `upsertInternshipOffer(data)`: creare sau editare ofertă, sincronizare atomică N:M `OfferTag` (tagId, isRequired, weight).
+- `toggleOfferStatus(offerId)`: comutare status între `ACTIVE` și `CLOSED`.
+- `deleteOffer(offerId)`: ștergere ofertă nealocată.
+
+### 6.3 Clasament Aplicanți Gale-Shapley (`CompanyApplicantRank`)
+- Constrângere DB: `@@unique([offerId, rank])` și `@@unique([offerId, studentId])`.
+- `rankApplicant(offerId, studentId)`: adăugare candidat la finalul clasamentului (`rank = max + 1`).
+- `reorderCompanyApplicantRanks(offerId, orderedRankIds)`: reordonare tranzacțională în 2 pași cu ranguri negative temporare pentru prevenirea coliziunilor de cheie unică.
+- `removeCompanyApplicantRank(rankId)`: ștergere și compactare 1..N.
+
+### 6.4 Programare & Rezervare Interviuri (`InterviewSlot`)
+- `createInterviewSlot(offerId, startTime, endTime, meetingLink)`: creare interval orar de interviu de către tutore.
+- `deleteInterviewSlot(slotId)`: ștergere slot.
+- `bookInterviewSlot(slotId)` (`src/app/actions/student.ts`): rezervare slot de către un student care are oferta în preferințe.
+- `cancelInterviewBooking(slotId)`: eliberare slot.
+

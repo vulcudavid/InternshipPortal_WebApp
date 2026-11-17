@@ -105,32 +105,46 @@ export function AuthCard() {
             </button>
 
             {/* Quick Demo Logins */}
-            <div className="pt-4 border-t border-slate-100">
-              <p className="text-xs text-slate-500 font-medium mb-2 flex items-center gap-1">
+            <div className="pt-4 border-t border-slate-100 space-y-2.5">
+              <p className="text-xs text-slate-500 font-semibold flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                Conturi demo preconfigurate (1-click):
+                <span>Acces rapid demo (1-click):</span>
               </p>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => handleQuickFill("alexandru.radu@student.ulbsibiu.ro", "demo_hash_student")}
-                  className="px-2 py-1.5 bg-slate-50 hover:bg-blue-50 border border-slate-200 text-slate-700 hover:text-blue-700 rounded-lg text-xs font-medium text-center transition"
+                  className="p-2.5 bg-blue-50/50 hover:bg-blue-100/70 border border-blue-200/80 text-blue-900 rounded-xl text-xs font-semibold text-left transition flex items-center gap-2 group shadow-2xs"
                 >
-                  Student
+                  <GraduationCap className="w-4 h-4 text-blue-600 group-hover:scale-110 transition shrink-0" />
+                  <div className="truncate">
+                    <span className="block font-bold">Student</span>
+                    <span className="text-[10px] text-blue-600 truncate block">Alexandru (CTI)</span>
+                  </div>
                 </button>
+
                 <button
                   type="button"
                   onClick={() => handleQuickFill("recruitment@continental-sibiu.com", "demo_hash_company")}
-                  className="px-2 py-1.5 bg-slate-50 hover:bg-blue-50 border border-slate-200 text-slate-700 hover:text-blue-700 rounded-lg text-xs font-medium text-center transition"
+                  className="p-2.5 bg-indigo-50/50 hover:bg-indigo-100/70 border border-indigo-200/80 text-indigo-900 rounded-xl text-xs font-semibold text-left transition flex items-center gap-2 group shadow-2xs"
                 >
-                  Firmă (Tutor)
+                  <Building2 className="w-4 h-4 text-indigo-600 group-hover:scale-110 transition shrink-0" />
+                  <div className="truncate">
+                    <span className="block font-bold">Firmă Parteneră</span>
+                    <span className="text-[10px] text-indigo-600 truncate block">Continental</span>
+                  </div>
                 </button>
+
                 <button
                   type="button"
                   onClick={() => handleQuickFill("coordonator.practica@ulbsibiu.ro", "demo_hash_coordonator")}
-                  className="px-2 py-1.5 bg-slate-50 hover:bg-blue-50 border border-slate-200 text-slate-700 hover:text-blue-700 rounded-lg text-xs font-medium text-center transition"
+                  className="p-2.5 bg-purple-50/50 hover:bg-purple-100/70 border border-purple-200/80 text-purple-900 rounded-xl text-xs font-semibold text-left transition flex items-center gap-2 group shadow-2xs"
                 >
-                  Coordonator
+                  <ShieldCheck className="w-4 h-4 text-purple-600 group-hover:scale-110 transition shrink-0" />
+                  <div className="truncate">
+                    <span className="block font-bold">Coordonator</span>
+                    <span className="text-[10px] text-purple-600 truncate block">Facultate ULBS</span>
+                  </div>
                 </button>
               </div>
             </div>

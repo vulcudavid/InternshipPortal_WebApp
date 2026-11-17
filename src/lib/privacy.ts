@@ -1,12 +1,14 @@
 import { prisma } from "@/lib/prisma";
 
 /**
- * Verifică dacă o companie are permisiunea legală de a accesa CV-ul complet
- * și datele de contact directe ale unui student.
+ * Verifică dacă o companie are permisiunea legală (GDPR / Privacy Gate)
+ * de a accesa CV-ul complet și datele de contact directe ale unui student.
  * 
- * REGULĂ DE SECURITATE (P14):
- * CV-ul detaliat este accesibil companiei DOAR DACĂ studentul a aplicat
- * (sau este clasat) la cel puțin o poziție deschisă a companiei respective.
+ * REGULĂ DE SECURITATE STRICTĂ (P14):
+ * O firmă poate accesa CV-ul și datele de contact ale unui student EXCLUSIV
+ * dacă studentul a adăugat cel puțin o ofertă a acelei companii în preferințele sale
+ * (StudentPreference). Dacă studentul nu a aplicat / nu a adăugat oferta în preferințe,
+ * accesul este strict interzis.
  */
 export async function canCompanyAccessStudentCv(
   companyProfileId: string,
@@ -14,20 +16,7 @@ export async function canCompanyAccessStudentCv(
   targetOfferId?: string
 ): Promise<boolean> {
   if (targetOfferId) {
-    // Verifică aplicarea la o ofertă specifică
-    const application = await prisma.companyApplicantRank.findFirst({
-      where: {
-        offerId: targetOfferId,
-        studentId: studentId,
-        offer: {
-          companyId: companyProfileId,
-        },
-      },
-    });
-
-    if (application) return true;
-
-    // Verifică și în preferințele studentului
+    // Verifică dacă studentul a inclus oferta specifică în preferințele sale
     const preference = await prisma.studentPreference.findFirst({
       where: {
         offerId: targetOfferId,
@@ -41,32 +30,17 @@ export async function canCompanyAccessStudentCv(
     return !!preference;
   }
 
-  // Verifică dacă a aplicat la oricare dintre ofertele acestei companii
-  const companyOfferIds = await prisma.internshipOffer.findMany({
-    where: { companyId: companyProfileId },
-    select: { id: true },
-  });
-
-  const offerIds = companyOfferIds.map((o) => o.id);
-  if (offerIds.length === 0) return false;
-
-  const hasApplicantRank = await prisma.companyApplicantRank.findFirst({
+  // Verifică dacă studentul a adăugat oricare dintre ofertele acestei companii în preferințe
+  const preference = await prisma.studentPreference.findFirst({
     where: {
-      offerId: { in: offerIds },
       studentId: studentId,
+      offer: {
+        companyId: companyProfileId,
+      },
     },
   });
 
-  if (hasApplicantRank) return true;
-
-  const hasPreference = await prisma.studentPreference.findFirst({
-    where: {
-      offerId: { in: offerIds },
-      studentId: studentId,
-    },
-  });
-
-  return !!hasPreference;
+  return !!preference;
 }
 
 /**
