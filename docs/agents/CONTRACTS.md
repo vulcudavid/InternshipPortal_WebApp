@@ -128,3 +128,26 @@ Unde:
 - `bookInterviewSlot(slotId)` (`src/app/actions/student.ts`): rezervare slot de către un student care are oferta în preferințe.
 - `cancelInterviewBooking(slotId)`: eliberare slot.
 
+## 7. Contracte Server Actions - Modul Student (`src/app/actions/student.ts`)
+
+### 7.1 Profil Academic & Social
+- `updateStudentProfile(data)`: Salvare headline, bio, telefon, link-uri GitHub, LinkedIn, portofoliu și selecție specializare ULBS.
+- `updateStudentTags(tags)`: Sincronizare N:M în `student_tags` cu nivel de competență (BEGINNER, INTERMEDIATE, ADVANCED).
+
+### 7.2 Gestiune CV
+- `uploadCvFile(formData)`: Încărcare fișier PDF (max 10MB), stocare securizată pe disc și înregistrare `cvUrl`.
+
+### 7.3 Preferințe Ordonate Gale-Shapley (`StudentPreference`)
+- Constrângere DB: `@@unique([studentId, offerId])` și `@@unique([studentId, rank])`.
+- `addStudentPreference(offerId)`: Adăugare ofertă în preferințe la rangul `max + 1`.
+- `reorderStudentPreferences(orderedPreferenceIds)`: Reordonare tranzacțională în 2 pași cu ranguri negative temporare pentru prevenirea coliziunilor de cheie unică.
+- `removeStudentPreference(preferenceId)`: Ștergere și compactare 1..N a rangurilor rămase.
+
+### 7.4 Rezervare Interviuri
+- `bookInterviewSlot(slotId)`: Rezervare slot liber de către un student care a inclus oferta în preferințe.
+- `cancelInterviewBooking(slotId)`: Anulare rezervare proprie.
+
+## 8. Guvernanță & Skill-uri de Lucru (`.agents/skills/`)
+- `/plan` ([.agents/skills/plan/SKILL.md](../../.agents/skills/plan/SKILL.md)): Ghid de cercetare și elaborare a planului tehnic de implementare înaintea modificării de cod, cu respectarea strictă a regulilor din `AGENTS.md`.
+- `/build` ([.agents/skills/build/SKILL.md](../../.agents/skills/build/SKILL.md)): Ghid de execuție a planurilor aprobate, dezvoltare modulară, rulare teste automate (`privacy.test.ts`, `matching.test.ts`), linting registru (`ledger-lint.py`) și verificare build Next.js.
+

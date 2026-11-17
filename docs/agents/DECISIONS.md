@@ -75,3 +75,51 @@ Pentru proiectul P14, interacțiunea dintre studenți și companii este conceput
 3. **Restricția de Acces la CV (Privacy Gate)**:
    - Verificare la nivel de Server Action / API Route / Data Access Layer:
      - Accesul la `cvUrl` este permis exclusiv dacă există o înregistrare în `CompanyApplicantRank` / `Application` cu status activ asociată studentului și ofertei deținute de firmă.
+
+
+## ADR-003: Constrângerea de Unicitate pe Clasamentul Firmei (CompanyApplicantRank) și Pattern-ul Tranzacțional cu Ranguri Negative Temporare
+
+- **Data**: 2026-11-17
+- **Status**: approved
+- **Autor**: Agent AI & David Vulcu
+
+### 1. Context și Cerințe
+Algoritmul de matching Gale-Shapley (Many-to-One) necesită din partea fiecărei companii o listă strict ordonată a preferințelor pentru candidații săi (Locul 1, Locul 2, ...).
+Pentru a asigura integritatea datelor în PostgreSQL:
+- Fiecare aplicant ierarhizat pentru o ofertă trebuie să aibă un rang unic pozitiv (1..N).
+- Schema Prisma a fost actualizată cu `@@unique([offerId, rank])` pe modelul `CompanyApplicantRank`.
+
+### 2. Problema Tehnică a Reordonării
+La actualizarea ordinii elementelor într-un tabel cu constrângere de unicitate (ex: mutarea elementului de pe rangul 2 pe rangul 1), modificarea directă produce o eroare `UniqueConstraintViolation` dacă rangul țintă este deja ocupat de o altă înregistrare înainte ca aceasta să fie actualizată.
+
+### 3. Decizia Adoptată: Pattern Tranzacțional în 2 Pași cu Ranguri Negative Temporare
+Pentru orice reordonare a candidaților (`reorderCompanyApplicantRanks`) sau a preferințelor studenților (`reorderStudentPreferences`), operațiunea este executată într-o tranzacție atomică `prisma.$transaction`:
+1. **Pasul 1 (Ranguri negative)**: Toate înregistrările afectate primesc temporar ranguri negative: `rank = -(i + 1)`. Astfel, se eliberează toate rangurile pozitive fără a genera coliziuni.
+2. **Pasul 2 (Ranguri finale pozitive)**: Fiecare înregistrare primește rangul final calculat: `rank = i + 1`.
+
+### 4. Consecințe
+- Garanție matematică de atomicitate ACID fără coliziuni de constrângere unică.
+- Interfața utilizator poate efectua operațiuni de Drag & Drop sau mutări Sus/Jos fără riscul de corupere a clasamentului.
+
+
+## ADR-004: Politica GDPR Privacy Gate - Exclusivitate pe Baza Preferinței Studentului și Integrarea Nativă a Skill-urilor de Lucru
+
+- **Data**: 2026-11-17
+- **Status**: approved
+- **Autor**: Agent AI & David Vulcu
+
+### 1. Context și Regula GDPR Privacy Gate
+În proiectul universitar P14, protecția datelor cu caracter personal (GDPR) impune ca datele de contact directe (telefon) și fișierul CV (PDF) ale studentului să nu fie accesibile public companiilor.
+- **Clarificare Regulă**: O firmă poate vizualiza și descărca CV-ul unui student **EXCLUSIV DACĂ** studentul a adăugat în mod voluntar o ofertă a acelei companii în lista sa de preferințe (`StudentPreference`).
+- Dacă o companie ierarhizează unilateral un student dintr-un feed general de recomandări (fără ca studentul să fi aplicat la acea firmă), CV-ul și datele de contact **rămân strict blocate și anonimizate**.
+
+### 2. Decizia de Implementare Privacy Gate
+1. `canCompanyAccessStudentCv(companyProfileId, studentId, targetOfferId?)` verifică exclusiv existența unei intrări în `StudentPreference` legate de compania respectivă.
+2. Endpoint-ul securizat `GET /api/cv/[studentId]` returnează HTTP 403 Forbidden dacă această condiție nu este satisfăcută.
+3. Funcția `sanitizeStudentProfileForCompany` maschează `cvUrl: null` și `phone: null` pentru studenții din feed-ul de talente recomandate care nu au aplicat încă.
+
+### 3. Integrarea Nativă a Skill-urilor de Guvernanță (`/plan`, `/build`)
+Pentru a formaliza fluxul de lucru în Antigravity/Gemini pe baza regulilor din `AGENTS.md`:
+1. `.agents/skills/plan/SKILL.md`: Guvernează faza de cercetare și planificare fără modificări în cod până la aprobarea explicită.
+2. `.agents/skills/build/SKILL.md`: Guvernează implementarea tehnică, testarea automată obligatorie, actualizarea registrului și interdicția strictă de `git push` fără acordul utilizatorului.
+
