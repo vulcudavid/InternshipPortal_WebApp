@@ -1,0 +1,118 @@
+# Registry Ecrane — P14 Portal de Practică ULBS
+# Fiecare ecran primeste un ID DS- si un mock HTML in docs/design/mocks/
+# Status-uri: draft | review | approved
+
+screens:
+  # ── Ecrane comune / autentificare ──────────────────────────────────────────
+  - id: DS-001
+    name: Login Page
+    slug: login
+    role: ALL
+    description: Pagina de autentificare unificată (email + parolă). Redirecționare per rol după login.
+    mock: mocks/DS-001-login.html
+    status: draft
+    created: 2026-11-17
+
+  - id: DS-002
+    name: Register — Student
+    slug: register-student
+    role: STUDENT
+    description: Înregistrare cont nou student cu selecție specializare ULBS și an de studiu.
+    mock: mocks/DS-002-register-student.html
+    status: draft
+    created: 2026-11-17
+
+  - id: DS-003
+    name: Register — Company Tutor
+    slug: register-company
+    role: COMPANY_TUTOR
+    description: Înregistrare cont nou tutore firmă cu CUI/CIF și detalii companie.
+    mock: mocks/DS-003-register-company.html
+    status: draft
+    created: 2026-11-17
+
+  # ── Modul Student ──────────────────────────────────────────────────────────
+  - id: DS-004
+    name: Student — Dashboard & Profile
+    slug: student-dashboard
+    role: STUDENT
+    description: Profil academic, competențe, CV upload, scor compatibilitate. Stări: empty, loading, error, success.
+    mock: mocks/DS-004-student-dashboard.html
+    status: draft
+    created: 2026-11-17
+
+  - id: DS-005
+    name: Student — Offer Feed & Preferences
+    slug: student-offers
+    role: STUDENT
+    description: Feed oferte cu scor compatibilitate. Preferințe ordonate drag-and-drop. Rezervare interviu.
+    mock: mocks/DS-005-student-offers.html
+    status: draft
+    created: 2026-11-17
+
+  # ── Modul Firmă ────────────────────────────────────────────────────────────
+  - id: DS-006
+    name: Company — Dashboard & Offer Manager
+    slug: company-dashboard
+    role: COMPANY_TUTOR
+    description: Gestiune oferte, clasament aplicanți Gale-Shapley, sloturi interviuri, Privacy Gate indicator.
+    mock: mocks/DS-006-company-dashboard.html
+    status: draft
+    created: 2026-11-17
+
+  # ── Modul Coordonator Academic ─────────────────────────────────────────────
+  - id: DS-007
+    name: Coordinator — Dashboard
+    slug: coordinator-dashboard
+    role: COORDINATOR
+    description: >
+      Panou central Coordonator Academic. Vizualizare statistici (total studenți plasați,
+      neplacați, convenții lipsă, ore validate). Acțiuni: Run Matching, Confirm Placements,
+      Generate Conventions, Export CSV. Stări: empty, loading, error, success, long-text.
+      Light & Dark mode.
+    mock: mocks/DS-007-coordinator-dashboard.html
+    status: approved
+    created: 2026-11-17
+    approved: 2026-11-17
+
+  - id: DS-008
+    name: Coordinator — Placements List
+    slug: coordinator-placements
+    role: COORDINATOR
+    description: >
+      Tabel complet cu toate plasamentele. Filtrare pe status (PENDING_CONFIRMATION, CONFIRMED,
+      CANCELLED_*). Acțiuni inline: Confirm, Cancel. Export CSV. Paginare.
+    mock: mocks/DS-008-coordinator-placements.html
+    status: draft
+    created: 2026-11-17
+
+  - id: DS-009
+    name: Coordinator — Conventions Manager
+    slug: coordinator-conventions
+    role: COORDINATOR
+    description: Generare PDF convenții practică, urmărire status semnare (upload scan / marcare semnată).
+    mock: mocks/DS-009-coordinator-conventions.html
+    status: draft
+    created: 2026-11-17
+
+  - id: DS-010
+    name: Coordinator — Work Logs Overview
+    slug: coordinator-worklogs
+    role: COORDINATOR
+    description: Jurnal ore studenți (vizualizare per student, per firmă). Validare tutore. Export.
+    mock: mocks/DS-010-coordinator-worklogs.html
+    status: draft
+    created: 2026-11-17
+
+  # ── Modul Admin ────────────────────────────────────────────────────────────
+  - id: DS-011
+    name: Admin — Users & Roles
+    slug: admin-users
+    role: ADMIN
+    description: Gestiune conturi utilizatori, asignare roluri, activare/dezactivare conturi.
+    mock: mocks/DS-011-admin-users.html
+    status: draft
+    created: 2026-11-17
+
+design_tokens_ref: docs/design/DESIGN.md
+last_updated: 2026-11-17
