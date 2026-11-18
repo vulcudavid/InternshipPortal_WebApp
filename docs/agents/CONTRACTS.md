@@ -151,3 +151,17 @@ Unde:
 - `/plan` ([.agents/skills/plan/SKILL.md](../../.agents/skills/plan/SKILL.md)): Ghid de cercetare și elaborare a planului tehnic de implementare înaintea modificării de cod, cu respectarea strictă a regulilor din `AGENTS.md`.
 - `/build` ([.agents/skills/build/SKILL.md](../../.agents/skills/build/SKILL.md)): Ghid de execuție a planurilor aprobate, dezvoltare modulară, rulare teste automate (`privacy.test.ts`, `matching.test.ts`), linting registru (`ledger-lint.py`) și verificare build Next.js.
 
+## 9. Contracte Server Actions - Modul Coordonator & Matching Gale-Shapley (Partea 2A)
+
+### 9.1 Alocare Stabilă & Gestiune Plasamente (`src/app/actions/coordinator.ts`)
+- `runMatchingAction()`: Rulează Gale-Shapley (Many-to-One / Hospital-Residents) pentru toți studenții cu preferințe exprimate și ofertele active. Exclude studenții deja `CONFIRMED` (protecție D-005). Salvează noile alocări cu status `PENDING_CONFIRMATION`.
+- `confirmPlacement(placementId)`: Trecere din `PENDING_CONFIRMATION` în `CONFIRMED` (blochează plasamentul la re-rulări viitoare).
+- `confirmAllPlacements()`: Aprobare în masă a tuturor plasamentelor aflate în așteptare.
+- `cancelPlacementByCoordinator(placementId, reason)`: Trecere în `CANCELLED_BY_COORDINATOR` cu înregistrare dată și motiv opțional.
+- `getCoordinatorDashboardData()`: Agregare indicatori KPI (studenți eligibili, confirmate, în așteptare, nealocați, convenții lipsă, jurnale pe săptămâna curentă) și ultimele 50 de plasamente cu date relaționate.
+- `exportPlacementsCsv()`: Generare raport CSV cu toate plasamentele (fără date personale de contact GDPR: fără telefon/email).
+
+### 9.2 Anulare Plasament Firmă & Realocare Minimală (`src/app/actions/company.ts`)
+- `cancelPlacementByCompany(placementId, reason)`: Firma anulează un plasament asociat ofertei sale (`CANCELLED_BY_COMPANY`) și declanșează `handleMinimalReallocation` pentru a găsi automat următorul candidat eligibil fără perturbarea studenților deja confirmați.
+
+

@@ -4,6 +4,8 @@ import { AuthCard } from "@/components/auth-card";
 import { RoleDashboardSkeleton } from "@/components/role-dashboard-skeleton";
 import { StudentDashboard } from "@/components/student/student-dashboard";
 import { CompanyDashboard } from "@/components/company/company-dashboard";
+import { CoordinatorDashboard } from "@/components/coordinator/coordinator-dashboard";
+import { getCoordinatorDashboardData } from "@/app/actions/coordinator";
 import { logoutAction } from "@/app/actions/auth";
 import { sanitizeStudentProfileForCompany } from "@/lib/privacy";
 import { 
@@ -142,6 +144,12 @@ export default async function Home() {
     };
   }
 
+  // 3. Date necesare pentru Dashboard Coordonator (Partea 2A - Gale-Shapley)
+  let coordinatorData = null;
+  if (currentUser && currentUser.role === UserRole.COORDINATOR) {
+    coordinatorData = await getCoordinatorDashboardData();
+  }
+
   return (
     <main className="min-h-screen bg-slate-50/80 text-slate-800 relative overflow-hidden">
       {/* Glow de fundal odihnitor */}
@@ -221,8 +229,14 @@ export default async function Home() {
               availableTags={companyData.availableTags}
               allStudents={companyData.allStudents}
             />
+          ) : currentUser.role === UserRole.COORDINATOR && coordinatorData ? (
+            /* VEDERE COMPLETĂ DASHBOARD COORDONATOR (PARTEA 2A - GALE-SHAPLEY) */
+            <CoordinatorDashboard
+              user={currentUser}
+              data={coordinatorData}
+            />
           ) : (
-            /* VEDERE SKELETON PENTRU CELELALTE ROLURI (Coordonator, Admin) */
+            /* VEDERE SKELETON PENTRU CELELALTE ROLURI (Admin) */
             <RoleDashboardSkeleton
               role={currentUser.role}
               userName={`${currentUser.firstName} ${currentUser.lastName}`}
