@@ -8,6 +8,7 @@ import { TagSelector } from "./tag-selector";
 import { CvManager } from "./cv-manager";
 import { OffersExplorer, OfferData } from "./offers-explorer";
 import { PreferencesManager, PreferenceItem } from "./preferences-manager";
+import { StudentConventionCard } from "./student-convention-card";
 import { 
   GraduationCap, 
   Sparkles, 
@@ -54,6 +55,8 @@ interface StudentDashboardProps {
     portfolioUrl: string | null;
     availableFrom: Date | null;
     availableTo: Date | null;
+    gdprConsent?: boolean;
+    gdprConsentAt?: Date | null;
     tags: {
       tagId: string;
       proficiency: ProficiencyLevel;
@@ -73,6 +76,7 @@ interface StudentDashboardProps {
   }[];
   offers: OfferData[];
   preferences: PreferenceItem[];
+  placement?: any;
 }
 
 export function StudentDashboard({
@@ -81,9 +85,12 @@ export function StudentDashboard({
   availableTags,
   offers,
   preferences,
+  placement,
 }: StudentDashboardProps) {
-  // 1. Implicit se deschide tabul de OFERTE DE PRACTICĂ (conform cerinței utilizatorului)
-  const [activeTab, setActiveTab] = useState<"offers" | "preferences" | "profile">("offers");
+  // 1. Implicit se deschide tabul de STAGIU & CONVENȚIE dacă este confirmat, altfel OFERTE
+  const [activeTab, setActiveTab] = useState<"offers" | "preferences" | "profile" | "convention">(
+    placement && placement.status === "CONFIRMED" ? "convention" : "offers"
+  );
   
   // Stare pentru editare profil (implicit este în mod VIZUALIZARE curat)
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -252,7 +259,10 @@ export function StudentDashboard({
         {/* TAB 3: PROFILUL MEU */}
         <button
           type="button"
-          onClick={() => setActiveTab("profile")}
+          onClick={() => {
+            setActiveTab("profile");
+            setIsEditingProfile(false);
+          }}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             activeTab === "profile"
               ? "bg-white text-indigo-700 shadow-sm"
@@ -262,6 +272,28 @@ export function StudentDashboard({
           <User className="w-4 h-4" />
           <span>Profilul Meu & CV</span>
         </button>
+
+        {/* TAB 4: STAGIU & CONVENȚIE (Dacă există plasament) */}
+        {placement && (
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab("convention");
+              setIsEditingProfile(false);
+            }}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+              activeTab === "convention"
+                ? "bg-white text-emerald-700 shadow-sm"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <span>Stagiu & Convenție</span>
+            {placement.status === "CONFIRMED" && (
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            )}
+          </button>
+        )}
       </div>
 
       {/* CONȚINUT TAB ACTIV */}
@@ -407,7 +439,7 @@ export function StudentDashboard({
                         </span>
                       </div>
                       <a
-                        href={profile.cvUrl}
+                        href={`/api/cv/${profile.id}`}
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 hover:underline"
@@ -518,6 +550,8 @@ export function StudentDashboard({
                   portfolioUrl: profile.portfolioUrl,
                   availableFrom: profile.availableFrom,
                   availableTo: profile.availableTo,
+                  gdprConsent: profile.gdprConsent,
+                  gdprConsentAt: profile.gdprConsentAt,
                 }}
               />
 
@@ -533,6 +567,11 @@ export function StudentDashboard({
             </div>
           )}
         </div>
+      )}
+
+      {/* TAB 4: STAGIU & CONVENȚIE DE PRACTICĂ */}
+      {activeTab === "convention" && placement && (
+        <StudentConventionCard placement={placement} />
       )}
     </div>
   );

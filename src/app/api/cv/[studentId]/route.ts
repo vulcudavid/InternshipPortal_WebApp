@@ -4,6 +4,7 @@ import path from "path";
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { canCompanyAccessStudentCv } from "@/lib/privacy";
+import { getPrivateCvPath } from "@/lib/storage";
 import { UserRole } from "@prisma/client";
 
 export async function GET(
@@ -64,22 +65,31 @@ export async function GET(
     return NextResponse.redirect(cvUrl);
   }
 
-  // Dacă este un fișier local stocat în public/
-  try {
-    const filePath = path.join(process.cwd(), "public", cvUrl.replace(/^\//, ""));
-    const fileBuffer = await fs.readFile(filePath);
+  const filename = path.basename(cvUrl);
+  const candidatePaths = [
+    getPrivateCvPath(filename),
+    path.join(process.cwd(), "storage", "cvs", filename),
+    path.join(process.cwd(), "public", "uploads", "cvs", filename),
+    path.join(process.cwd(), "public", cvUrl.replace(/^\//, "")),
+  ];
 
-    return new Response(fileBuffer, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": `inline; filename="CV_${studentProfile.user.lastName}_${studentProfile.user.firstName}.pdf"`,
-      },
-    });
-  } catch {
-    return NextResponse.json(
-      { error: "Fișierul CV nu a fost găsit pe server." },
-      { status: 404 }
-    );
+  for (const filePath of candidatePaths) {
+    try {
+      const fileBuffer = await fs.readFile(filePath);
+      return new Response(fileBuffer, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": `inline; filename="CV_${studentProfile.user.lastName}_${studentProfile.user.firstName}.pdf"`,
+        },
+      });
+    } catch {
+      // Încercăm următoarea cale candidată
+    }
   }
+
+  return NextResponse.json(
+    { error: "Fișierul CV nu a fost găsit pe server." },
+    { status: 404 }
+  );
 }
