@@ -90,4 +90,20 @@
 - Creare `docs/design/registry.yaml` (lista ecranelor DS-).
 - Creare mock HTML `docs/design/mocks/DS-007-coordinator-dashboard.html` (status: draft).
 **Decizii luate**: D-005
-**Status final**: ⏳ în progres — așteptare confirmare mock înainte de `/plan`
+**Status final**: ✅ done
+
+---
+
+### S-006 | 2026-11-18 | Gemini 3.8 Flash (Thinking) | Autor: Agent AI & David Vulcu
+**Scop sesiune**: Implementare Partea 2A — Modulul Coordonator Academic & Motorul de Alocare Gale-Shapley (`/build`).
+**Realizat**:
+- Actualizare schemă Prisma: enum `PlacementStatus` extins cu `CANCELLED_BY_COORDINATOR`, default `Placement.status` setat la `PENDING_CONFIRMATION`, adăugat `cancelledAt` și `cancelReason`. Sincronizat cu `prisma db push` și `prisma generate`.
+- Server Actions noi în `src/app/actions/coordinator.ts`: `runMatchingAction`, `confirmPlacement`, `confirmAllPlacements`, `cancelPlacementByCoordinator`, `getCoordinatorDashboardData`, `exportPlacementsCsv`.
+- Adăugat Server Action `cancelPlacementByCompany` în `src/app/actions/company.ts` cu declanșare automată de realocare minimală `handleMinimalReallocation`.
+- Componente UI Coordonator conform mock DS-007 aprobat: `CoordinatorDashboard`, `StatsCard`, `PlacementsTable`, `RunMatchingButton`, `ExportCsvButton`.
+- Integrare vizualizare coordonator în `src/app/page.tsx` și adăugat `src/app/not-found.tsx`.
+- Extindere suită de teste în `src/lib/matching.test.ts` (TC-NEW-1 protecție confirmați, TC-NEW-2 anulare companie, TC-NEW-3 confirmare în masă).
+- Toate testele și build-ul Next.js de producție au trecut cu succes (exit code 0).
+**Decizii luate / ADR**: D-005 implementat
+**Fișiere modificate**: `prisma/schema.prisma`, `src/app/actions/coordinator.ts`, `src/app/actions/company.ts`, `src/app/page.tsx`, `src/lib/matching.test.ts`, `docs/agents/CONTRACTS.md`, `AI_LOG.md`, componente în `src/components/coordinator/`
+**Status final**: ✅ done

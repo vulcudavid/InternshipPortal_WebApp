@@ -2,7 +2,8 @@
 
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { UserRole, EngineeringDomain, OfferStatus } from "@prisma/client";
+import { UserRole, EngineeringDomain, OfferStatus, PlacementStatus } from "@prisma/client";
+import { handleMinimalReallocation, OfferPreferences, StudentPreferences } from "@/lib/matching";
 import { revalidatePath } from "next/cache";
 
 /**
@@ -443,4 +444,121 @@ export async function deleteInterviewSlot(slotId: string) {
 
   revalidatePath("/");
   return { success: true };
+}
+
+/**
+ * 10. Anulare Plasament de către Companie (D-005)
+ * Declanșează realocarea minimală pentru candidatul de pe poziția eliberată
+ */
+export async function cancelPlacementByCompany(
+  placementId: string,
+  reason?: string
+): Promise<{
+  success: boolean;
+  newPlacementCreated: boolean;
+}> {
+  const { profile } = await requireCompanyProfile();
+
+  const result = await prisma.$transaction(async (tx) => {
+    const placement = await tx.placement.findUnique({
+      where: { id: placementId },
+      include: {
+        offer: true,
+      },
+    });
+
+    if (!placement || placement.offer.companyId !== profile.id) {
+      throw new Error("Plasamentul specificat nu a fost găsit sau nu aparține companiei dumneavoastră.");
+    }
+
+    // 1. Marcăm plasamentul ca anulat de către companie
+    await tx.placement.update({
+      where: { id: placementId },
+      data: {
+        status: PlacementStatus.CANCELLED_BY_COMPANY,
+        cancelledAt: new Date(),
+        cancelReason: reason?.trim() || null,
+      },
+    });
+
+    // 2. Colectăm datele pentru realocare minimală
+    const confirmedPlacementsDb = await tx.placement.findMany({
+      where: {
+        status: PlacementStatus.CONFIRMED,
+        id: { not: placementId },
+      },
+      select: {
+        studentId: true,
+        offerId: true,
+      },
+    });
+
+    const activeOffersDb = await tx.internshipOffer.findMany({
+      where: { status: OfferStatus.ACTIVE },
+      include: {
+        applicantRanks: {
+          orderBy: { rank: "asc" },
+        },
+      },
+    });
+
+    const offersInput: OfferPreferences[] = activeOffersDb.map((o) => ({
+      offerId: o.id,
+      capacity: o.slotsTotal,
+      studentRanking: o.applicantRanks.map((r) => r.studentId),
+    }));
+
+    const studentsWithPrefs = await tx.studentProfile.findMany({
+      where: {
+        preferences: { some: {} },
+      },
+      include: {
+        preferences: {
+          orderBy: { rank: "asc" },
+        },
+      },
+    });
+
+    const studentsInput: StudentPreferences[] = studentsWithPrefs.map((s) => ({
+      studentId: s.id,
+      preferences: s.preferences.map((p) => p.offerId),
+    }));
+
+    const minimalResult = handleMinimalReallocation(
+      confirmedPlacementsDb,
+      {
+        type: "STUDENT_REFUSED", // Efect identic: un loc devine liber la această ofertă
+        studentId: placement.studentId,
+        offerId: placement.offerId,
+      },
+      offersInput,
+      studentsInput
+    );
+
+    let newPlacementCreated = false;
+    if (minimalResult.newlyAssigned.length > 0) {
+      const newMatch = minimalResult.newlyAssigned[0];
+      await tx.placement.upsert({
+        where: { studentId: newMatch.studentId },
+        create: {
+          studentId: newMatch.studentId,
+          offerId: newMatch.offerId,
+          status: PlacementStatus.PENDING_CONFIRMATION,
+        },
+        update: {
+          offerId: newMatch.offerId,
+          status: PlacementStatus.PENDING_CONFIRMATION,
+          matchedAt: new Date(),
+          cancelledAt: null,
+          cancelReason: null,
+        },
+      });
+      newPlacementCreated = true;
+    }
+
+    return { success: true, newPlacementCreated };
+  });
+
+  revalidatePath("/");
+  return result;
 }
