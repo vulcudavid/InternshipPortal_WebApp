@@ -23,6 +23,7 @@ async function main() {
       },
     });
   }
+
   console.log(`✅ ${PREDEFINED_ENGINEERING_TAGS.length} tag-uri predefinite create/actualizate.`);
 
   // 2. Utilizator Coordonator Facultate
@@ -35,6 +36,19 @@ async function main() {
       role: UserRole.COORDINATOR,
       firstName: "Mihai",
       lastName: "Ionescu",
+    },
+  });
+
+  // 2.1 Utilizator Administrator Sistem
+  const adminUser = await prisma.user.upsert({
+    where: { email: "admin@ulbsibiu.ro" },
+    update: {},
+    create: {
+      email: "admin@ulbsibiu.ro",
+      passwordHash: "demo_hash_admin",
+      role: UserRole.ADMIN,
+      firstName: "Admin",
+      lastName: "ULBS",
     },
   });
 
@@ -146,7 +160,7 @@ async function main() {
       headline: "Student CTI pasionat de Web Full-Stack și Sisteme Distribuite",
       bio: "Dezvoltator pasionat de TypeScript, React și arhitecturi cloud. Caut un stagiu de practică axat pe dezvoltare software modernă.",
       phone: "+40 740 111 222",
-      cvUrl: "/uploads/cvs/alexandru-radu-cv.pdf", // Protejat conform regulii de confidențialitate
+      cvUrl: "/uploads/cvs/alexandru-radu-cv.pdf",
       githubUrl: "https://github.com/alex-radu-demo",
       linkedinUrl: "https://linkedin.com/in/alex-radu-demo",
       availableFrom: new Date("2026-07-01"),
@@ -209,10 +223,8 @@ async function main() {
   console.log("🎯 Rezultat calcul compatibilitate demo:");
   console.log(`   - Student: ${studentUser.firstName} ${studentUser.lastName}`);
   console.log(`   - Ofertă: ${offer.title}`);
-  console.log(`   - Scor calculat: ${compResult.score}% (Puncte: Obligatorii=${compResult.breakdown.requiredScore}, Opționale=${compResult.breakdown.optionalScore}, Domeniu=${compResult.breakdown.domainScore})`);
-  console.log(`   - Competențe obligatorii potrivite: ${compResult.matchedRequiredTags.join(", ")}`);
-  console.log(`   - Competențe opționale potrivite: ${compResult.matchedOptionalTags.join(", ")}`);
-
+  console.log(`   - Scor calculat: ${compResult.score}%`);
+  console.log(`   - Conturi create: ${studentUser.email}, ${companyUser.email}, ${coordinatorUser.email}, ${adminUser.email}`);
   console.log("✨ Seeding finalizat cu succes!");
 }
 

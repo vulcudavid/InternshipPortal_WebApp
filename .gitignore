@@ -17,6 +17,12 @@
 /public/uploads/cvs/*
 !/public/uploads/cvs/.gitkeep
 
+# Private storage (CVs, conventions) — keep .gitkeep
+/storage/**/*.pdf
+/storage/**/*.png
+/storage/**/*.jpg
+/storage/**/*.jpeg
+
 # Production
 /build
 /dist

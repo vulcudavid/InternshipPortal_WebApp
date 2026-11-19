@@ -101,6 +101,8 @@ model StudentProfile {
   portfolioUrl   String?            @map("portfolio_url")
   availableFrom  DateTime?          @map("available_from")
   availableTo    DateTime?          @map("available_to")
+  gdprConsent    Boolean            @default(false) @map("gdpr_consent")
+  gdprConsentAt  DateTime?          @map("gdpr_consent_at")
   createdAt      DateTime           @default(now()) @map("created_at")
   updatedAt      DateTime           @updatedAt @map("updated_at")
 

@@ -23,7 +23,7 @@ export default async function Home() {
   // 1. Date necesare pentru Dashboard Student (Partea 1A)
   let studentData = null;
   if (currentUser && currentUser.role === UserRole.STUDENT && currentUser.studentProfile) {
-    const [availableTags, offers, preferences] = await Promise.all([
+    const [availableTags, offers, preferences, placement] = await Promise.all([
       prisma.tag.findMany({
         orderBy: { name: "asc" },
         select: { id: true, name: true, domain: true, isPredefined: true },
@@ -60,12 +60,24 @@ export default async function Home() {
         },
         orderBy: { rank: "asc" },
       }),
+      prisma.placement.findUnique({
+        where: { studentId: currentUser.studentProfile.id },
+        include: {
+          offer: {
+            include: {
+              company: true,
+            },
+          },
+          convention: true,
+        },
+      }),
     ]);
 
     studentData = {
       availableTags,
       offers,
       preferences,
+      placement,
     };
   }
 
@@ -219,6 +231,7 @@ export default async function Home() {
               availableTags={studentData.availableTags}
               offers={studentData.offers}
               preferences={studentData.preferences}
+              placement={studentData.placement}
             />
           ) : currentUser.role === UserRole.COMPANY_TUTOR && currentUser.companyProfile && companyData ? (
             /* VEDERE COMPLETĂ DASHBOARD COMPANIE / TUTORE (PARTEA 1B) */

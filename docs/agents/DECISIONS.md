@@ -165,3 +165,71 @@ enum PlacementStatus {
 - Dashboard-ul Coordonator filtrează plasamentele pe status și permite acțiuni bulk de confirmare.
 - Firma vede statusul plasamentului pentru ofertele sale, dar nu poate confirma — doar anula.
 - Studentul vede statusul plasamentului său în read-only.
+
+
+## ADR-006: Arhitectura de Generare și Management al Convențiilor de Practică PDF (Șablon Oficial ULBS Licență 2026-2027)
+
+- **Data**: 2026-11-19
+- **Status**: accepted
+- **Autor**: Agent AI & David Vulcu
+
+### 1. Context și Cerințe
+Proiectul P14 impune generarea convențiilor de practică ca documente oficiale precompletate, conform șablonului real al Facultății de Inginerie ULBS (`Template_Conventie-pentru-efectuarea-stagiului-de-practica-Licenta_2026-2027.docx`).
+Cerințe cheie:
+- Generarea este disponibilă exclusiv pentru plasamentele cu status `CONFIRMED`.
+- Documentul trebuie să reflecte fidel structura formularului universitar:
+  - Date părți (Facultatea de Inginerie ULBS, decan prof.univ.dr.ing. Maria Vințan; Partener de practică cu CUI/CIF, adresă, reprezentant, tutore).
+  - Art. 1 - 12 din convenția-cadru.
+  - Anexa 1 (Portofoliu practică: date student, durată 90 ore / 3 săptămâni, tabel competențe vizate).
+  - Anexa 2 (Tabel nominal practicant, grupă, specializare).
+- Suport impecabil pentru diacriticele limbii române (ă, â, î, ș, ț) în codare UTF-8.
+- Flux de semnare flexibil: descărcare PDF generat, posibilitate de încărcare scan semnat (PDF/imagine) și/sau marcare ca semnată de către student (`SIGNED_BY_STUDENT`) și coordonator (`APPROVED_BY_COORDINATOR`).
+- Sincronizare automată cu indicatorul „Convenții Lipsă” din Dashboard-ul Coordonatorului Academic.
+
+### 2. Decizia de Arhitectură
+1. **Generare Document Server-Side**:
+   - Modul dedicat `src/lib/conventions/generator.ts` ce compilează datele complete (`prefilledData` JSON) din relațiile `Placement` $\rightarrow$ `StudentProfile` / `User` $\rightarrow$ `InternshipOffer` $\rightarrow$ `CompanyProfile`.
+   - Generare șablon HTML print-ready A4 (`@page { size: A4; margin: 15mm; }`) cu tipografie conformă `DESIGN.md` și conversie automată în PDF nativ prin utilitarul de sistem LibreOffice headless (`soffice --headless --convert-to pdf`), stocat în `storage/conventions/`.
+   - Endpoint dedicat de preview și descărcare `/api/conventions/[id]/download` cu autorizare per rol.
+2. **Stocare Securizată**:
+   - Fișierele generate și scanurile semnate se salvează în `storage/conventions/` (director privat, ferit de acces direct web).
+3. **Flux de Semnare & Server Actions**:
+   - `generateConventionAction(placementId)`: accesibil coordonatorului sau generat automat la confirmare.
+   - `uploadSignedConventionAction(conventionId, formData)`: permite studentului sau coordonatorului încărcarea scanului semnat (PDF, PNG, JPG).
+   - `signConventionAction(conventionId, role)`: permite marcarea digitală ca semnată (`SIGNED_BY_STUDENT` / `APPROVED_BY_COORDINATOR`).
+4. **Impact Metrici Coordonator**:
+   - KPI-ul „Convenții lipsă” reflectă toate plasamentele `CONFIRMED` fără înregistrare de convenție sau cu status nesemnat (`DRAFT`, `GENERATED`).
+
+
+## ADR-007: Securizarea CV-urilor și Implementarea Dreptului la Ștergere / Anonimizare Conform GDPR (Art. 17)
+
+- **Data**: 2026-11-19
+- **Status**: accepted
+- **Autor**: Agent AI & David Vulcu
+
+### 1. Context și Cerințe GDPR
+Confidențialitatea datelor studenților (GDPR) impune reguli riguroase:
+- **Protecția fișierelor CV**: CV-urile încărcate conțin date cu caracter personal (telefon, adresă, email, istoric educațional). Stocarea lor în `public/uploads/` permitea descărcarea directă prin URL static, ocolind verificările Privacy Gate.
+- **Autorizare Strictă la Descărcare**: Accesul la CV trebuie permis doar titularului student, coordonatorului academic și firmelor la ale căror oferte studentul a aplicat explicit. Orice alt acces din partea unei firme terțe trebuie respins cu `403 Forbidden` (iar neautentificat cu `401 Unauthorized`).
+- **Consimțământ Explicit GDPR**: Formularul de profil/înregistrare student trebuie să conțină o bifă obligatorie de acceptare a prelucrării datelor personale pentru scopul stagiilor de practică.
+- **Dreptul la Ștergere (Right to Erasure - Art. 17 GDPR)**: Posibilitatea ca un student să solicite ștergerea sau anonimizarea ireversibilă a datelor sale personale din sistem.
+
+### 2. Decizia de Arhitectură
+1. **Mutarea Stocării CV-urilor în Director Privat**:
+   - Toate CV-urile sunt stocate în directorul privat `storage/cvs/` (în afara directorului `public/`).
+   - Servirea fișierului se face exclusiv prin API Route-ul securizat `GET /api/cv/[studentId]`.
+2. **Autorizare Granulară și Teste Automate**:
+   - Endpoint-ul `/api/cv/[studentId]` validează autorizarea conform matricei:
+     - `STUDENT`: permis dacă `currentUser.studentProfile.id === studentId`, altfel 403.
+     - `COORDINATOR` / `ADMIN`: permis (audit și supraveghere academică).
+     - `COMPANY_TUTOR`: permis **doar dacă** studentul are cel puțin o preferință (`StudentPreference`) pentru o ofertă a acelei companii, altfel 403 Forbidden.
+     - Neautentificat: 401 Unauthorized.
+   - Suită automată de teste de autorizare (`test:cv-auth`).
+3. **Modelare Consimțământ în Schema Prisma**:
+   - Adăugare câmpuri `gdprConsent Boolean @default(false)` și `gdprConsentAt DateTime?` în modelul `StudentProfile`.
+4. **Anonimizare și Ștergere Ireversibilă (`anonymizeStudentProfile`)**:
+   - Ștergerea fișierului CV fizic de pe disc (`fs.unlink`).
+   - Anonimizarea datelor de identificare din `User` (`firstName: "Student"`, `lastName: "[Anonimizat]"`, `email: "gdpr-erased-<uuid>@anonymized.ulbsibiu.ro"`, `isActive: false`).
+   - Golirea metadatelor private din `StudentProfile` (`headline: null`, `bio: null`, `phone: null`, `cvUrl: null`, link-uri sociale: null).
+   - Conservarea structurii anonimizate a plasamentului (`Placement`) pentru a nu periclita integritatea istorică și rapoartele universitare de audit ale algoritmului Gale-Shapley.
+   - Suită automată de teste pentru verificarea procesului de anonimizare (`test:gdpr`).

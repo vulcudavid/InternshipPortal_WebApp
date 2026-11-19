@@ -7,6 +7,7 @@ import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { getDomainForSpecialization } from "@/lib/specializations";
 import { ProficiencyLevel, UserRole, EngineeringDomain } from "@prisma/client";
+import { ensureStorageDirs, getPrivateCvPath } from "@/lib/storage";
 
 /**
  * Verifică autentificarea și obține profilul de student al utilizatorului curent
@@ -34,27 +35,35 @@ export async function updateStudentProfile(params: {
   portfolioUrl?: string | null;
   availableFrom?: string | null;
   availableTo?: string | null;
+  gdprConsent?: boolean;
 }) {
   const { profile } = await requireStudentProfile();
 
   const domain = getDomainForSpecialization(params.specialization);
 
+  const updateData: any = {
+    specialization: params.specialization.trim(),
+    studyYear: Number(params.studyYear),
+    group: params.group.trim(),
+    domain: domain,
+    headline: params.headline?.trim() || null,
+    bio: params.bio?.trim() || null,
+    phone: params.phone?.trim() || null,
+    githubUrl: params.githubUrl?.trim() || null,
+    linkedinUrl: params.linkedinUrl?.trim() || null,
+    portfolioUrl: params.portfolioUrl?.trim() || null,
+    availableFrom: params.availableFrom ? new Date(params.availableFrom) : null,
+    availableTo: params.availableTo ? new Date(params.availableTo) : null,
+  };
+
+  if (params.gdprConsent !== undefined) {
+    updateData.gdprConsent = params.gdprConsent;
+    updateData.gdprConsentAt = params.gdprConsent ? new Date() : null;
+  }
+
   await prisma.studentProfile.update({
     where: { id: profile.id },
-    data: {
-      specialization: params.specialization.trim(),
-      studyYear: Number(params.studyYear),
-      group: params.group.trim(),
-      domain: domain,
-      headline: params.headline?.trim() || null,
-      bio: params.bio?.trim() || null,
-      phone: params.phone?.trim() || null,
-      githubUrl: params.githubUrl?.trim() || null,
-      linkedinUrl: params.linkedinUrl?.trim() || null,
-      portfolioUrl: params.portfolioUrl?.trim() || null,
-      availableFrom: params.availableFrom ? new Date(params.availableFrom) : null,
-      availableTo: params.availableTo ? new Date(params.availableTo) : null,
-    },
+    data: updateData,
   });
 
   revalidatePath("/");
@@ -150,7 +159,7 @@ export async function saveCvLink(url: string) {
 }
 
 /**
- * 4. Upload fișier PDF CV pe server (salvat în public/uploads/cvs/)
+ * 4. Upload fișier PDF CV pe server (salvat securizat în storage/cvs/)
  */
 export async function uploadCvFile(formData: FormData) {
   const { profile } = await requireStudentProfile();
@@ -174,22 +183,19 @@ export async function uploadCvFile(formData: FormData) {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
-  const uploadsDir = path.join(process.cwd(), "public", "uploads", "cvs");
-  await fs.mkdir(uploadsDir, { recursive: true });
+  await ensureStorageDirs();
 
   const safeFileName = `cv-${profile.id}-${Date.now()}.pdf`;
-  const filePath = path.join(uploadsDir, safeFileName);
+  const filePath = getPrivateCvPath(safeFileName);
   await fs.writeFile(filePath, buffer);
-
-  const publicUrl = `/uploads/cvs/${safeFileName}`;
 
   await prisma.studentProfile.update({
     where: { id: profile.id },
-    data: { cvUrl: publicUrl },
+    data: { cvUrl: safeFileName },
   });
 
   revalidatePath("/");
-  return { success: true, cvUrl: publicUrl, fileName: file.name };
+  return { success: true, cvUrl: safeFileName, fileName: file.name };
 }
 
 /**

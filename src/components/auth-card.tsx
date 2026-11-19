@@ -2,7 +2,7 @@
 
 import { useState, useActionState } from "react";
 import { loginAction, registerAction } from "@/app/actions/auth";
-import { GraduationCap, Building2, ShieldCheck, LogIn, UserPlus, Sparkles } from "lucide-react";
+import { GraduationCap, Building2, ShieldCheck, KeyRound, LogIn, UserPlus, Sparkles } from "lucide-react";
 
 export function AuthCard() {
   const [tab, setTab] = useState<"login" | "register">("login");
@@ -110,7 +110,7 @@ export function AuthCard() {
                 <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                 <span>Acces rapid demo (1-click):</span>
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => handleQuickFill("alexandru.radu@student.ulbsibiu.ro", "demo_hash_student")}
@@ -144,6 +144,18 @@ export function AuthCard() {
                   <div className="truncate">
                     <span className="block font-bold">Coordonator</span>
                     <span className="text-[10px] text-purple-600 truncate block">Facultate ULBS</span>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleQuickFill("admin@ulbsibiu.ro", "demo_hash_admin")}
+                  className="p-2.5 bg-rose-50/50 hover:bg-rose-100/70 border border-rose-200/80 text-rose-900 rounded-xl text-xs font-semibold text-left transition flex items-center gap-2 group shadow-2xs"
+                >
+                  <KeyRound className="w-4 h-4 text-rose-600 group-hover:scale-110 transition shrink-0" />
+                  <div className="truncate">
+                    <span className="block font-bold">Administrator</span>
+                    <span className="text-[10px] text-rose-600 truncate block">admin@ulbsibiu.ro</span>
                   </div>
                 </button>
               </div>
