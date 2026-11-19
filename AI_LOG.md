@@ -107,3 +107,19 @@
 **Decizii luate / ADR**: D-005 implementat
 **Fișiere modificate**: `prisma/schema.prisma`, `src/app/actions/coordinator.ts`, `src/app/actions/company.ts`, `src/app/page.tsx`, `src/lib/matching.test.ts`, `docs/agents/CONTRACTS.md`, `AI_LOG.md`, componente în `src/components/coordinator/`
 **Status final**: ✅ done
+
+---
+
+### S-007 | 2026-11-18 | Gemini 3.8 Flash (Thinking) | Autor: Agent AI & David Vulcu
+**Scop sesiune**: Implementare Defalcare Statistici pe Specializări & Filtrare în Dashboard Coordonator (`/build`).
+**Realizat**:
+- Extindere `src/lib/specializations.ts` cu interfața `SpecializationStat`, etichete prietenoase `formatEngineeringDomain` și funcția pură de agregare `computeSpecializationBreakdown`.
+- Actualizare `getCoordinatorDashboardData` din `src/app/actions/coordinator.ts` pentru colectarea automată a distribuției pe secții a celor 13 programe de studii ale Facultății de Inginerie ULBS.
+- Componentă nouă `SpecializationsBreakdown` în `src/components/coordinator/specializations-breakdown.tsx` cu indicatori de progres, alerte de atenție pentru studenți nealocați și filtrare interactivă.
+- Actualizare `PlacementsTable` în `src/components/coordinator/placements-table.tsx` cu bară de căutare dinamică (nume student, grupă, firmă, titlu), selecție specializare și status, numărători sincronizate și resetare rapidă.
+- Sincronizare stare de filtrare în `CoordinatorDashboard` între tabelul de plasamente și secțiunea de specializări.
+- Adăugare test unitar TC-NEW-4 în `src/lib/matching.test.ts` pentru validarea calculului granular și a consistenței cu sumele globale.
+- Rulat cu succes verificările: `tsc --noEmit`, `matching.test.ts`, `privacy.test.ts`, `ledger-lint.py` și `npm run build` (exit code 0).
+**Decizii luate / ADR**: Consolidare D-005, ADR-001
+**Fișiere modificate**: `src/lib/specializations.ts`, `src/app/actions/coordinator.ts`, `src/components/coordinator/specializations-breakdown.tsx`, `src/components/coordinator/placements-table.tsx`, `src/components/coordinator/coordinator-dashboard.tsx`, `src/lib/matching.test.ts`, `docs/agents/CONTRACTS.md`, `AI_LOG.md`
+**Status final**: ✅ done

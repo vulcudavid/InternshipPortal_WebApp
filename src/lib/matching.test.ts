@@ -1,4 +1,6 @@
 import { runGaleShapley, handleMinimalReallocation } from "./matching";
+import { computeSpecializationBreakdown } from "./specializations";
+import { PlacementStatus } from "@prisma/client";
 
 function testGaleShapley() {
   console.log("🧪 Testare Algoritm Gale-Shapley (Many-to-One)...");
@@ -150,7 +152,112 @@ function testConfirmAllLogic() {
   }
 }
 
+/**
+ * TC-NEW-4: Verificare agregare statistici pe specializări ULBS & consistență KPI
+ */
+function testSpecializationAggregationLogic() {
+  console.log("\n🧪 Testare Agregare Statistici pe Specializări ULBS...");
+
+  const mockStudents = [
+    // Calculatoare (CTI): 2 studenți (1 confirmat, 1 în așteptare) => total 2, plasați 2, nealocați 0, rate 100%
+    {
+      specialization: "Calculatoare",
+      placement: { status: PlacementStatus.CONFIRMED },
+    },
+    {
+      specialization: "Calculatoare",
+      placement: { status: PlacementStatus.PENDING_CONFIRMATION },
+    },
+    // Tehnologia Informației (TI): 2 studenți (1 în așteptare, 1 anulat) => total 2, plasați 1, nealocați 1, rate 50%
+    {
+      specialization: "Tehnologia Informației",
+      placement: { status: PlacementStatus.PENDING_CONFIRMATION },
+    },
+    {
+      specialization: "Tehnologia Informației",
+      placement: { status: PlacementStatus.CANCELLED_BY_COMPANY },
+    },
+    // Robotică (ROB): 1 student fără plasament => total 1, plasați 0, nealocați 1, rate 0%
+    {
+      specialization: "Robotică",
+      placement: null,
+    },
+  ];
+
+  const breakdown = computeSpecializationBreakdown(mockStudents);
+
+  const cti = breakdown.find((s) => s.name === "Calculatoare");
+  const ti = breakdown.find((s) => s.name === "Tehnologia Informației");
+  const rob = breakdown.find((s) => s.name === "Robotică");
+  const em = breakdown.find((s) => s.name === "Electromecanică");
+
+  if (!cti || !ti || !rob || !em) {
+    throw new Error("Nu au fost generate toate specializările standard ULBS!");
+  }
+
+  // Verificare CTI
+  if (
+    cti.totalEligible !== 2 ||
+    cti.placedCount !== 2 ||
+    cti.confirmedCount !== 1 ||
+    cti.pendingCount !== 1 ||
+    cti.unplacedCount !== 0 ||
+    cti.successRate !== 100
+  ) {
+    throw new Error(`Statistici incorecte pentru CTI: ${JSON.stringify(cti)}`);
+  }
+
+  // Verificare TI
+  if (
+    ti.totalEligible !== 2 ||
+    ti.placedCount !== 1 ||
+    ti.confirmedCount !== 0 ||
+    ti.pendingCount !== 1 ||
+    ti.unplacedCount !== 1 ||
+    ti.successRate !== 50
+  ) {
+    throw new Error(`Statistici incorecte pentru TI: ${JSON.stringify(ti)}`);
+  }
+
+  // Verificare ROB
+  if (
+    rob.totalEligible !== 1 ||
+    rob.placedCount !== 0 ||
+    rob.unplacedCount !== 1 ||
+    rob.successRate !== 0
+  ) {
+    throw new Error(`Statistici incorecte pentru ROB: ${JSON.stringify(rob)}`);
+  }
+
+  // Verificare EM (specializare fără studenți)
+  if (em.totalEligible !== 0 || em.placedCount !== 0 || em.unplacedCount !== 0) {
+    throw new Error(`Specializarea goală EM ar trebui să aibă 0 eligibili: ${JSON.stringify(em)}`);
+  }
+
+  // Verificare Consistență Sumă Globală
+  const sumEligible = breakdown.reduce((acc, s) => acc + s.totalEligible, 0);
+  const sumPlaced = breakdown.reduce((acc, s) => acc + s.placedCount, 0);
+  const sumConfirmed = breakdown.reduce((acc, s) => acc + s.confirmedCount, 0);
+  const sumPending = breakdown.reduce((acc, s) => acc + s.pendingCount, 0);
+  const sumUnplaced = breakdown.reduce((acc, s) => acc + s.unplacedCount, 0);
+
+  if (sumEligible !== 5) {
+    throw new Error(`Suma totalEligible este ${sumEligible}, așteptat 5!`);
+  }
+  if (sumPlaced !== 3) {
+    throw new Error(`Suma placedCount este ${sumPlaced}, așteptat 3!`);
+  }
+  if (sumConfirmed !== 1 || sumPending !== 2 || sumUnplaced !== 2) {
+    throw new Error(
+      `Sume status invalide: Confirmed=${sumConfirmed}, Pending=${sumPending}, Unplaced=${sumUnplaced}`
+    );
+  }
+
+  console.log("✅ Agregarea pe specializări și consistența sumelor globale sunt validate cu succes!");
+}
+
 testGaleShapley();
 testConfirmedStudentsExcluded();
 testMinimalReallocationOnCompanyCancel();
 testConfirmAllLogic();
+testSpecializationAggregationLogic();

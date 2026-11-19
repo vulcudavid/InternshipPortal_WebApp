@@ -164,4 +164,23 @@ Unde:
 ### 9.2 Anulare Plasament Firmă & Realocare Minimală (`src/app/actions/company.ts`)
 - `cancelPlacementByCompany(placementId, reason)`: Firma anulează un plasament asociat ofertei sale (`CANCELLED_BY_COMPANY`) și declanșează `handleMinimalReallocation` pentru a găsi automat următorul candidat eligibil fără perturbarea studenților deja confirmați.
 
+### 9.3 Defalcare Statistici pe Specializări ULBS (`src/lib/specializations.ts` & `src/app/actions/coordinator.ts`)
+- `computeSpecializationBreakdown(students)`: Funcție pură deterministă care agregează distribuția studenților pe cele 13 programe de studii ale Facultății de Inginerie (CTI, TI, ISM, EA, RST, EM, MTR, ROB, TCM, MSP, IEDM, IMC, ITT).
+- Structură `SpecializationStat`:
+  ```typescript
+  export interface SpecializationStat {
+    name: string;
+    abbreviation: string;
+    domain: EngineeringDomain;
+    totalEligible: number;
+    placedCount: number; // CONFIRMED + PENDING_CONFIRMATION
+    confirmedCount: number;
+    pendingCount: number;
+    unplacedCount: number;
+    successRate: number; // (placedCount / totalEligible * 100)
+  }
+  ```
+- `getCoordinatorDashboardData()`: Include proprietatea `specializationBreakdown: SpecializationStat[]` pentru afișarea în dashboard și filtrare dinamică în tabelul de plasamente.
+
+
 

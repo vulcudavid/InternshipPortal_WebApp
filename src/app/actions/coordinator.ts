@@ -4,6 +4,8 @@ import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { UserRole, PlacementStatus, OfferStatus } from "@prisma/client";
 import { runGaleShapley, OfferPreferences, StudentPreferences } from "@/lib/matching";
+import { computeSpecializationBreakdown, SpecializationStat } from "@/lib/specializations";
+export type { SpecializationStat } from "@/lib/specializations";
 import { revalidatePath } from "next/cache";
 
 /**
@@ -240,6 +242,7 @@ export async function getCoordinatorDashboardData() {
     conventionsMissing,
     workLogsThisWeek,
     recentPlacements,
+    studentsForBreakdown,
   ] = await Promise.all([
     // Studenți cu cel puțin o preferință de practică
     prisma.studentProfile.count({
@@ -301,6 +304,19 @@ export async function getCoordinatorDashboardData() {
         },
       },
     }),
+    // Date pentru defalcarea pe specializări
+    prisma.studentProfile.findMany({
+      where: { preferences: { some: {} } },
+      select: {
+        specialization: true,
+        domain: true,
+        placement: {
+          select: {
+            status: true,
+          },
+        },
+      },
+    }),
   ]);
 
   let totalConfirmed = 0;
@@ -322,6 +338,7 @@ export async function getCoordinatorDashboardData() {
   }
 
   const totalUnplaced = Math.max(0, totalEligibleStudents - activePlacedCount);
+  const specializationBreakdown = computeSpecializationBreakdown(studentsForBreakdown);
 
   return {
     stats: {
@@ -333,6 +350,7 @@ export async function getCoordinatorDashboardData() {
       conventionsMissing,
       workLogsThisWeek,
     },
+    specializationBreakdown,
     recentPlacements: recentPlacements.map((p) => ({
       id: p.id,
       status: p.status,

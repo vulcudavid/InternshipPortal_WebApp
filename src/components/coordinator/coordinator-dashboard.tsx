@@ -1,6 +1,9 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { CoordinatorDashboardData } from "@/app/actions/coordinator";
 import { StatsCard } from "./stats-card";
+import { SpecializationsBreakdown } from "./specializations-breakdown";
 import { PlacementsTable } from "./placements-table";
 import { RunMatchingButton } from "./run-matching-button";
 import { ExportCsvButton } from "./export-csv-button";
@@ -25,7 +28,8 @@ interface CoordinatorDashboardProps {
 }
 
 export function CoordinatorDashboard({ user, data }: CoordinatorDashboardProps) {
-  const { stats, recentPlacements } = data;
+  const { stats, specializationBreakdown, recentPlacements } = data;
+  const [selectedSpecialization, setSelectedSpecialization] = useState<string>("ALL");
 
   const placementRate =
     stats.totalEligibleStudents > 0
@@ -172,8 +176,19 @@ export function CoordinatorDashboard({ user, data }: CoordinatorDashboardProps) 
         </div>
       </div>
 
-      {/* ── Tabel Plasamente & Gestiune Gale-Shapley ────────────────────────── */}
-      <PlacementsTable placements={recentPlacements} />
+      {/* ── Defalcare & Statistică pe Specializări ULBS ───────────────────── */}
+      <SpecializationsBreakdown
+        breakdown={specializationBreakdown}
+        selectedSpecialization={selectedSpecialization}
+        onSelectSpecialization={setSelectedSpecialization}
+      />
+
+      {/* ── Tabel Plasamente & Gestiune Gale-Shapley (cu Filtrare Sincronizată) */}
+      <PlacementsTable
+        placements={recentPlacements}
+        selectedSpecialization={selectedSpecialization}
+        onSelectSpecialization={setSelectedSpecialization}
+      />
     </div>
   );
 }
