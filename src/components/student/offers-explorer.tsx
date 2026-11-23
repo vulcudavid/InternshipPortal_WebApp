@@ -186,7 +186,7 @@ export function OffersExplorer({
   return (
     <div className="space-y-6">
       {/* Header & Filtre */}
-      <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] p-6 space-y-4">
+      <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] p-6 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-sky-500/15 pb-4">
           <div>
             <h3 className="font-bold text-white text-lg flex items-center gap-2">
@@ -242,7 +242,7 @@ export function OffersExplorer({
           return (
             <div
               key={offer.id}
-              className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] hover:border-sky-400/40 transition p-6 space-y-4"
+              className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] hover:border-sky-400/40 transition p-6 space-y-4"
             >
               {/* Header Card */}
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
@@ -289,7 +289,7 @@ export function OffersExplorer({
                     <span>{comp.score}% Compatibil</span>
                   </div>
                   <span className="block text-[10px] text-slate-400 mt-1">
-                    Calculat prin algoritm P14
+                    Calculat prin algoritm Gale-Shapley ULBS
                   </span>
                 </div>
               </div>
@@ -443,7 +443,7 @@ export function OffersExplorer({
         })}
 
         {filteredOffers.length === 0 && (
-          <div className="p-8 text-center bg-[#0B1221]/80 rounded-2xl border border-sky-400/20 text-slate-400 text-xs">
+          <div className="p-8 text-center bg-[#0B1221]/88 rounded-2xl border border-sky-400/20 text-slate-400 text-xs">
             Nu a fost găsită nicio ofertă care să corespundă criteriilor de căutare.
           </div>
         )}

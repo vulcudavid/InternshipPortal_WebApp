@@ -1,4 +1,6 @@
 import React from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { logoutAction } from "@/app/actions/auth";
 import { LogOut } from "lucide-react";
 
@@ -47,22 +49,29 @@ export function AppHeader({ currentUser }: AppHeaderProps) {
     <nav className="border-b border-sky-500/20 bg-[#070D19]/85 backdrop-blur-xl sticky top-0 z-50 shadow-[0_4px_30px_rgba(4,8,18,0.6)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Logo & Brand Identity */}
-        <div className="flex items-center gap-3">
-          <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-sky-500 to-indigo-500 rounded-xl blur-xs opacity-60 group-hover:opacity-100 transition duration-300"></div>
-            <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 via-sky-500 to-blue-600 text-slate-950 flex items-center justify-center font-black text-lg tracking-wider border border-sky-200/50 shadow-[0_0_15px_rgba(14,165,233,0.45)]">
-              P14
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative group/logo">
+            <div className="absolute -inset-1 bg-gradient-to-r from-sky-500 to-indigo-500 rounded-xl blur-xs opacity-50 group-hover/logo:opacity-100 transition duration-300"></div>
+            <div className="relative w-10 h-10 rounded-xl bg-[#0B1221]/95 p-1 flex items-center justify-center border border-sky-400/40 shadow-[0_0_15px_rgba(14,165,233,0.3)]">
+              <Image
+                src="/images/ulbs-shield.svg"
+                alt="Sigla Oficială ULBS - Facultatea de Inginerie"
+                width={36}
+                height={36}
+                className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(14,165,233,0.4)]"
+                priority
+              />
             </div>
           </div>
           <div>
-            <span className="font-extrabold text-white text-sm sm:text-base leading-tight block tracking-tight">
+            <span className="font-extrabold text-white text-sm sm:text-base leading-tight block tracking-tight group-hover:text-sky-300 transition">
               Portal Practică Inginerie
             </span>
             <span className="text-[11px] text-sky-400/80 block leading-tight font-medium tracking-wide">
               Universitatea „Lucian Blaga” din Sibiu
             </span>
           </div>
-        </div>
+        </Link>
 
         {/* User Info / Status & Actions */}
         <div className="flex items-center gap-3">

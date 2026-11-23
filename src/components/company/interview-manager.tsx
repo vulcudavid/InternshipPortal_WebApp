@@ -65,7 +65,7 @@ export function InterviewManager({ offers }: InterviewManagerProps) {
 
   if (!selectedOffer) {
     return (
-      <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-sky-400/20 p-8 text-center text-slate-400">
+      <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 p-8 text-center text-slate-400">
         <Calendar className="w-8 h-8 mx-auto text-sky-400 mb-2" />
         <p className="text-sm">Nu există nicio ofertă publicată pentru a programa interviuri.</p>
       </div>
@@ -127,7 +127,7 @@ export function InterviewManager({ offers }: InterviewManagerProps) {
   return (
     <div className="space-y-6">
       {/* Header & Selector */}
-      <div className="bg-[#0B1221]/80 backdrop-blur-xl p-6 rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-[#0B1221]/88 backdrop-blur-xl p-6 rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
             Selectează Oferta pentru Programare Interviuri
@@ -163,7 +163,7 @@ export function InterviewManager({ offers }: InterviewManagerProps) {
 
       {/* Listă Sloturi */}
       {sortedSlots.length === 0 ? (
-        <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-dashed border-sky-500/20 p-12 text-center">
+        <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-dashed border-sky-500/20 p-12 text-center">
           <div className="w-12 h-12 bg-sky-950/60 border border-sky-500/30 text-sky-400 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-[0_0_15px_rgba(14,165,233,0.2)]">
             <Calendar className="w-6 h-6" />
           </div>
@@ -189,7 +189,7 @@ export function InterviewManager({ offers }: InterviewManagerProps) {
             return (
               <div
                 key={slot.id}
-                className={`bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border p-5 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-3 transition flex flex-col justify-between ${
+                className={`bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border p-5 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-3 transition flex flex-col justify-between ${
                   isBooked ? "border-emerald-500/40 bg-emerald-950/20" : "border-sky-400/20 hover:border-sky-400/40"
                 }`}
               >

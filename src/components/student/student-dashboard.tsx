@@ -290,7 +290,7 @@ export function StudentDashboard({
       {activeTab === "profile" && (
         <div className="space-y-6">
           {/* Header Profil cu buton de comutare Editare */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0B1221]/80 backdrop-blur-xl p-6 rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0B1221]/88 backdrop-blur-xl p-6 rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)]">
             <div>
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
                 <User className="w-5 h-5 text-sky-400" />
@@ -329,7 +329,7 @@ export function StudentDashboard({
           {!isEditingProfile && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Coloana 1: Date Personale & Social */}
-              <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-sky-400/20 p-6 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-5">
+              <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 p-6 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-5">
                 <h3 className="text-xs font-bold text-sky-400 uppercase tracking-wider">
                   Informații Contact & Social
                 </h3>
@@ -436,7 +436,7 @@ export function StudentDashboard({
               {/* Coloana 2 & 3: Bio & Competențe Declarate */}
               <div className="md:col-span-2 space-y-6">
                 {/* Despre Mine / Bio */}
-                <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-sky-400/20 p-6 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-3">
+                <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 p-6 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-3">
                   <h3 className="text-xs font-bold text-sky-400 uppercase tracking-wider">
                     Despre Mine & Obiective
                   </h3>
@@ -452,7 +452,7 @@ export function StudentDashboard({
                 </div>
 
                 {/* Competențe Tehnice */}
-                <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-sky-400/20 p-6 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-4">
+                <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 p-6 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-xs font-bold text-sky-400 uppercase tracking-wider">

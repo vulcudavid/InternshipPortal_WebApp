@@ -108,7 +108,7 @@ export function ApplicantsManager({ offers, allStudents, companyId }: Applicants
 
   if (!selectedOffer) {
     return (
-      <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-sky-400/20 p-8 text-center text-slate-400">
+      <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 p-8 text-center text-slate-400">
         <Users className="w-8 h-8 mx-auto text-sky-400 mb-2" />
         <p className="text-sm">Nu există nicio ofertă publicată pentru a vizualiza candidații.</p>
       </div>
@@ -206,7 +206,7 @@ export function ApplicantsManager({ offers, allStudents, companyId }: Applicants
   return (
     <div className="space-y-6">
       {/* Selector Ofertă & Switcher Tab-uri */}
-      <div className="bg-[#0B1221]/80 backdrop-blur-xl p-6 rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-[#0B1221]/88 backdrop-blur-xl p-6 rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
             Selectează Oferta de Practică
@@ -283,7 +283,7 @@ export function ApplicantsManager({ offers, allStudents, companyId }: Applicants
               </h3>
 
               {applicantsList.length === 0 ? (
-                <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-dashed border-sky-500/20 p-8 text-center">
+                <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-dashed border-sky-500/20 p-8 text-center">
                   <p className="text-xs text-slate-400">
                     Niciun student nu a inclus încă această ofertă în lista de preferințe.
                   </p>
@@ -299,7 +299,7 @@ export function ApplicantsManager({ offers, allStudents, companyId }: Applicants
                     return (
                       <div
                         key={student.id}
-                        className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-sky-400/20 p-5 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-4 hover:border-sky-400/40 transition"
+                        className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 p-5 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-4 hover:border-sky-400/40 transition"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                           <div className="space-y-1">
@@ -425,7 +425,7 @@ export function ApplicantsManager({ offers, allStudents, companyId }: Applicants
 
             {/* Coloana 3: Panou Ordonare Clasament Gale-Shapley */}
             <div className="space-y-4">
-              <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-sky-400/20 p-5 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-4">
+              <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 p-5 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-4">
                 <div className="space-y-1">
                   <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                     <Award className="w-4 h-4 text-sky-400" />
@@ -507,7 +507,7 @@ export function ApplicantsManager({ offers, allStudents, companyId }: Applicants
               <span className="font-bold text-white">Regulă de Protecție a Datelor (GDPR Privacy Gate):</span>
               <p className="text-amber-300/80 leading-relaxed">
                 Acești studenți corespund profilului tehnic al ofertei, dar <strong>nu au aplicat încă</strong> la poziția dvs.
-                Conform legii și a cerințelor P14, CV-ul complet și datele directe de contact (telefon) sunt strict blocate
+                Conform normelor GDPR și cerințelor de securitate ULBS, CV-ul complet și datele directe de contact (telefon) sunt strict blocate
                 până când studentul își exprimă acordul prin adăugarea ofertei în preferințe.
               </p>
             </div>
@@ -517,7 +517,7 @@ export function ApplicantsManager({ offers, allStudents, companyId }: Applicants
             {recommendedStudents.map(({ student, score }) => (
               <div
                 key={student.id}
-                className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-sky-400/20 p-5 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-3"
+                className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 p-5 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-3"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>

@@ -82,7 +82,7 @@ export function AuditLogTab({ onNotify }: Props) {
       case "OFFER_WITHDRAW":
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-500/15 text-rose-300 border border-rose-500/30 shadow-[0_0_10px_rgba(244,63,94,0.15)]">
-            <AlertTriangle className="w-3 h-3" /> Retragere Ofertă (Twist P14)
+            <AlertTriangle className="w-3 h-3" /> Retragere Ofertă (Realocare Minimală)
           </span>
         );
       case "OFFER_ACTIVATE":
@@ -126,7 +126,7 @@ export function AuditLogTab({ onNotify }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_30px_rgba(14,165,233,0.06)] overflow-hidden">
+      <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_30px_rgba(14,165,233,0.06)] overflow-hidden">
         {/* Header Secțiune */}
         <div className="p-5 border-b border-sky-500/20 bg-[#070D19]/50 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
           <div>

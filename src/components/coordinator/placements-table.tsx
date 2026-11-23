@@ -159,7 +159,7 @@ export function PlacementsTable({ placements }: PlacementsTableProps) {
   };
 
   return (
-    <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] overflow-hidden">
+    <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] overflow-hidden">
       <div className="p-5 border-b border-sky-500/20 flex flex-wrap items-center justify-between gap-4 bg-[#070D19]/60">
         <div>
           <h2 className="text-lg font-bold text-white">

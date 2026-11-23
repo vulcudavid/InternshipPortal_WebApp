@@ -231,7 +231,7 @@ export function OfferManager({
   return (
     <div className="space-y-6">
       {/* Header & Buton Creare */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0B1221]/80 backdrop-blur-xl p-6 rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0B1221]/88 backdrop-blur-xl p-6 rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)]">
         <div>
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
             <Briefcase className="w-5 h-5 text-sky-400" />
@@ -260,7 +260,7 @@ export function OfferManager({
 
       {/* Grid Oferte */}
       {offers.length === 0 ? (
-        <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-dashed border-sky-500/20 p-12 text-center">
+        <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-dashed border-sky-500/20 p-12 text-center">
           <div className="w-12 h-12 bg-sky-950/60 border border-sky-500/30 text-sky-400 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-[0_0_15px_rgba(14,165,233,0.2)]">
             <Briefcase className="w-6 h-6" />
           </div>
@@ -286,7 +286,7 @@ export function OfferManager({
             return (
               <div
                 key={offer.id}
-                className={`bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border transition shadow-[0_0_25px_rgba(14,165,233,0.06)] overflow-hidden flex flex-col justify-between ${
+                className={`bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border transition shadow-[0_0_25px_rgba(14,165,233,0.06)] overflow-hidden flex flex-col justify-between ${
                   isActive ? "border-sky-400/20 hover:border-sky-400/40" : "border-slate-800 bg-[#070D19]/40 opacity-75"
                 }`}
               >

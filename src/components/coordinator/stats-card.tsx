@@ -25,7 +25,7 @@ export function StatsCard({ label, value, sub, variant, icon }: StatsCardProps) 
 
   return (
     <div
-      className={`bg-[#0B1221]/80 backdrop-blur-xl rounded-xl p-5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] border-t-4 ${borderColors[variant]} transition-all hover:border-sky-400/40 flex flex-col justify-between`}
+      className={`bg-[#0B1221]/88 backdrop-blur-xl rounded-xl p-5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] border-t-4 ${borderColors[variant]} transition-all hover:border-sky-400/40 flex flex-col justify-between`}
     >
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">

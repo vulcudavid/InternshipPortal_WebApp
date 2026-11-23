@@ -49,7 +49,7 @@ export function CompanyProfileEditor({ profile }: CompanyProfileEditorProps) {
   };
 
   return (
-    <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] overflow-hidden">
+    <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] overflow-hidden">
       <div className="p-6 border-b border-sky-500/15 bg-[#070D19]/60">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-sky-950/60 border border-sky-500/30 text-sky-400 flex items-center justify-center font-bold shadow-[0_0_15px_rgba(14,165,233,0.2)]">

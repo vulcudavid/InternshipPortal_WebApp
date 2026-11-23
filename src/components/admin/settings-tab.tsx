@@ -80,7 +80,7 @@ export function SettingsTab({ onNotify }: Props) {
 
   return (
     <div className="max-w-4xl space-y-6">
-      <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_30px_rgba(14,165,233,0.06)] p-6 space-y-6">
+      <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_30px_rgba(14,165,233,0.06)] p-6 space-y-6">
         <div>
           <div className="flex items-center gap-2">
             <Sliders className="w-5 h-5 text-sky-400" />

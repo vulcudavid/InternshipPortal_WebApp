@@ -164,7 +164,7 @@ export function CompaniesOffersTab({ onNotify }: Props) {
     }
   };
 
-  // Confirmare retragere ofertă (Twist P14)
+  // Confirmare retragere ofertă (Realocare Minimală)
   const handleConfirmWithdrawOffer = async () => {
     if (!withdrawingOffer) return;
     setActionLoadingId(withdrawingOffer.id);
@@ -232,7 +232,7 @@ export function CompaniesOffersTab({ onNotify }: Props) {
       {/* ── Carduri KPI Rapide ──────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* KPI 1 */}
-        <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-xl p-5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] border-t-2 border-t-sky-400 flex flex-col justify-between">
+        <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-xl p-5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] border-t-2 border-t-sky-400 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
               Total Companii
@@ -252,7 +252,7 @@ export function CompaniesOffersTab({ onNotify }: Props) {
         </div>
 
         {/* KPI 2 */}
-        <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-xl p-5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] border-t-2 border-t-amber-400 flex flex-col justify-between">
+        <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-xl p-5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] border-t-2 border-t-amber-400 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
               În Așteptare Validare
@@ -272,7 +272,7 @@ export function CompaniesOffersTab({ onNotify }: Props) {
         </div>
 
         {/* KPI 3 */}
-        <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-xl p-5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] border-t-2 border-t-emerald-400 flex flex-col justify-between">
+        <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-xl p-5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] border-t-2 border-t-emerald-400 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
               Oferte Active
@@ -292,7 +292,7 @@ export function CompaniesOffersTab({ onNotify }: Props) {
         </div>
 
         {/* KPI 4 */}
-        <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-xl p-5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] border-t-2 border-t-indigo-400 flex flex-col justify-between">
+        <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-xl p-5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] border-t-2 border-t-indigo-400 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
               Locuri Disponibile
@@ -313,7 +313,7 @@ export function CompaniesOffersTab({ onNotify }: Props) {
       </div>
 
       {/* ── Secțiunea 1: Validare Companii ──────────────────────────────────── */}
-      <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_30px_rgba(14,165,233,0.06)] overflow-hidden">
+      <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_30px_rgba(14,165,233,0.06)] overflow-hidden">
         <div className="p-5 border-b border-sky-500/20 bg-[#070D19]/50 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
           <div>
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
@@ -484,15 +484,15 @@ export function CompaniesOffersTab({ onNotify }: Props) {
         </div>
       </div>
 
-      {/* ── Secțiunea 2: Oferte & Retragere Oferte (Twist P14) ─────────────── */}
-      <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_30px_rgba(14,165,233,0.06)] overflow-hidden">
+      {/* ── Secțiunea 2: Oferte & Retragere Oferte ─────────────── */}
+      <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_30px_rgba(14,165,233,0.06)] overflow-hidden">
         <div className="p-5 border-b border-sky-500/20 bg-[#070D19]/50 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
           <div>
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
               <Briefcase className="w-5 h-5 text-indigo-400" /> Oferte de Stagiu de Practică
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
-              Monitorizare oferte active și retragere cu realocare minimală (Twist P14).
+              Monitorizare oferte active și retragere cu realocare minimală.
             </p>
           </div>
 
@@ -638,7 +638,7 @@ export function CompaniesOffersTab({ onNotify }: Props) {
         </div>
       </div>
 
-      {/* ── Dialog Modal Retragere Ofertă (Twist P14) ───────────────────────── */}
+      {/* ── Dialog Modal Retragere Ofertă ───────────────────────── */}
       {withdrawingOffer && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
           <div className="bg-[#0B1221]/95 backdrop-blur-2xl rounded-2xl p-6 border border-sky-400/30 shadow-[0_0_50px_rgba(14,165,233,0.15)] max-w-lg w-full space-y-4 animate-in fade-in zoom-in-95 duration-150">
@@ -648,7 +648,7 @@ export function CompaniesOffersTab({ onNotify }: Props) {
               </div>
               <div className="flex-1">
                 <h3 className="text-base font-bold text-white">
-                  Confirmare Retragere Ofertă (Twist P14)
+                  Confirmare Retragere Ofertă (Realocare Minimală)
                 </h3>
                 <p className="text-xs text-slate-400 mt-1">
                   Sunteți pe cale să retrageți oferta{" "}

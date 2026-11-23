@@ -64,7 +64,7 @@ export function AdminDashboard({ user }: AdminDashboardProps) {
       )}
 
       {/* ── Selector Tab-uri Navigare ────────────────────────────────────────── */}
-      <div className="bg-[#0B1221]/90 backdrop-blur-xl rounded-xl p-1.5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] flex flex-wrap gap-1.5">
+      <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-xl p-1.5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] flex flex-wrap gap-1.5">
         <button
           onClick={() => setActiveTab("companies-offers")}
           className={`flex-1 min-w-[140px] py-2.5 px-4 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${

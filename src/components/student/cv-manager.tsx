@@ -83,7 +83,7 @@ export function CvManager({ studentProfileId, initialCvUrl }: CvManagerProps) {
   };
 
   return (
-    <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] p-6 space-y-6">
+    <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] p-6 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-sky-500/15 pb-4">
         <div>
           <h3 className="font-bold text-white text-lg flex items-center gap-2">
@@ -136,7 +136,7 @@ export function CvManager({ studentProfileId, initialCvUrl }: CvManagerProps) {
       <div className="p-4 bg-[#070D19]/70 border border-indigo-500/30 rounded-xl space-y-1.5">
         <div className="flex items-center gap-2 text-indigo-300 font-bold text-xs">
           <ShieldCheck className="w-4 h-4 text-indigo-400 shrink-0" />
-          <span>Protecție de Confidențialitate Activă (Privacy Gate P14)</span>
+          <span>Protecție de Confidențialitate Activă (Privacy Gate ULBS)</span>
         </div>
         <p className="text-[11px] text-slate-300 leading-relaxed">
           CV-ul tău detaliat și datele de contact directe sunt <strong>strict confidențiale</strong>. 

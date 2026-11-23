@@ -66,7 +66,7 @@ export function CompanyDashboard({
   return (
     <div className="space-y-8 animate-in fade-in duration-200">
       {/* Header Companie Futuristic Dark */}
-      <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-3xl border border-sky-400/20 shadow-[0_0_35px_rgba(14,165,233,0.08)] p-6 md:p-8 space-y-6 relative overflow-hidden">
+      <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-3xl border border-sky-400/20 shadow-[0_0_35px_rgba(14,165,233,0.08)] p-6 md:p-8 space-y-6 relative overflow-hidden">
         {/* Glow de fundal */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
 

@@ -62,7 +62,7 @@ export function RoleDashboardSkeleton({ role, userName }: Props) {
             </div>
 
             {/* Skeleton Card 1 (Continental) */}
-            <div className="bg-[#0B1221]/80 backdrop-blur-xl border border-sky-400/20 rounded-xl p-5 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-3">
+            <div className="bg-[#0B1221]/88 backdrop-blur-xl border border-sky-400/20 rounded-xl p-5 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-3">
               <div className="flex items-start justify-between">
                 <div>
                   <span className="text-xs font-semibold text-sky-400 uppercase tracking-wider">Continental Automotive Sibiu</span>
@@ -91,7 +91,7 @@ export function RoleDashboardSkeleton({ role, userName }: Props) {
 
           {/* Coloana 2: Stare Plasament & Jurnal Pontaj */}
           <div className="space-y-6">
-            <div className="bg-[#0B1221]/80 backdrop-blur-xl border border-sky-400/20 rounded-xl p-5 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-3">
+            <div className="bg-[#0B1221]/88 backdrop-blur-xl border border-sky-400/20 rounded-xl p-5 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-3">
               <h3 className="font-bold text-white text-sm flex items-center gap-2">
                 <FileText className="w-4 h-4 text-purple-400" />
                 Stare Plasament & Convenție PDF
@@ -104,7 +104,7 @@ export function RoleDashboardSkeleton({ role, userName }: Props) {
               </div>
             </div>
 
-            <div className="bg-[#0B1221]/80 backdrop-blur-xl border border-sky-400/20 rounded-xl p-5 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-3">
+            <div className="bg-[#0B1221]/88 backdrop-blur-xl border border-sky-400/20 rounded-xl p-5 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-3">
               <h3 className="font-bold text-white text-sm flex items-center gap-2">
                 <Clock className="w-4 h-4 text-emerald-400" />
                 Jurnal Săptămânal Pontaj
@@ -176,22 +176,22 @@ export function RoleDashboardSkeleton({ role, userName }: Props) {
 
       {/* KPI Counters */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-[#0B1221]/80 backdrop-blur-xl border border-sky-400/20 rounded-xl p-4 shadow-[0_0_25px_rgba(14,165,233,0.06)]">
+        <div className="bg-[#0B1221]/88 backdrop-blur-xl border border-sky-400/20 rounded-xl p-4 shadow-[0_0_25px_rgba(14,165,233,0.06)]">
           <p className="text-xs text-slate-400 font-medium">Studenți Înscriși</p>
           <p className="text-2xl font-bold text-white mt-1">128</p>
           <p className="text-[11px] text-emerald-400 mt-0.5">85% cu preferințe exprimate</p>
         </div>
-        <div className="bg-[#0B1221]/80 backdrop-blur-xl border border-sky-400/20 rounded-xl p-4 shadow-[0_0_25px_rgba(14,165,233,0.06)]">
+        <div className="bg-[#0B1221]/88 backdrop-blur-xl border border-sky-400/20 rounded-xl p-4 shadow-[0_0_25px_rgba(14,165,233,0.06)]">
           <p className="text-xs text-slate-400 font-medium">Companii Partenere</p>
           <p className="text-2xl font-bold text-white mt-1">18</p>
           <p className="text-[11px] text-sky-400 mt-0.5">Continental, Siemens, etc.</p>
         </div>
-        <div className="bg-[#0B1221]/80 backdrop-blur-xl border border-sky-400/20 rounded-xl p-4 shadow-[0_0_25px_rgba(14,165,233,0.06)]">
+        <div className="bg-[#0B1221]/88 backdrop-blur-xl border border-sky-400/20 rounded-xl p-4 shadow-[0_0_25px_rgba(14,165,233,0.06)]">
           <p className="text-xs text-slate-400 font-medium">Total Locuri Ofertate</p>
           <p className="text-2xl font-bold text-white mt-1">145</p>
           <p className="text-[11px] text-purple-400 mt-0.5">Capacitate excedentară</p>
         </div>
-        <div className="bg-[#0B1221]/80 backdrop-blur-xl border border-sky-400/20 rounded-xl p-4 shadow-[0_0_25px_rgba(14,165,233,0.06)]">
+        <div className="bg-[#0B1221]/88 backdrop-blur-xl border border-sky-400/20 rounded-xl p-4 shadow-[0_0_25px_rgba(14,165,233,0.06)]">
           <p className="text-xs text-slate-400 font-medium">Convenții Emise</p>
           <p className="text-2xl font-bold text-white mt-1">0 / 128</p>
           <p className="text-[11px] text-amber-400 mt-0.5">Se emit după matching</p>
@@ -199,7 +199,7 @@ export function RoleDashboardSkeleton({ role, userName }: Props) {
       </div>
 
       {/* Centralizator */}
-      <div className="bg-[#0B1221]/80 backdrop-blur-xl border border-sky-400/20 rounded-xl p-5 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-4">
+      <div className="bg-[#0B1221]/88 backdrop-blur-xl border border-sky-400/20 rounded-xl p-5 shadow-[0_0_25px_rgba(14,165,233,0.06)] space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="font-bold text-white text-sm flex items-center gap-2">
             <Users className="w-4 h-4 text-purple-400" />

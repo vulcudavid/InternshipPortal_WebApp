@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useActionState } from "react";
+import Image from "next/image";
 import { loginAction, registerAction } from "@/app/actions/auth";
 import { 
   GraduationCap, 
@@ -31,7 +32,7 @@ export function AuthCard() {
   };
 
   return (
-    <div className="bg-[#0B1221]/80 backdrop-blur-2xl border border-sky-400/25 shadow-2xl rounded-2xl overflow-hidden max-w-xl mx-auto w-full relative">
+    <div className="bg-[#0B1221]/88 backdrop-blur-2xl border border-sky-400/25 shadow-2xl rounded-2xl overflow-hidden max-w-xl mx-auto w-full relative">
       {/* Glow Line Top */}
       <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-sky-400 to-transparent opacity-80" />
 
@@ -42,19 +43,29 @@ export function AuthCard() {
       <div className="absolute bottom-2 right-2 w-2 h-2 border-b-2 border-r-2 border-sky-400/40 pointer-events-none" />
 
       {/* Brand Header */}
-      <div className="p-6 pb-4 sm:p-7 sm:pb-5 text-center border-b border-sky-500/15 bg-[#070D19]/60">
+      <div className="p-6 pb-4 sm:p-7 sm:pb-5 text-center border-b border-sky-500/15 bg-[#070D19]/70">
         <div className="inline-flex items-center justify-center mb-3">
           <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-sky-500 to-blue-600 rounded-xl blur-xs opacity-70 group-hover:opacity-100 transition duration-300"></div>
-            <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-sky-400 via-sky-500 to-blue-600 text-slate-950 flex items-center justify-center font-black text-xl tracking-wider border border-sky-200/50 shadow-[0_0_20px_rgba(14,165,233,0.45)]">
-              P14
+            <div className="absolute -inset-1.5 bg-gradient-to-r from-sky-500 via-indigo-500 to-blue-600 rounded-2xl blur-xs opacity-75 group-hover:opacity-100 transition duration-300"></div>
+            <div className="relative w-16 h-16 rounded-2xl bg-[#0B1221]/95 p-2 flex items-center justify-center border border-sky-400/50 shadow-[0_0_25px_rgba(14,165,233,0.4)]">
+              <Image
+                src="/images/ulbs-shield.svg"
+                alt="Sigla Oficială ULBS - Facultatea de Inginerie"
+                width={56}
+                height={56}
+                className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(14,165,233,0.5)]"
+                priority
+              />
             </div>
           </div>
         </div>
         <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-          Portal Practică Inginerie — ULBS
+          Portal Practică Inginerie
         </h2>
-        <p className="text-xs text-sky-300/70 mt-1 flex items-center justify-center gap-1.5 font-medium">
+        <p className="text-xs text-sky-300/90 mt-1 font-semibold tracking-wide">
+          Facultatea de Inginerie • Universitatea „Lucian Blaga” din Sibiu
+        </p>
+        <p className="text-[11px] text-slate-400 mt-1 flex items-center justify-center gap-1.5 font-medium">
           <Cpu className="w-3.5 h-3.5 text-sky-400" />
           Cyber-Engineering Authentication Gateway
         </p>

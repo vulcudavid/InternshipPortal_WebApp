@@ -35,7 +35,7 @@ export function CoordinatorDashboard({ user, data }: CoordinatorDashboardProps) 
   return (
     <div className="space-y-6">
       {/* ── Topbar / Header Acțiuni Coordonator ─────────────────────────────── */}
-      <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-xl p-5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-xl p-5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-950/60 text-sky-300 border border-sky-500/30">
@@ -110,7 +110,7 @@ export function CoordinatorDashboard({ user, data }: CoordinatorDashboardProps) 
       {/* ── Bară de Progres & Indicatori Suplimentari ───────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Card Progres Ocupare */}
-        <div className="md:col-span-2 bg-[#0B1221]/80 backdrop-blur-xl rounded-xl p-5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] flex flex-col justify-between">
+        <div className="md:col-span-2 bg-[#0B1221]/88 backdrop-blur-xl rounded-xl p-5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -144,7 +144,7 @@ export function CoordinatorDashboard({ user, data }: CoordinatorDashboardProps) 
         </div>
 
         {/* Card Indicatori Convenții & Jurnale */}
-        <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-xl p-5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] flex flex-col justify-between">
+        <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-xl p-5 border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] flex flex-col justify-between">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
             Documente & Monitorizare
           </span>

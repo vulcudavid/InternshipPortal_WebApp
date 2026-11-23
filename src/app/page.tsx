@@ -157,16 +157,17 @@ export default async function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#040812] text-slate-100 relative overflow-hidden flex flex-col selection:bg-sky-500/30 selection:text-sky-200">
+    <main className="min-h-screen bg-transparent text-slate-100 relative overflow-hidden flex flex-col selection:bg-sky-500/30 selection:text-sky-200">
       {/* Glowuri radiale cybernetice în colțuri și centru */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[350px] bg-sky-500/10 pointer-events-none -z-10 rounded-full blur-[120px]" />
       <div className="absolute top-1/3 right-10 w-[450px] h-[350px] bg-indigo-600/10 pointer-events-none -z-10 rounded-full blur-[140px]" />
       <div className="absolute bottom-10 left-10 w-[400px] h-[300px] bg-cyan-600/10 pointer-events-none -z-10 rounded-full blur-[130px]" />
 
-      {/* Top Navigation Bar Unificat (Fără fundal alb) */}
-      <AppHeader currentUser={currentUser} />
+      <div className="relative z-10 flex flex-col min-h-screen bg-transparent">
+        {/* Top Navigation Bar Unificat (Fără fundal alb) */}
+        <AppHeader currentUser={currentUser} />
 
-      <div className="max-w-7xl mx-auto py-8 sm:py-10 px-4 sm:px-6 lg:px-8 space-y-10 flex-1 w-full">
+        <div className="max-w-7xl mx-auto py-8 sm:py-10 px-4 sm:px-6 lg:px-8 space-y-10 flex-1 w-full bg-transparent">
         {currentUser ? (
           currentUser.role === UserRole.STUDENT && currentUser.studentProfile && studentData ? (
             /* VEDERE COMPLETĂ DASHBOARD STUDENT (PARTEA 1A) */
@@ -225,20 +226,20 @@ export default async function Home() {
               <AuthCard />
             </section>
 
-            {/* Overview Grid Module P14 în Stil Futuristic */}
+            {/* Overview Grid Module Platformă de Practică în Stil Futuristic */}
             <section className="space-y-6 pt-8 border-t border-sky-500/20">
               <div className="text-center space-y-1">
                 <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-400 uppercase tracking-widest">
                   <Layers className="w-3.5 h-3.5 text-sky-400" />
                   Arhitectură de Sistem
                 </div>
-                <h2 className="text-xl font-bold text-white tracking-tight">Modulele Platformei P14</h2>
+                <h2 className="text-xl font-bold text-white tracking-tight">Modulele Platformei de Practică</h2>
                 <p className="text-xs text-slate-400">Flux integrat pentru studenți, companii partenere, coordonatori și administratori</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {/* Modul Studenți */}
-                <div className="bg-[#0B1221]/80 backdrop-blur-xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] rounded-xl p-5 space-y-3 relative group hover:border-sky-400/40 transition">
+                <div className="bg-[#0B1221]/88 backdrop-blur-xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] rounded-xl p-5 space-y-3 relative group hover:border-sky-400/40 transition">
                   <div className="w-10 h-10 bg-sky-950/60 border border-sky-500/30 text-sky-400 rounded-xl flex items-center justify-center font-bold shadow-[0_0_15px_rgba(14,165,233,0.2)]">
                     <GraduationCap className="w-5 h-5" />
                   </div>
@@ -258,7 +259,7 @@ export default async function Home() {
                 </div>
 
                 {/* Modul Companii */}
-                <div className="bg-[#0B1221]/80 backdrop-blur-xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] rounded-xl p-5 space-y-3 relative group hover:border-sky-400/40 transition">
+                <div className="bg-[#0B1221]/88 backdrop-blur-xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] rounded-xl p-5 space-y-3 relative group hover:border-sky-400/40 transition">
                   <div className="w-10 h-10 bg-cyan-950/60 border border-cyan-500/30 text-cyan-400 rounded-xl flex items-center justify-center font-bold shadow-[0_0_15px_rgba(6,182,212,0.2)]">
                     <Building2 className="w-5 h-5" />
                   </div>
@@ -278,7 +279,7 @@ export default async function Home() {
                 </div>
 
                 {/* Modul Coordonator */}
-                <div className="bg-[#0B1221]/80 backdrop-blur-xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] rounded-xl p-5 space-y-3 relative group hover:border-sky-400/40 transition">
+                <div className="bg-[#0B1221]/88 backdrop-blur-xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] rounded-xl p-5 space-y-3 relative group hover:border-sky-400/40 transition">
                   <div className="w-10 h-10 bg-indigo-950/60 border border-indigo-500/30 text-indigo-400 rounded-xl flex items-center justify-center font-bold shadow-[0_0_15px_rgba(99,102,241,0.2)]">
                     <ShieldCheck className="w-5 h-5" />
                   </div>
@@ -303,9 +304,10 @@ export default async function Home() {
 
         {/* Footer High-Tech */}
         <footer className="text-center text-xs text-slate-500 pt-8 border-t border-sky-500/15 pb-4">
-          Laborator Web 2 • Universitatea „Lucian Blaga” din Sibiu • Proiect P14 Portal de Practică • Cyber-Engineering Enterprise Dark
+          Laborator Web 2 • Universitatea „Lucian Blaga” din Sibiu • Facultatea de Inginerie • Portal Practică • Cyber-Engineering Enterprise Dark
         </footer>
       </div>
-    </main>
-  );
+    </div>
+  </main>
+);
 }
