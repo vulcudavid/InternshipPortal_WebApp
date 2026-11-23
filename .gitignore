@@ -16,6 +16,7 @@
 # Uploads
 /public/uploads/cvs/*
 !/public/uploads/cvs/.gitkeep
+/storage/
 
 # Production
 /build
