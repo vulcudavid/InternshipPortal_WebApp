@@ -231,20 +231,20 @@ export function OfferManager({
   return (
     <div className="space-y-6">
       {/* Header & Buton Creare */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0B1221]/80 backdrop-blur-xl p-6 rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)]">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <Briefcase className="w-5 h-5 text-blue-600" />
+          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <Briefcase className="w-5 h-5 text-sky-400" />
             Oferte de Practică Publicate ({offers.length})
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-400 mt-0.5">
             Definiți pozițiile deschise, numărul de locuri și competențele cerute (obligatorii/opționale) pentru matching Gale-Shapley.
           </p>
         </div>
 
         <button
           onClick={openCreateModal}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold shadow-sm transition"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-sky-500 hover:bg-sky-400 text-slate-950 rounded-xl text-sm font-bold shadow-[0_0_20px_rgba(14,165,233,0.35)] transition"
         >
           <Plus className="w-4 h-4" />
           Adaugă Ofertă Nouă
@@ -252,25 +252,25 @@ export function OfferManager({
       </div>
 
       {successMsg && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-sm flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+        <div className="p-3 bg-emerald-950/40 border border-emerald-500/40 rounded-xl text-emerald-200 text-sm flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.15)] animate-fadeIn">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{successMsg}</span>
         </div>
       )}
 
       {/* Grid Oferte */}
       {offers.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-12 text-center">
-          <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+        <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-dashed border-sky-500/20 p-12 text-center">
+          <div className="w-12 h-12 bg-sky-950/60 border border-sky-500/30 text-sky-400 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-[0_0_15px_rgba(14,165,233,0.2)]">
             <Briefcase className="w-6 h-6" />
           </div>
-          <h3 className="text-base font-bold text-slate-900">Nu aveți nicio ofertă publicată</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-4">
+          <h3 className="text-base font-bold text-white">Nu aveți nicio ofertă publicată</h3>
+          <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1 mb-4">
             Creați prima ofertă de practică pentru a permite studenților să o aleagă în listele lor de preferințe.
           </p>
           <button
             onClick={openCreateModal}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-sky-500 hover:bg-sky-400 text-slate-950 rounded-xl text-xs font-bold shadow-[0_0_15px_rgba(14,165,233,0.3)]"
           >
             <Plus className="w-4 h-4" />
             Publică Prima Ofertă
@@ -286,8 +286,8 @@ export function OfferManager({
             return (
               <div
                 key={offer.id}
-                className={`bg-white rounded-2xl border transition shadow-sm overflow-hidden flex flex-col justify-between ${
-                  isActive ? "border-slate-200/80 hover:border-blue-300" : "border-slate-200 bg-slate-50/40 opacity-80"
+                className={`bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border transition shadow-[0_0_25px_rgba(14,165,233,0.06)] overflow-hidden flex flex-col justify-between ${
+                  isActive ? "border-sky-400/20 hover:border-sky-400/40" : "border-slate-800 bg-[#070D19]/40 opacity-75"
                 }`}
               >
                 <div className="p-6 space-y-4">
@@ -298,20 +298,20 @@ export function OfferManager({
                         <span
                           className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${
                             isActive
-                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                              : "bg-slate-100 text-slate-600 border border-slate-200"
+                              ? "bg-emerald-950/50 text-emerald-300 border border-emerald-500/30"
+                              : "bg-slate-900/60 text-slate-400 border border-slate-700/60"
                           }`}
                         >
                           <span
-                            className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`}
+                            className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" : "bg-slate-500"}`}
                           />
                           {isActive ? "Activă (Înscrieri deschise)" : "Închisă"}
                         </span>
-                        <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md font-semibold border border-blue-100">
+                        <span className="text-xs px-2 py-0.5 bg-sky-950/60 text-sky-300 rounded-md font-semibold border border-sky-500/30">
                           {DOMAIN_LABELS[offer.primaryDomain]}
                         </span>
                       </div>
-                      <h3 className="text-base font-bold text-slate-900 leading-snug">{offer.title}</h3>
+                      <h3 className="text-base font-bold text-white leading-snug">{offer.title}</h3>
                     </div>
 
                     <div className="flex items-center gap-1 shrink-0">
@@ -319,56 +319,56 @@ export function OfferManager({
                         title={isActive ? "Dezactivează oferta" : "Activează oferta"}
                         onClick={() => handleToggleStatus(offer.id)}
                         disabled={isPending}
-                        className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-slate-100 rounded-lg transition"
+                        className="p-1.5 text-slate-400 hover:text-amber-400 hover:bg-slate-800/60 rounded-lg transition"
                       >
                         <Power className="w-4 h-4" />
                       </button>
                       <button
                         title="Editează"
                         onClick={() => openEditModal(offer)}
-                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-slate-100 rounded-lg transition"
+                        className="p-1.5 text-slate-400 hover:text-sky-400 hover:bg-slate-800/60 rounded-lg transition"
                       >
                         <Edit3 className="w-4 h-4" />
                       </button>
                       <button
                         title="Șterge"
                         onClick={() => handleDeleteOffer(offer.id)}
-                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-slate-100 rounded-lg transition"
+                        className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800/60 rounded-lg transition"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">{offer.description}</p>
+                  <p className="text-xs text-slate-300 line-clamp-3 leading-relaxed">{offer.description}</p>
 
                   {/* Informații cheie */}
-                  <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 pt-2 border-t border-slate-100">
+                  <div className="grid grid-cols-2 gap-2 text-xs text-slate-300 pt-2 border-t border-sky-500/15">
                     <div className="flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5 text-slate-400" />
+                      <Users className="w-3.5 h-3.5 text-sky-400" />
                       <span>
-                        <strong>{offer.slotsTotal}</strong> locuri totale ({offer.slotsAvailable} disponibile)
+                        <strong className="text-white">{offer.slotsTotal}</strong> locuri ({offer.slotsAvailable} libere)
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                      <MapPin className="w-3.5 h-3.5 text-sky-400" />
                       <span className="truncate">{offer.location} {offer.isRemote && "(Remote)"}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                      <Calendar className="w-3.5 h-3.5 text-sky-400" />
                       <span>
                         {new Date(offer.startDate).toLocaleDateString("ro-RO")} – {new Date(offer.endDate).toLocaleDateString("ro-RO")}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5 truncate">
-                      <span className="font-semibold text-slate-700">Tutore:</span>
+                      <span className="font-semibold text-sky-300">Tutore:</span>
                       <span className="truncate">{offer.tutorName}</span>
                     </div>
                   </div>
 
                   {/* Competențe cerute */}
-                  <div className="space-y-1.5 pt-2 border-t border-slate-100">
-                    <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500">
+                  <div className="space-y-1.5 pt-2 border-t border-sky-500/15">
+                    <div className="flex items-center justify-between text-[11px] font-semibold text-slate-400">
                       <span>Competențe Cerute ({offer.offerTags.length})</span>
                       <span>{requiredCount} Obligatorii • {optionalCount} Opționale</span>
                     </div>
@@ -378,11 +378,11 @@ export function OfferManager({
                           key={ot.tagId}
                           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium ${
                             ot.isRequired
-                              ? "bg-rose-50 text-rose-700 border border-rose-200"
-                              : "bg-slate-100 text-slate-600 border border-slate-200"
+                              ? "bg-rose-950/40 text-rose-300 border border-rose-500/30"
+                              : "bg-[#070D19] text-slate-300 border border-sky-500/20"
                           }`}
                         >
-                          <TagIcon className="w-2.5 h-2.5" />
+                          <TagIcon className="w-2.5 h-2.5 text-sky-400" />
                           {ot.tag.name}
                           <span className="text-[9px] font-bold opacity-75">
                             {ot.isRequired ? "(Obligatoriu)" : "(Opțional)"}
@@ -394,16 +394,16 @@ export function OfferManager({
                 </div>
 
                 {/* Footer Metrics */}
-                <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 text-xs text-slate-500 flex items-center justify-between">
+                <div className="px-6 py-3 bg-[#070D19]/70 border-t border-sky-500/15 text-xs text-slate-400 flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <span>
-                      <strong className="text-slate-800">{offer._count?.preferences || 0}</strong> aplicanți
+                      <strong className="text-white">{offer._count?.preferences || 0}</strong> aplicanți
                     </span>
                     <span>
-                      <strong className="text-slate-800">{offer._count?.applicantRanks || 0}</strong> ierarhizați
+                      <strong className="text-white">{offer._count?.applicantRanks || 0}</strong> ierarhizați
                     </span>
                     <span>
-                      <strong className="text-slate-800">{offer._count?.interviewSlots || 0}</strong> sloturi interviu
+                      <strong className="text-white">{offer._count?.interviewSlots || 0}</strong> sloturi interviu
                     </span>
                   </div>
                 </div>
@@ -415,25 +415,25 @@ export function OfferManager({
 
       {/* Modal Creare / Editare Ofertă */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+          <div className="bg-[#0B1221] rounded-2xl border border-sky-400/30 shadow-[0_0_50px_rgba(14,165,233,0.15)] w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             {/* Modal Header */}
-            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+            <div className="p-5 border-b border-sky-500/20 flex items-center justify-between bg-[#070D19]/80">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-xl bg-sky-950 border border-sky-500/30 text-sky-400 flex items-center justify-center font-bold">
                   <Briefcase className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 className="text-base font-bold text-white">
                     {editingOffer ? "Editează Oferta de Practică" : "Publică Ofertă Nouă de Practică"}
                   </h3>
-                  <p className="text-xs text-slate-500">Completați detaliile poziției și competențele tehnice căutate</p>
+                  <p className="text-xs text-slate-400">Completați detaliile poziției și competențele tehnice căutate</p>
                 </div>
               </div>
 
               <button
                 onClick={() => setModalOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition"
+                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -442,8 +442,8 @@ export function OfferManager({
             {/* Modal Form Body */}
             <form onSubmit={handleSaveOffer} className="p-6 overflow-y-auto space-y-6 flex-1">
               {errorMsg && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <div className="p-3 bg-rose-950/40 border border-rose-500/40 rounded-xl text-rose-200 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
                   <span>{errorMsg}</span>
                 </div>
               )}
@@ -451,8 +451,8 @@ export function OfferManager({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Titlu */}
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                    Titlu Ofertă / Poziție <span className="text-rose-500">*</span>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                    Titlu Ofertă / Poziție <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
@@ -460,19 +460,19 @@ export function OfferManager({
                     value={formTitle}
                     onChange={(e) => setFormTitle(e.target.value)}
                     placeholder="Ex: Junior Embedded & Cloud Developer"
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm bg-[#070D19] border border-sky-500/30 text-white rounded-xl focus:outline-none focus:border-sky-400 placeholder-slate-500"
                   />
                 </div>
 
                 {/* Domeniu Principal */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                    Domeniu Ingineresc Principal <span className="text-rose-500">*</span>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                    Domeniu Ingineresc Principal <span className="text-rose-400">*</span>
                   </label>
                   <select
                     value={formDomain}
                     onChange={(e) => setFormDomain(e.target.value as EngineeringDomain)}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm bg-[#070D19] border border-sky-500/30 text-white rounded-xl focus:outline-none focus:border-sky-400"
                   >
                     {Object.entries(DOMAIN_LABELS).map(([domainKey, label]) => (
                       <option key={domainKey} value={domainKey}>
@@ -484,8 +484,8 @@ export function OfferManager({
 
                 {/* Număr Locuri */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                    Locuri Disponibile (Capacitate Gale-Shapley) <span className="text-rose-500">*</span>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                    Locuri Disponibile (Capacitate Gale-Shapley) <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="number"
@@ -494,14 +494,14 @@ export function OfferManager({
                     required
                     value={formSlotsTotal}
                     onChange={(e) => setFormSlotsTotal(parseInt(e.target.value) || 1)}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                    className="w-full px-3 py-2 text-sm bg-[#070D19] border border-sky-500/30 text-white rounded-xl focus:outline-none focus:border-sky-400 font-mono"
                   />
                 </div>
 
                 {/* Locație */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                    Locație Sediu <span className="text-rose-500">*</span>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                    Locație Sediu <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
@@ -509,7 +509,7 @@ export function OfferManager({
                     value={formLocation}
                     onChange={(e) => setFormLocation(e.target.value)}
                     placeholder="Ex: Sibiu, Str. Salzburg 8"
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm bg-[#070D19] border border-sky-500/30 text-white rounded-xl focus:outline-none focus:border-sky-400 placeholder-slate-500"
                   />
                 </div>
 
@@ -520,44 +520,44 @@ export function OfferManager({
                     id="isRemote"
                     checked={formIsRemote}
                     onChange={(e) => setFormIsRemote(e.target.checked)}
-                    className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+                    className="w-4 h-4 text-sky-500 bg-[#070D19] rounded border-sky-500/30 focus:ring-sky-400"
                   />
-                  <label htmlFor="isRemote" className="text-xs font-medium text-slate-700 cursor-pointer">
+                  <label htmlFor="isRemote" className="text-xs font-medium text-slate-300 cursor-pointer">
                     Permite lucru Remote / Hibrid
                   </label>
                 </div>
 
                 {/* Perioadă */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                    Data Început Stagiu <span className="text-rose-500">*</span>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                    Data Început Stagiu <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="date"
                     required
                     value={formStartDate}
                     onChange={(e) => setFormStartDate(e.target.value)}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm bg-[#070D19] border border-sky-500/30 text-white rounded-xl focus:outline-none focus:border-sky-400"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                    Data Finalizare Stagiu <span className="text-rose-500">*</span>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                    Data Finalizare Stagiu <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="date"
                     required
                     value={formEndDate}
                     onChange={(e) => setFormEndDate(e.target.value)}
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm bg-[#070D19] border border-sky-500/30 text-white rounded-xl focus:outline-none focus:border-sky-400"
                   />
                 </div>
 
                 {/* Tutore */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                    Nume Tutore / Coordonator Firmă <span className="text-rose-500">*</span>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                    Nume Tutore / Coordonator Firmă <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
@@ -565,13 +565,13 @@ export function OfferManager({
                     value={formTutorName}
                     onChange={(e) => setFormTutorName(e.target.value)}
                     placeholder="Ex: Ing. Elena Popa"
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm bg-[#070D19] border border-sky-500/30 text-white rounded-xl focus:outline-none focus:border-sky-400 placeholder-slate-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                    Email Tutore <span className="text-rose-500">*</span>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                    Email Tutore <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="email"
@@ -579,14 +579,14 @@ export function OfferManager({
                     value={formTutorEmail}
                     onChange={(e) => setFormTutorEmail(e.target.value)}
                     placeholder="elena.popa@firma.ro"
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm bg-[#070D19] border border-sky-500/30 text-white rounded-xl focus:outline-none focus:border-sky-400 placeholder-slate-500"
                   />
                 </div>
 
                 {/* Descriere */}
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                    Descriere Activitate & Proiect de Practică <span className="text-rose-500">*</span>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                    Descriere Activitate & Proiect de Practică <span className="text-rose-400">*</span>
                   </label>
                   <textarea
                     rows={3}
@@ -594,19 +594,19 @@ export function OfferManager({
                     value={formDescription}
                     onChange={(e) => setFormDescription(e.target.value)}
                     placeholder="Descrieți pe scurt proiectele în care va fi implicat studentul, tehnologiile utilizate și obiectivele de învățare..."
-                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm bg-[#070D19] border border-sky-500/30 text-white rounded-xl focus:outline-none focus:border-sky-400 placeholder-slate-500"
                   />
                 </div>
               </div>
 
-              {/* Selector Competențe (41 Tag-uri Catalog ULBS) */}
-              <div className="space-y-3 pt-4 border-t border-slate-200">
+              {/* Selector Competențe */}
+              <div className="space-y-3 pt-4 border-t border-sky-500/20">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
-                    <label className="block text-xs font-bold text-slate-900 uppercase tracking-wider">
+                    <label className="block text-xs font-bold text-white uppercase tracking-wider">
                       Competențe Cerute ({selectedTags.length} selectate)
                     </label>
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-[11px] text-slate-400">
                       Tag-urile <strong>Obligatorii</strong> asigură 70% din scorul de compatibilitate; cele <strong>Opționale</strong> aduc 20%.
                     </p>
                   </div>
@@ -621,14 +621,14 @@ export function OfferManager({
                       placeholder="Caută în catalogul de 41 de competențe..."
                       value={tagSearch}
                       onChange={(e) => setTagSearch(e.target.value)}
-                      className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#070D19] border border-sky-500/30 text-white rounded-lg focus:outline-none focus:border-sky-400 placeholder-slate-500"
                     />
                   </div>
 
                   <select
                     value={tagDomainFilter}
                     onChange={(e) => setTagDomainFilter(e.target.value)}
-                    className="px-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-2.5 py-1.5 text-xs bg-[#070D19] border border-sky-500/30 text-white rounded-lg focus:outline-none focus:border-sky-400"
                   >
                     <option value="ALL">Toate Domeniile</option>
                     {Object.entries(DOMAIN_LABELS).map(([k, v]) => (
@@ -640,7 +640,7 @@ export function OfferManager({
                 </div>
 
                 {/* Tag Cloud Selector */}
-                <div className="p-3 bg-slate-50/70 border border-slate-200 rounded-xl max-h-48 overflow-y-auto flex flex-wrap gap-1.5">
+                <div className="p-3 bg-[#070D19]/80 border border-sky-500/20 rounded-xl max-h-48 overflow-y-auto flex flex-wrap gap-1.5">
                   {filteredTags.map((t) => {
                     const isSelected = selectedTags.some((st) => st.tagId === t.id);
                     return (
@@ -650,13 +650,13 @@ export function OfferManager({
                         onClick={() => toggleTagSelection(t.id)}
                         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition ${
                           isSelected
-                            ? "bg-blue-600 text-white shadow-sm ring-2 ring-blue-600/30"
-                            : "bg-white text-slate-700 border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50"
+                            ? "bg-sky-500 text-slate-950 font-bold shadow-[0_0_12px_rgba(14,165,233,0.35)]"
+                            : "bg-[#0B1221] text-slate-300 border border-sky-500/20 hover:border-sky-400/40 hover:text-white"
                         }`}
                       >
                         <TagIcon className="w-3 h-3" />
                         <span>{t.name}</span>
-                        {isSelected && <CheckCircle2 className="w-3 h-3 text-white" />}
+                        {isSelected && <CheckCircle2 className="w-3 h-3 text-slate-950" />}
                       </button>
                     );
                   })}
@@ -665,7 +665,7 @@ export function OfferManager({
                 {/* Lista de Competențe Selectate cu Setare Obligatoriu / Opțional */}
                 {selectedTags.length > 0 && (
                   <div className="space-y-2 pt-2">
-                    <span className="text-[11px] font-semibold text-slate-600 uppercase tracking-wider block">
+                    <span className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider block">
                       Configurează cerințele pe competențele alese:
                     </span>
                     <div className="space-y-1.5 max-h-40 overflow-y-auto">
@@ -676,9 +676,9 @@ export function OfferManager({
                         return (
                           <div
                             key={st.tagId}
-                            className="flex items-center justify-between p-2 bg-white rounded-lg border border-slate-200 text-xs"
+                            className="flex items-center justify-between p-2 bg-[#070D19] rounded-lg border border-sky-500/20 text-xs"
                           >
-                            <span className="font-semibold text-slate-800">{tagObj.name}</span>
+                            <span className="font-semibold text-white">{tagObj.name}</span>
 
                             <div className="flex items-center gap-2">
                               <button
@@ -686,8 +686,8 @@ export function OfferManager({
                                 onClick={() => toggleTagRequirement(st.tagId)}
                                 className={`px-2 py-0.5 rounded text-[11px] font-bold transition ${
                                   st.isRequired
-                                    ? "bg-rose-100 text-rose-700 border border-rose-300"
-                                    : "bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200"
+                                    ? "bg-rose-950/60 text-rose-300 border border-rose-500/40"
+                                    : "bg-slate-800 text-slate-300 border border-slate-700 hover:border-slate-500"
                                 }`}
                               >
                                 {st.isRequired ? "★ Obligatorie (70% scor)" : "○ Opțională (20% scor)"}
@@ -696,7 +696,7 @@ export function OfferManager({
                               <button
                                 type="button"
                                 onClick={() => toggleTagSelection(st.tagId)}
-                                className="text-slate-400 hover:text-rose-500 p-1"
+                                className="text-slate-400 hover:text-rose-400 p-1"
                               >
                                 <X className="w-3.5 h-3.5" />
                               </button>
@@ -710,20 +710,20 @@ export function OfferManager({
               </div>
 
               {/* Modal Footer */}
-              <div className="flex justify-end gap-2 pt-4 border-t border-slate-100">
+              <div className="flex justify-end gap-2 pt-4 border-t border-sky-500/20">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl text-xs font-semibold"
+                  className="px-4 py-2 border border-slate-700 text-slate-300 hover:bg-slate-800 rounded-xl text-xs font-semibold"
                 >
                   Anulează
                 </button>
                 <button
                   type="submit"
                   disabled={isPending}
-                  className="inline-flex items-center gap-1.5 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm transition disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 px-5 py-2 bg-sky-500 hover:bg-sky-400 text-slate-950 rounded-xl text-xs font-bold shadow-[0_0_20px_rgba(14,165,233,0.35)] transition disabled:opacity-50"
                 >
-                  {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-950" />}
                   <span>{editingOffer ? "Salvează Modificările" : "Publică Oferta"}</span>
                 </button>
               </div>

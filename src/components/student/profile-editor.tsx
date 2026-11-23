@@ -106,52 +106,52 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
-      <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+    <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] p-6 space-y-6">
+      <div className="flex items-center justify-between border-b border-sky-500/15 pb-4">
         <div>
-          <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
-            <User className="w-5 h-5 text-blue-600" />
+          <h3 className="font-bold text-white text-lg flex items-center gap-2">
+            <User className="w-5 h-5 text-sky-400" />
             Date Academice & Profil Profesional
           </h3>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-400">
             Facultatea de Inginerie • Universitatea „Lucian Blaga” din Sibiu
           </p>
         </div>
       </div>
 
       {successMessage && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs flex items-center gap-2 animate-fadeIn">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+        <div className="p-3 bg-emerald-950/40 border border-emerald-500/40 text-emerald-200 rounded-xl text-xs flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.15)] animate-fadeIn">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{successMessage}</span>
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-3 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs flex items-center gap-2 animate-fadeIn">
-          <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+        <div className="p-3 bg-rose-950/40 border border-rose-500/40 text-rose-200 rounded-xl text-xs flex items-center gap-2 shadow-[0_0_15px_rgba(244,63,94,0.15)] animate-fadeIn">
+          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
           <span>{errorMessage}</span>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Date Academice Oficiale ULBS */}
-        <div className="p-4 bg-slate-50 border border-slate-200/80 rounded-xl space-y-4">
-          <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-            <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+        <div className="p-4 bg-[#070D19]/70 border border-sky-500/20 rounded-xl space-y-4">
+          <h4 className="text-xs font-bold text-sky-300 uppercase tracking-wider flex items-center gap-1.5">
+            <BookOpen className="w-3.5 h-3.5 text-sky-400" />
             Apartenență Academică Oficială ULBS
           </h4>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Specializare */}
             <div className="md:col-span-1">
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
                 Program de Studii (Specializare) *
               </label>
               <select
                 value={specialization}
                 onChange={(e) => setSpecialization(e.target.value)}
                 required
-                className="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+                className="w-full text-xs px-3 py-2 rounded-lg border border-sky-500/30 bg-[#0B1221] text-white focus:outline-none focus:border-sky-400 font-medium"
               >
                 {ULBS_ENGINEERING_SPECIALIZATIONS.map((spec) => (
                   <option key={spec.name} value={spec.name}>
@@ -163,14 +163,14 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
 
             {/* An de studiu */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
                 An de studiu *
               </label>
               <select
                 value={studyYear}
                 onChange={(e) => setStudyYear(Number(e.target.value))}
                 required
-                className="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+                className="w-full text-xs px-3 py-2 rounded-lg border border-sky-500/30 bg-[#0B1221] text-white focus:outline-none focus:border-sky-400 font-medium"
               >
                 {STUDY_YEARS.map((y) => (
                   <option key={y.value} value={y.value}>
@@ -182,7 +182,7 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
 
             {/* Grupa */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
                 Grupă / Semigrupă *
               </label>
               <input
@@ -191,7 +191,7 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
                 onChange={(e) => setGroup(e.target.value)}
                 placeholder="Ex: 331 CTI, 321 TI"
                 required
-                className="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full text-xs px-3 py-2 rounded-lg border border-sky-500/30 bg-[#070D19] text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
               />
             </div>
           </div>
@@ -200,7 +200,7 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
         {/* Headline & Bio */}
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-semibold text-slate-300 mb-1">
               Titlu profesional / Headline
             </label>
             <div className="relative">
@@ -209,14 +209,14 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
                 value={headline}
                 onChange={(e) => setHeadline(e.target.value)}
                 placeholder="Ex: Student CTI pasionat de Cloud, DevOps și Sisteme Distribuite"
-                className="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 pl-8"
+                className="w-full text-xs px-3 py-2 rounded-lg border border-sky-500/30 bg-[#070D19] text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 pl-8"
               />
-              <Sparkles className="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" />
+              <Sparkles className="w-4 h-4 text-sky-400 absolute left-2.5 top-2.5" />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <label className="block text-xs font-semibold text-slate-300 mb-1">
               Despre mine (Bio / Motivație pentru stagiu)
             </label>
             <textarea
@@ -224,7 +224,7 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               placeholder="Prezintă pe scurt experiența ta, tehnologiile preferate și ce tip de proiecte cauți pentru practica universitară..."
-              className="w-full text-xs p-3 rounded-lg border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full text-xs p-3 rounded-lg border border-sky-500/30 bg-[#070D19] text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
             />
           </div>
         </div>
@@ -232,8 +232,8 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
         {/* Link-uri Social & Contact */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5 text-slate-500" />
+            <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+              <Phone className="w-3.5 h-3.5 text-sky-400" />
               Număr Telefon (Privat până la aplicare)
             </label>
             <input
@@ -241,13 +241,13 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+40 7xx xxx xxx"
-              className="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full text-xs px-3 py-2 rounded-lg border border-sky-500/30 bg-[#070D19] text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
-              <GithubIcon className="w-3.5 h-3.5 text-slate-700" />
+            <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+              <GithubIcon className="w-3.5 h-3.5 text-slate-300" />
               Profil GitHub
             </label>
             <input
@@ -255,13 +255,13 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
               value={githubUrl}
               onChange={(e) => setGithubUrl(e.target.value)}
               placeholder="https://github.com/username"
-              className="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full text-xs px-3 py-2 rounded-lg border border-sky-500/30 bg-[#070D19] text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
-              <LinkedinIcon className="w-3.5 h-3.5 text-blue-700" />
+            <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+              <LinkedinIcon className="w-3.5 h-3.5 text-sky-400" />
               Profil LinkedIn
             </label>
             <input
@@ -269,13 +269,13 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
               value={linkedinUrl}
               onChange={(e) => setLinkedinUrl(e.target.value)}
               placeholder="https://linkedin.com/in/username"
-              className="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full text-xs px-3 py-2 rounded-lg border border-sky-500/30 bg-[#070D19] text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
-              <Globe className="w-3.5 h-3.5 text-indigo-600" />
+            <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+              <Globe className="w-3.5 h-3.5 text-sky-400" />
               Portofoliu Web / Website Personal
             </label>
             <input
@@ -283,34 +283,34 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
               value={portfolioUrl}
               onChange={(e) => setPortfolioUrl(e.target.value)}
               placeholder="https://myportfolio.dev"
-              className="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full text-xs px-3 py-2 rounded-lg border border-sky-500/30 bg-[#070D19] text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
             />
           </div>
         </div>
 
         {/* Disponibilitate */}
-        <div className="p-3 bg-blue-50/50 border border-blue-100 rounded-xl space-y-2">
-          <label className="block text-xs font-bold text-blue-900 flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5 text-blue-600" />
+        <div className="p-3 bg-[#070D19]/70 border border-sky-500/20 rounded-xl space-y-2">
+          <label className="block text-xs font-bold text-sky-300 flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5 text-sky-400" />
             Interval de Disponibilitate pentru Practică
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <span className="text-[11px] text-slate-500 block mb-0.5">Disponibil de la:</span>
+              <span className="text-[11px] text-slate-400 block mb-0.5">Disponibil de la:</span>
               <input
                 type="date"
                 value={availableFrom}
                 onChange={(e) => setAvailableFrom(e.target.value)}
-                className="w-full text-xs px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full text-xs px-3 py-1.5 rounded-lg border border-sky-500/30 bg-[#0B1221] text-white focus:outline-none focus:border-sky-400"
               />
             </div>
             <div>
-              <span className="text-[11px] text-slate-500 block mb-0.5">Disponibil până la:</span>
+              <span className="text-[11px] text-slate-400 block mb-0.5">Disponibil până la:</span>
               <input
                 type="date"
                 value={availableTo}
                 onChange={(e) => setAvailableTo(e.target.value)}
-                className="w-full text-xs px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full text-xs px-3 py-1.5 rounded-lg border border-sky-500/30 bg-[#0B1221] text-white focus:outline-none focus:border-sky-400"
               />
             </div>
           </div>
@@ -321,10 +321,10 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
           <button
             type="submit"
             disabled={isPending}
-            className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold text-xs transition flex items-center gap-2 shadow-sm"
+            className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 font-bold text-xs transition flex items-center gap-2 shadow-[0_0_20px_rgba(14,165,233,0.35)]"
           >
             {isPending ? (
-              <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              <span className="inline-block w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span>
             ) : (
               <Save className="w-4 h-4" />
             )}

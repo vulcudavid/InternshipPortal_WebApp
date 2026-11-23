@@ -6,6 +6,7 @@ import { RoleDashboardSkeleton } from "@/components/role-dashboard-skeleton";
 import { StudentDashboard } from "@/components/student/student-dashboard";
 import { CompanyDashboard } from "@/components/company/company-dashboard";
 import { CoordinatorDashboard } from "@/components/coordinator/coordinator-dashboard";
+import { AdminDashboard } from "@/components/admin/admin-dashboard";
 import { getCoordinatorDashboardData } from "@/app/actions/coordinator";
 import { sanitizeStudentProfileForCompany } from "@/lib/privacy";
 import { 
@@ -186,6 +187,11 @@ export default async function Home() {
             <CoordinatorDashboard
               user={currentUser}
               data={coordinatorData}
+            />
+          ) : currentUser.role === UserRole.ADMIN ? (
+            /* VEDERE COMPLETĂ DASHBOARD ADMINISTRATOR */
+            <AdminDashboard
+              user={currentUser}
             />
           ) : (
             /* VEDERE SKELETON PENTRU CELELALTE ROLURI (ex: Admin) */

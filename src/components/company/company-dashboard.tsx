@@ -57,7 +57,6 @@ export function CompanyDashboard({
 }: CompanyDashboardProps) {
   const [activeTab, setActiveTab] = useState<"OFFERS" | "APPLICANTS" | "INTERVIEWS" | "PROFILE">("OFFERS");
 
-  // Calcul statistici rapide
   const totalOffers = offers.length;
   const activeOffers = offers.filter((o) => o.status === OfferStatus.ACTIVE).length;
   const totalApplicants = offers.reduce((acc, o) => acc + (o.preferences?.length || 0), 0);
@@ -66,34 +65,40 @@ export function CompanyDashboard({
 
   return (
     <div className="space-y-8 animate-in fade-in duration-200">
-      {/* Header Companie */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 md:p-8 space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      {/* Header Companie Futuristic Dark */}
+      <div className="bg-[#0B1221]/80 backdrop-blur-xl rounded-3xl border border-sky-400/20 shadow-[0_0_35px_rgba(14,165,233,0.08)] p-6 md:p-8 space-y-6 relative overflow-hidden">
+        {/* Glow de fundal */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-black text-2xl shadow-md shrink-0">
-              {profile.companyName.charAt(0)}
+            <div className="relative group">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-sky-400 to-blue-600 rounded-2xl blur-xs opacity-70 group-hover:opacity-100 transition"></div>
+              <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-400 via-sky-500 to-blue-600 text-slate-950 flex items-center justify-center font-black text-2xl shadow-[0_0_20px_rgba(14,165,233,0.4)] shrink-0 border border-sky-200/50">
+                {profile.companyName.charAt(0)}
+              </div>
             </div>
 
             <div className="space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-2xl font-black text-slate-900 tracking-tight">{profile.companyName}</h1>
-                <span className="px-2.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-xs font-bold">
+                <h1 className="text-2xl font-black text-white tracking-tight">{profile.companyName}</h1>
+                <span className="px-2.5 py-0.5 bg-sky-500/15 text-sky-300 border border-sky-500/30 rounded-full text-xs font-bold">
                   Companie Parteneră ULBS
                 </span>
               </div>
 
-              <p className="text-xs text-slate-500 flex items-center gap-3 flex-wrap">
-                <span className="font-mono">CUI: {profile.cuiCif}</span>
+              <p className="text-xs text-slate-400 flex items-center gap-3 flex-wrap">
+                <span className="font-mono text-sky-300/80">CUI: {profile.cuiCif}</span>
                 <span>•</span>
-                <span className="flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                <span className="flex items-center gap-1 text-slate-300">
+                  <MapPin className="w-3.5 h-3.5 text-sky-400" />
                   {profile.city}, {profile.address}
                 </span>
                 {profile.contactPhone && (
                   <>
                     <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <Phone className="w-3.5 h-3.5 text-slate-400" />
+                    <span className="flex items-center gap-1 text-slate-300">
+                      <Phone className="w-3.5 h-3.5 text-sky-400" />
                       {profile.contactPhone}
                     </span>
                   </>
@@ -103,47 +108,47 @@ export function CompanyDashboard({
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-xs font-semibold">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-950/50 text-emerald-300 border border-emerald-500/30 rounded-full text-xs font-semibold shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
               Privacy Gate Activ
             </span>
           </div>
         </div>
 
-        {/* Statistici rapide */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-100">
-          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
+        {/* 4 Carduri KPI Statistici Rapide */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-sky-500/15 relative z-10">
+          <div className="p-3.5 bg-[#070D19]/80 rounded-2xl border border-sky-500/20 shadow-inner">
+            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
               Oferte Active
             </span>
-            <span className="text-xl font-bold text-slate-900 mt-0.5 block">
-              {activeOffers} <span className="text-xs font-normal text-slate-400">/ {totalOffers}</span>
+            <span className="text-xl font-bold text-white mt-0.5 block">
+              {activeOffers} <span className="text-xs font-normal text-slate-500">/ {totalOffers}</span>
             </span>
           </div>
 
-          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
+          <div className="p-3.5 bg-[#070D19]/80 rounded-2xl border border-sky-500/20 shadow-inner">
+            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
               Aplicanți Înscriși
             </span>
-            <span className="text-xl font-bold text-blue-600 mt-0.5 block">
+            <span className="text-xl font-bold text-sky-400 mt-0.5 block">
               {totalApplicants}
             </span>
           </div>
 
-          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
+          <div className="p-3.5 bg-[#070D19]/80 rounded-2xl border border-sky-500/20 shadow-inner">
+            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
               Candidați Ierarhizați
             </span>
-            <span className="text-xl font-bold text-indigo-600 mt-0.5 block">
+            <span className="text-xl font-bold text-indigo-400 mt-0.5 block">
               {totalRanked}
             </span>
           </div>
 
-          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
+          <div className="p-3.5 bg-[#070D19]/80 rounded-2xl border border-sky-500/20 shadow-inner">
+            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
               Sloturi Interviu
             </span>
-            <span className="text-xl font-bold text-emerald-600 mt-0.5 block">
+            <span className="text-xl font-bold text-emerald-400 mt-0.5 block">
               {totalSlots}
             </span>
           </div>
@@ -151,16 +156,16 @@ export function CompanyDashboard({
       </div>
 
       {/* Bară de Navigare Tab-uri */}
-      <div className="flex bg-slate-200/70 p-1.5 rounded-2xl gap-1 overflow-x-auto">
+      <div className="flex bg-[#070D19]/80 backdrop-blur-xl border border-sky-500/20 p-1.5 rounded-2xl gap-1 overflow-x-auto shadow-sm">
         <button
           onClick={() => setActiveTab("OFFERS")}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             activeTab === "OFFERS"
-              ? "bg-white text-blue-700 shadow-sm"
-              : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+              ? "bg-sky-500/20 text-sky-300 border border-sky-400/40 shadow-[0_0_15px_rgba(14,165,233,0.2)]"
+              : "text-slate-400 hover:text-sky-200 hover:bg-sky-500/5"
           }`}
         >
-          <Briefcase className="w-4 h-4" />
+          <Briefcase className="w-4 h-4 text-sky-400" />
           <span>Oferte de Practică ({totalOffers})</span>
         </button>
 
@@ -168,14 +173,14 @@ export function CompanyDashboard({
           onClick={() => setActiveTab("APPLICANTS")}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             activeTab === "APPLICANTS"
-              ? "bg-white text-blue-700 shadow-sm"
-              : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+              ? "bg-sky-500/20 text-sky-300 border border-sky-400/40 shadow-[0_0_15px_rgba(14,165,233,0.2)]"
+              : "text-slate-400 hover:text-sky-200 hover:bg-sky-500/5"
           }`}
         >
-          <Users className="w-4 h-4" />
+          <Users className="w-4 h-4 text-sky-400" />
           <span>Candidați & Clasament Gale-Shapley</span>
           {totalApplicants > 0 && (
-            <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-800 text-[10px] flex items-center justify-center font-bold">
+            <span className="px-1.5 py-0.5 rounded-full bg-sky-950 text-sky-300 border border-sky-500/30 text-[10px] font-bold">
               {totalApplicants}
             </span>
           )}
@@ -185,11 +190,11 @@ export function CompanyDashboard({
           onClick={() => setActiveTab("INTERVIEWS")}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             activeTab === "INTERVIEWS"
-              ? "bg-white text-blue-700 shadow-sm"
-              : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+              ? "bg-sky-500/20 text-sky-300 border border-sky-400/40 shadow-[0_0_15px_rgba(14,165,233,0.2)]"
+              : "text-slate-400 hover:text-sky-200 hover:bg-sky-500/5"
           }`}
         >
-          <Calendar className="w-4 h-4" />
+          <Calendar className="w-4 h-4 text-sky-400" />
           <span>Programare Interviuri ({totalSlots})</span>
         </button>
 
@@ -197,11 +202,11 @@ export function CompanyDashboard({
           onClick={() => setActiveTab("PROFILE")}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             activeTab === "PROFILE"
-              ? "bg-white text-blue-700 shadow-sm"
-              : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+              ? "bg-sky-500/20 text-sky-300 border border-sky-400/40 shadow-[0_0_15px_rgba(14,165,233,0.2)]"
+              : "text-slate-400 hover:text-sky-200 hover:bg-sky-500/5"
           }`}
         >
-          <Building2 className="w-4 h-4" />
+          <Building2 className="w-4 h-4 text-sky-400" />
           <span>Profil Companie & Juridic</span>
         </button>
       </div>
