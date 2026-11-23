@@ -6,6 +6,7 @@ import {
   STUDY_YEARS 
 } from "@/lib/specializations";
 import { updateStudentProfile } from "@/app/actions/student";
+import { requestDataErasure } from "@/app/actions/gdpr";
 import { 
   User, 
   BookOpen, 
@@ -15,7 +16,10 @@ import {
   Sparkles, 
   Save, 
   CheckCircle2, 
-  AlertCircle 
+  AlertCircle,
+  ShieldCheck,
+  Trash2,
+  AlertTriangle
 } from "lucide-react";
 
 function GithubIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
@@ -47,6 +51,8 @@ interface ProfileEditorProps {
     portfolioUrl: string | null;
     availableFrom: Date | null;
     availableTo: Date | null;
+    gdprConsent?: boolean;
+    gdprConsentAt?: Date | null;
   };
 }
 
@@ -72,6 +78,9 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
   const [availableTo, setAvailableTo] = useState(
     initialData.availableTo ? new Date(initialData.availableTo).toISOString().slice(0, 10) : ""
   );
+  const [gdprConsent, setGdprConsent] = useState<boolean>(
+    Boolean(initialData.gdprConsent)
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,6 +101,7 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
           portfolioUrl,
           availableFrom: availableFrom || null,
           availableTo: availableTo || null,
+          gdprConsent,
         });
 
         if (result?.success) {
@@ -101,6 +111,24 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
       } catch (err: unknown) {
         const error = err as Error;
         setErrorMessage(error.message || "A apărut o eroare la salvarea profilului.");
+      }
+    });
+  };
+
+  const handleErasureRequest = () => {
+    const confirmed = window.confirm(
+      "ATENȚIE! Această acțiune este ireversibilă conform Art. 17 GDPR.\n\nDatele dvs. de identificare (nume, prenume, telefon, CV și profil social) vor fi anonimizate sau șterse complet din sistem.\n\nSunteți sigur că doriți să continuați?"
+    );
+
+    if (!confirmed) return;
+
+    startTransition(async () => {
+      try {
+        const res = await requestDataErasure();
+        alert(res.message);
+        window.location.reload();
+      } catch (err: any) {
+        alert(err.message || "Eroare la solicitarea anonimizării datelor.");
       }
     });
   };
@@ -316,12 +344,37 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
           </div>
         </div>
 
+        {/* Consimțământ GDPR */}
+        <div className="p-4 bg-[#070D19]/70 border border-sky-500/20 rounded-xl space-y-2">
+          <div className="flex items-start gap-3">
+            <input
+              type="checkbox"
+              id="gdprConsent"
+              checked={gdprConsent}
+              onChange={(e) => setGdprConsent(e.target.checked)}
+              className="mt-0.5 h-4 w-4 rounded border-sky-500/40 bg-[#0B1221] text-sky-500 focus:ring-sky-400 cursor-pointer"
+            />
+            <label htmlFor="gdprConsent" className="text-xs text-slate-300 leading-relaxed cursor-pointer">
+              <span className="font-bold flex items-center gap-1 text-sky-300 mb-0.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                Consimțământ GDPR (Prelucrare date personale):
+              </span>
+              Sunt de acord cu prelucrarea datelor mele cu caracter personal (nume, adresă de email, telefon, CV și profil academic) de către Facultatea de Inginerie ULBS și companiile partenere de practică, strict în vederea organizării, repartizării și desfășurării stagiilor de practică universitară.
+            </label>
+          </div>
+          {initialData.gdprConsentAt && (
+            <p className="text-[11px] text-slate-400 pl-7">
+              Consimțământ înregistrat la data de: {new Date(initialData.gdprConsentAt).toLocaleString("ro-RO")}
+            </p>
+          )}
+        </div>
+
         {/* Buton Salvare */}
         <div className="flex justify-end pt-2">
           <button
             type="submit"
             disabled={isPending}
-            className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 font-bold text-xs transition flex items-center gap-2 shadow-[0_0_20px_rgba(14,165,233,0.35)]"
+            className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 font-bold text-xs transition flex items-center gap-2 shadow-[0_0_20px_rgba(14,165,233,0.35)] cursor-pointer"
           >
             {isPending ? (
               <span className="inline-block w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span>
@@ -332,6 +385,30 @@ export function ProfileEditor({ initialData }: ProfileEditorProps) {
           </button>
         </div>
       </form>
+
+      {/* Secțiune Dreptul la Ștergere / Art. 17 GDPR */}
+      <div className="pt-4 border-t border-sky-500/15">
+        <div className="p-4 rounded-xl border border-rose-500/30 bg-rose-950/25 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="text-xs font-bold text-rose-300 flex items-center gap-1.5">
+              <AlertTriangle className="w-4 h-4 text-rose-400" />
+              Dreptul la Ștergerea Datelor (Art. 17 GDPR)
+            </div>
+            <p className="text-xs text-slate-400 max-w-xl">
+              Puteți solicita oricând anonimizarea ireversibilă a identității dvs. și ștergerea fișierului CV de pe serverele universității. Istoricul statistic al plasamentului va fi conservat anonimizat.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleErasureRequest}
+            disabled={isPending}
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-[0_0_15px_rgba(244,63,94,0.3)] transition shrink-0 cursor-pointer"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Anonimizare Date (GDPR)</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

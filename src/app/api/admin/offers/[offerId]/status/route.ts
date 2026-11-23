@@ -108,7 +108,7 @@ export async function PATCH(
 
       // Notificăm toți coordonatorii de practică
       await notifyCoordinators({
-        title: "Alertă Sistem: Ofertă retrasă de Admin - Realocare necesară",
+        title: "Alertă Twist P14: Ofertă retrasă de Admin - Realocare necesară",
         message: `Oferta '${offer.title}' a firmei ${offer.company.companyName} a fost retrasă de către administrator. ${result.affectedPlacements.length} student(i) au fost trecuți în status NEPLASAT și necesită realocare minimală fără re-rularea completă a algoritmului Gale-Shapley.`,
         type: NotificationType.OFFER_WITHDRAWN,
       });

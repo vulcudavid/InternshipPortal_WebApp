@@ -107,3 +107,30 @@
 **Decizii luate / ADR**: D-005 implementat
 **Fișiere modificate**: `prisma/schema.prisma`, `src/app/actions/coordinator.ts`, `src/app/actions/company.ts`, `src/app/page.tsx`, `src/lib/matching.test.ts`, `docs/agents/CONTRACTS.md`, `AI_LOG.md`, componente în `src/components/coordinator/`
 **Status final**: ✅ done
+
+---
+
+### S-007 | 2026-11-23 | Antigravity | Autor: Agent AI & David Vulcu
+**Scop sesiune**: Implementare Backend și Securitate pentru Rolul ADMIN (RBAC, Twist P14 Retragere Oferte, Reguli Globale, Management Utilizatori, Anonimizare GDPR, Audit Log).
+**Realizat**:
+- Actualizare schemă Prisma: enum `PlacementStatus` extins cu `NEPLASAT`, enum `CompanyStatus` (`PENDING`, `APPROVED`, `REJECTED`), enum `AuditActionType`, enum `NotificationType`, enum `TieBreakerRule`. Modele noi: `SystemSettings`, `AuditLog`, `Notification`. Sincronizat cu `prisma db push` și `prisma generate`.
+- Securitate & RBAC: middleware `src/middleware.ts` (blocare 403 pentru API neautorizat pe `/api/admin/*`, redirect `/` pentru rute `/admin/*`), layout `src/app/admin/layout.tsx`, guard-uri `src/lib/admin-guard.ts` (`requireAdminUser`, `checkAdminApiAuth`).
+- Twist P14 Retragere Oferte: la retragerea unei oferte de către Admin (`PATCH /api/admin/offers/[offerId]/status`), toți studenții alocați sunt marcați `NEPLASAT` cu motiv de realocare minimală, sunt emise notificări către studenți și coordonatori și se înregistrează în `AuditLog`.
+- Validare companii: `GET /api/admin/companies`, `PATCH /api/admin/companies/[companyId]/status` (aprobare/respingere + notificare + audit).
+- Management utilizatori: `GET /api/admin/users`, `PATCH /api/admin/users/[userId]/role` (prevenire auto-demotare admin), `PATCH /api/admin/users/[userId]/status` (prevenire auto-dezactivare).
+- Reguli globale: `GET /api/admin/settings`, `PUT /api/admin/settings` (`required_hours`, `tie_breaker_rule`).
+- Anonimizare GDPR la cerere: `POST /api/admin/gdpr/anonymize` conform Art. 17 (`Student_Anonim_<id>`, `anonim_<id>@deleted.local`, ștergere fișier CV fizic, păstrare intactă plasamente și statistici).
+- Audit log & Notificări: helper `src/lib/audit.ts` și `src/lib/notifications.ts`, rute `GET /api/admin/audit-logs`, `GET /api/admin/notifications`.
+- Suită de teste automate dedicată: `src/lib/admin.test.ts` (7 teste noi, total 24 teste trecute în vitest).
+- Typecheck `npx tsc --noEmit` și build complet de producție Next.js (`npm run build`) validate cu succes.
+- Implementare Interfață Completă Panou Admin (`/admin`):
+  - `AdminHeader`: antet consistent conform design system-ului Coordonator cu badge `ADMIN` (#2563EB), date de identificare și buton `Deconectare`.
+  - `CompaniesOffersTab`: carduri KPI rapide (Total Companii, În așteptare, Oferte Active, Locuri Disponibile), tabel companii cu căutare/filtre și acțiuni `Aprobă`/`Respinge`, tabel oferte cu dialog modal de confirmare a retragerii (Twist P14 - avertisment trecere în `NEPLASAT` și notificare studenți/coordonator).
+  - `UsersGdprTab`: tabel utilizatori cu căutare/filtrare rol, acțiuni schimbare rol, activare/dezactivare cont și buton dedicat `Anonimizează GDPR` cu modal de confirmare a ștergerii ireversibile conform Art. 17.
+  - `SettingsTab`: formular setări globale `required_hours` și `tie_breaker_rule` (`APPLICATION_ORDER` vs `ACADEMIC_SCORE`) cu feedback vizual.
+  - `AuditLogTab`: tabel cronologic read-only al acțiunilor critice cu filtrare pe tipul acțiunii și inspector JSON.
+  - `AdminDashboard`: orchestrator cu comutare pe 4 tab-uri și sistem de alerte toast.
+  - Gestionare elegantă a tuturor stărilor goale (empty states).
+**Decizii luate / ADR**: Securitate RBAC Admin, Twist P14 Audit & Notificări, UI Admin Panel P14
+**Fișiere modificate**: `prisma/schema.prisma`, `AI_LOG.md`, `src/app/page.tsx`, `src/app/admin/layout.tsx`, `src/app/admin/page.tsx`, `src/components/admin/*`, `src/lib/admin*`
+**Status final**: ✅ done

@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { UserRole, PlacementStatus, OfferStatus } from "@prisma/client";
+import { UserRole, PlacementStatus, OfferStatus, ConventionStatus } from "@prisma/client";
 import { runGaleShapley, OfferPreferences, StudentPreferences } from "@/lib/matching";
 import { revalidatePath } from "next/cache";
 
@@ -256,11 +256,20 @@ export async function getCoordinatorDashboardData() {
         status: { in: [PlacementStatus.CONFIRMED, PlacementStatus.PENDING_CONFIRMATION] },
       },
     }),
-    // Plasamente CONFIRMED care nu au convenție generată
+    // Plasamente CONFIRMED care nu au convenție sau sunt încă nesemnate/neaprobate
     prisma.placement.count({
       where: {
         status: PlacementStatus.CONFIRMED,
-        convention: null,
+        OR: [
+          { convention: null },
+          {
+            convention: {
+              status: {
+                in: [ConventionStatus.DRAFT, ConventionStatus.GENERATED],
+              },
+            },
+          },
+        ],
       },
     }),
     // Jurnale de practică create în săptămâna curentă
@@ -297,6 +306,17 @@ export async function getCoordinatorDashboardData() {
                 companyName: true,
               },
             },
+          },
+        },
+        convention: {
+          select: {
+            id: true,
+            status: true,
+            conventionNumber: true,
+            generatedPdfUrl: true,
+            signedPdfUrl: true,
+            signedAt: true,
+            approvedAt: true,
           },
         },
       },

@@ -7,6 +7,10 @@ import {
   cancelPlacementByCoordinator,
 } from "@/app/actions/coordinator";
 import {
+  generateConventionForPlacement,
+  approveConventionByCoordinator,
+} from "@/app/actions/convention";
+import {
   Check,
   X,
   FileText,
@@ -17,8 +21,10 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  Download,
+  ExternalLink,
 } from "lucide-react";
-import { PlacementStatus } from "@prisma/client";
+import { PlacementStatus, ConventionStatus } from "@prisma/client";
 
 export interface PlacementItem {
   id: string;
@@ -44,6 +50,15 @@ export interface PlacementItem {
       companyName: string;
     };
   };
+  convention?: {
+    id: string;
+    status: ConventionStatus;
+    conventionNumber: string;
+    generatedPdfUrl?: string | null;
+    signedPdfUrl?: string | null;
+    signedAt?: Date | null;
+    approvedAt?: Date | null;
+  } | null;
 }
 
 interface PlacementsTableProps {
@@ -109,6 +124,32 @@ export function PlacementsTable({ placements }: PlacementsTableProps) {
     });
   };
 
+  const handleGenerateConvention = (placementId: string) => {
+    setActiveActionId(`conv-gen-${placementId}`);
+    startTransition(async () => {
+      try {
+        await generateConventionForPlacement(placementId);
+      } catch (err: any) {
+        alert(err.message || "Eroare la generarea convenției.");
+      } finally {
+        setActiveActionId(null);
+      }
+    });
+  };
+
+  const handleApproveConvention = (conventionId: string) => {
+    setActiveActionId(`conv-app-${conventionId}`);
+    startTransition(async () => {
+      try {
+        await approveConventionByCoordinator(conventionId);
+      } catch (err: any) {
+        alert(err.message || "Eroare la aprobarea convenției.");
+      } finally {
+        setActiveActionId(null);
+      }
+    });
+  };
+
   const totalPages = Math.max(1, Math.ceil(placements.length / pageSize));
   const displayedPlacements = placements.slice(
     (currentPage - 1) * pageSize,
@@ -155,6 +196,41 @@ export function PlacementsTable({ placements }: PlacementsTableProps) {
         );
       default:
         return <span className="text-xs text-slate-400">{status}</span>;
+    }
+  };
+
+  const getConventionBadge = (status: ConventionStatus) => {
+    switch (status) {
+      case ConventionStatus.APPROVED_BY_COORDINATOR:
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+            <CheckCircle className="w-2.5 h-2.5 text-emerald-400" /> Aprobată
+          </span>
+        );
+      case ConventionStatus.SIGNED_BY_STUDENT:
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+            <FileText className="w-2.5 h-2.5 text-indigo-400" /> Semnată Student
+          </span>
+        );
+      case ConventionStatus.SIGNED_BY_COMPANY:
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-sky-500/15 text-sky-300 border border-sky-500/30">
+            <FileText className="w-2.5 h-2.5 text-sky-400" /> Semnată Firmă
+          </span>
+        );
+      case ConventionStatus.GENERATED:
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+            <Clock className="w-2.5 h-2.5 text-amber-400" /> Generată
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+            {status}
+          </span>
+        );
     }
   };
 
@@ -208,6 +284,7 @@ export function PlacementsTable({ placements }: PlacementsTableProps) {
                 <th className="py-3.5 px-4">Specializare & An</th>
                 <th className="py-3.5 px-4">Companie & Poziție</th>
                 <th className="py-3.5 px-4">Status</th>
+                <th className="py-3.5 px-4">Convenție Practică</th>
                 <th className="py-3.5 px-4">Data Alocării</th>
                 <th className="py-3.5 px-4 text-right">Acțiuni</th>
               </tr>
@@ -217,6 +294,11 @@ export function PlacementsTable({ placements }: PlacementsTableProps) {
                 const isItemLoading = isPending && activeActionId === p.id;
                 const isConfirmed = p.status === PlacementStatus.CONFIRMED;
                 const isPendingConf = p.status === PlacementStatus.PENDING_CONFIRMATION;
+                const conv = p.convention;
+                const isConvLoading =
+                  isPending &&
+                  (activeActionId === `conv-gen-${p.id}` ||
+                    (conv && activeActionId === `conv-app-${conv.id}`));
 
                 return (
                   <tr
@@ -250,6 +332,61 @@ export function PlacementsTable({ placements }: PlacementsTableProps) {
                     <td className="py-3.5 px-4">
                       {getStatusBadge(p.status, p.cancelReason)}
                     </td>
+                    {/* Coloana Convenție Practică */}
+                    <td className="py-3.5 px-4">
+                      {!isConfirmed ? (
+                        <span className="text-xs text-slate-500">—</span>
+                      ) : !conv ? (
+                        <button
+                          onClick={() => handleGenerateConvention(p.id)}
+                          disabled={isPending}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-sky-300 bg-sky-950/50 hover:bg-sky-900/60 rounded-md border border-sky-500/30 transition-colors cursor-pointer shadow-[0_0_10px_rgba(14,165,233,0.15)]"
+                        >
+                          {isConvLoading ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          ) : (
+                            <FileText className="w-3 h-3 text-sky-400" />
+                          )}
+                          <span>Generează PDF</span>
+                        </button>
+                      ) : (
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {getConventionBadge(conv.status)}
+                            <a
+                              href={`/api/conventions/${conv.id}/download`}
+                              target="_blank"
+                              rel="noreferrer"
+                              title="Descarcă PDF Convenție"
+                              className="text-xs text-sky-400 hover:text-sky-300 hover:underline inline-flex items-center gap-0.5 font-medium"
+                            >
+                              <Download className="w-3 h-3" /> PDF
+                            </a>
+                            <a
+                              href={`/api/conventions/${conv.id}/preview`}
+                              target="_blank"
+                              rel="noreferrer"
+                              title="Previzualizare Convenție"
+                              className="text-xs text-slate-400 hover:text-slate-200 hover:underline inline-flex items-center gap-0.5"
+                            >
+                              <ExternalLink className="w-2.5 h-2.5" />
+                            </a>
+                          </div>
+                          {conv.signedPdfUrl && (
+                            <div>
+                              <a
+                                href={`/api/conventions/${conv.id}/download?signed=true`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-[11px] text-emerald-400 hover:text-emerald-300 hover:underline inline-flex items-center gap-0.5 font-medium"
+                              >
+                                <Download className="w-2.5 h-2.5" /> Scan Semnat
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </td>
                     <td className="py-3.5 px-4 text-xs text-slate-400 whitespace-nowrap font-mono">
                       {new Date(p.matchedAt).toLocaleDateString("ro-RO", {
                         day: "2-digit",
@@ -275,6 +412,22 @@ export function PlacementsTable({ placements }: PlacementsTableProps) {
                           </button>
                         )}
 
+                        {conv && conv.status !== ConventionStatus.APPROVED_BY_COORDINATOR && (
+                          <button
+                            onClick={() => handleApproveConvention(conv.id)}
+                            disabled={isPending}
+                            title="Aprobă convenția de către Coordonator"
+                            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold text-indigo-300 bg-indigo-950/50 hover:bg-indigo-900/60 rounded-md border border-indigo-500/30 transition-colors cursor-pointer shadow-[0_0_10px_rgba(99,102,241,0.15)]"
+                          >
+                            {isConvLoading ? (
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                            ) : (
+                              <CheckCircle className="w-3 h-3" />
+                            )}
+                            <span>Aprobă Conv.</span>
+                          </button>
+                        )}
+
                         {(isPendingConf || isConfirmed) && (
                           <button
                             onClick={() => handleCancel(p.id)}
@@ -295,14 +448,6 @@ export function PlacementsTable({ placements }: PlacementsTableProps) {
                             <Lock className="w-3 h-3" /> Protejat
                           </span>
                         )}
-
-                        <button
-                          disabled
-                          title="Generarea convenției PDF va fi disponibilă în Partea 2B"
-                          className="inline-flex items-center gap-1 px-2 py-1 text-xs text-slate-500 bg-[#070D19] rounded border border-sky-500/15 cursor-not-allowed opacity-50"
-                        >
-                          <FileText className="w-3 h-3" /> Convenție
-                        </button>
                       </div>
                     </td>
                   </tr>
