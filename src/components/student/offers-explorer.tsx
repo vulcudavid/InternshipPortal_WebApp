@@ -72,8 +72,8 @@ interface OffersExplorerProps {
     domain: EngineeringDomain;
     proficiency: ProficiencyLevel;
   }[];
-  preferredOfferIds: string[]; // ID-urile ofertelor deja adăugate în StudentPreference
-  preferencesRankMap: Record<string, number>; // offerId -> rank
+  preferredOfferIds: string[];
+  preferencesRankMap: Record<string, number>;
   currentStudentId?: string;
 }
 
@@ -90,7 +90,6 @@ export function OffersExplorer({
   const [sortBy, setSortBy] = useState<"score" | "slots">("score");
   const [successNotice, setSuccessNotice] = useState<string | null>(null);
 
-  // Calculăm scorul de compatibilitate pentru fiecare ofertă
   const evaluatedOffers = offers.map((offer) => {
     const offerTagInputs = offer.offerTags.map((ot) => ({
       tagId: ot.tagId,
@@ -119,7 +118,6 @@ export function OffersExplorer({
     return domain;
   }
 
-  // Filtrare & Sortare
   const filteredOffers = evaluatedOffers
     .filter((offer) => {
       const q = searchTerm.toLowerCase();
@@ -177,36 +175,36 @@ export function OffersExplorer({
 
   const getScoreBadge = (score: number) => {
     if (score >= 80) {
-      return "bg-emerald-50 text-emerald-700 border-emerald-300";
+      return "bg-emerald-950/50 text-emerald-300 border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]";
     }
     if (score >= 60) {
-      return "bg-blue-50 text-blue-700 border-blue-300";
+      return "bg-sky-950/50 text-sky-300 border-sky-500/40 shadow-[0_0_15px_rgba(14,165,233,0.2)]";
     }
-    return "bg-amber-50 text-amber-700 border-amber-300";
+    return "bg-amber-950/50 text-amber-300 border-amber-500/40";
   };
 
   return (
     <div className="space-y-6">
       {/* Header & Filtre */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+      <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-sky-500/15 pb-4">
           <div>
-            <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-blue-600" />
+            <h3 className="font-bold text-white text-lg flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-sky-400" />
               Explorare Oferte de Practică & Potrivire Inteligentă
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-400">
               Scorurile sunt calculate live pe baza competențelor tale din profil și cerințelor companiilor.
             </p>
           </div>
-          <span className="text-xs font-semibold px-3 py-1 bg-blue-50 text-blue-700 rounded-full border border-blue-200 self-start sm:self-auto">
+          <span className="text-xs font-semibold px-3 py-1 bg-sky-950/60 text-sky-300 rounded-full border border-sky-500/30 self-start sm:self-auto shadow-xs">
             {filteredOffers.length} oferte disponibile
           </span>
         </div>
 
         {successNotice && (
-          <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs flex items-center gap-2 animate-fadeIn">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          <div className="p-3 bg-emerald-950/40 border border-emerald-500/40 text-emerald-200 rounded-xl text-xs flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.15)] animate-fadeIn">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>{successNotice}</span>
           </div>
         )}
@@ -218,17 +216,17 @@ export function OffersExplorer({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Caută după titlu, companie, tehnologie sau oraș..."
-              className="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 bg-white pl-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full text-xs px-3 py-2 rounded-xl border border-sky-500/30 bg-[#070D19] text-white placeholder-slate-500 pl-8 focus:outline-none focus:border-sky-400"
             />
             <Search className="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" />
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500">Sortează după:</span>
+            <span className="text-xs text-slate-400">Sortează după:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as "score" | "slots")}
-              className="text-xs px-3 py-2 rounded-xl border border-slate-300 bg-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-xs px-3 py-2 rounded-xl border border-sky-500/30 bg-[#070D19] text-white font-medium focus:outline-none focus:border-sky-400"
             >
               <option value="score">Scor compatibilitate (cel mai mare)</option>
               <option value="slots">Locuri disponibile</option>
@@ -244,36 +242,36 @@ export function OffersExplorer({
           return (
             <div
               key={offer.id}
-              className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 transition p-6 space-y-4"
+              className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] hover:border-sky-400/40 transition p-6 space-y-4"
             >
               {/* Header Card */}
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1">
-                      <Building2 className="w-3.5 h-3.5" />
+                    <span className="text-xs font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1">
+                      <Building2 className="w-3.5 h-3.5 text-sky-400" />
                       {offer.company.companyName}
                     </span>
                     {offer.isRemote && (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-950/50 text-purple-300 border border-purple-500/30">
                         Remote / Hibrid
                       </span>
                     )}
                   </div>
-                  <h4 className="font-bold text-slate-900 text-lg leading-snug">
+                  <h4 className="font-bold text-white text-lg leading-snug">
                     {offer.title}
                   </h4>
-                  <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 pt-0.5">
+                  <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 pt-0.5">
                     <span className="flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                      <MapPin className="w-3.5 h-3.5 text-sky-400" />
                       {offer.location}
                     </span>
                     <span className="flex items-center gap-1">
-                      <Users className="w-3.5 h-3.5 text-slate-400" />
+                      <Users className="w-3.5 h-3.5 text-sky-400" />
                       {offer.slotsAvailable} din {offer.slotsTotal} locuri libere
                     </span>
                     <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                      <Calendar className="w-3.5 h-3.5 text-sky-400" />
                       {new Date(offer.startDate).toLocaleDateString("ro-RO", { month: "short", year: "numeric" })} -{" "}
                       {new Date(offer.endDate).toLocaleDateString("ro-RO", { month: "short", year: "numeric" })}
                     </span>
@@ -291,19 +289,19 @@ export function OffersExplorer({
                     <span>{comp.score}% Compatibil</span>
                   </div>
                   <span className="block text-[10px] text-slate-400 mt-1">
-                    Calculat prin algoritm P14
+                    Calculat prin algoritm Gale-Shapley ULBS
                   </span>
                 </div>
               </div>
 
               {/* Descriere */}
-              <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">
+              <p className="text-xs text-slate-300 leading-relaxed line-clamp-2">
                 {offer.description}
               </p>
 
               {/* Breakdown Competențe Cerute & Potrivire */}
-              <div className="space-y-2 pt-2 border-t border-slate-100">
-                <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">
+              <div className="space-y-2 pt-2 border-t border-sky-500/15">
+                <span className="text-[11px] font-bold text-sky-300 uppercase tracking-wider block">
                   Competențe Cerute de Companie:
                 </span>
                 <div className="flex flex-wrap gap-1.5">
@@ -315,16 +313,16 @@ export function OffersExplorer({
                         key={ot.tagId}
                         className={`text-xs px-2.5 py-1 rounded-lg border flex items-center gap-1 ${
                           isMatched
-                            ? "bg-emerald-50 text-emerald-800 border-emerald-200 font-semibold"
+                            ? "bg-emerald-950/40 text-emerald-300 border-emerald-500/40 font-semibold"
                             : ot.isRequired
-                            ? "bg-rose-50/70 text-rose-700 border-rose-200"
-                            : "bg-slate-100 text-slate-600 border-slate-200"
+                            ? "bg-rose-950/40 text-rose-300 border-rose-500/40"
+                            : "bg-slate-900/60 text-slate-300 border-slate-700/60"
                         }`}
                       >
                         {isMatched ? (
-                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                         ) : ot.isRequired ? (
-                          <AlertCircle className="w-3 h-3 text-rose-500" />
+                          <AlertCircle className="w-3 h-3 text-rose-400" />
                         ) : null}
                         <span>{ot.tag.name}</span>
                         {ot.isRequired && (
@@ -338,14 +336,14 @@ export function OffersExplorer({
 
               {/* Sloturi Interviu Disponibile */}
               {offer.interviewSlots && offer.interviewSlots.length > 0 && (
-                <div className="space-y-2 pt-2 border-t border-slate-100">
-                  <div className="flex items-center justify-between text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                <div className="space-y-2 pt-2 border-t border-sky-500/15">
+                  <div className="flex items-center justify-between text-[11px] font-bold text-sky-300 uppercase tracking-wider">
                     <span className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-blue-600" />
+                      <Calendar className="w-3.5 h-3.5 text-sky-400" />
                       Sloturi Interviu Disponibile ({offer.interviewSlots.length})
                     </span>
                     {!offer.isPreferred && (
-                      <span className="text-[10px] text-amber-600 font-semibold lowercase">
+                      <span className="text-[10px] text-amber-400 font-semibold lowercase">
                         (adaugă oferta la preferințe pentru a rezerva)
                       </span>
                     )}
@@ -363,15 +361,15 @@ export function OffersExplorer({
                           key={slot.id}
                           className={`p-2.5 rounded-xl border text-xs flex items-center justify-between gap-2 ${
                             isMine
-                              ? "bg-emerald-50 border-emerald-300 text-emerald-900"
+                              ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-200"
                               : isAvailable
-                              ? "bg-slate-50 border-slate-200 text-slate-700"
-                              : "bg-slate-100 border-slate-200 text-slate-400 opacity-60"
+                              ? "bg-[#070D19]/70 border-sky-500/20 text-slate-200"
+                              : "bg-[#070D19]/40 border-slate-800 text-slate-500 opacity-60"
                           }`}
                         >
                           <div className="space-y-0.5">
                             <div className="font-semibold flex items-center gap-1">
-                              <Clock className="w-3 h-3 text-slate-400" />
+                              <Clock className="w-3 h-3 text-sky-400" />
                               <span>
                                 {sDate.toLocaleDateString("ro-RO", { day: "numeric", month: "short" })},{" "}
                                 {sDate.toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" })} -{" "}
@@ -379,7 +377,7 @@ export function OffersExplorer({
                               </span>
                             </div>
                             {slot.meetingLink && (
-                              <div className="text-[10px] text-slate-500 truncate max-w-[180px]">
+                              <div className="text-[10px] text-slate-400 truncate max-w-[180px]">
                                 {slot.meetingLink}
                               </div>
                             )}
@@ -391,7 +389,7 @@ export function OffersExplorer({
                                 type="button"
                                 disabled={isPending}
                                 onClick={() => handleCancelSlot(slot.id)}
-                                className="px-2 py-1 bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-lg text-[10px] font-bold"
+                                className="px-2 py-1 bg-rose-950/40 border border-rose-500/30 text-rose-300 hover:bg-rose-900/50 rounded-lg text-[10px] font-bold"
                               >
                                 Anulează
                               </button>
@@ -400,12 +398,12 @@ export function OffersExplorer({
                                 type="button"
                                 disabled={!offer.isPreferred || isPending}
                                 onClick={() => handleBookSlot(slot.id)}
-                                className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white rounded-lg text-[10px] font-bold shadow-2xs"
+                                className="px-2.5 py-1 bg-sky-500 hover:bg-sky-400 disabled:opacity-40 text-slate-950 rounded-lg text-[10px] font-bold shadow-[0_0_10px_rgba(14,165,233,0.3)]"
                               >
                                 Rezervă
                               </button>
                             ) : (
-                              <span className="text-[10px] font-semibold text-slate-400">Ocupat</span>
+                              <span className="text-[10px] font-semibold text-slate-500">Ocupat</span>
                             )}
                           </div>
                         </div>
@@ -416,15 +414,15 @@ export function OffersExplorer({
               )}
 
               {/* Footer Card: Tutore & Acțiune Preferință */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-100">
-                <span className="text-xs text-slate-500">
-                  Tutore desemnat: <strong className="text-slate-700">{offer.tutorName}</strong>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-sky-500/15">
+                <span className="text-xs text-slate-400">
+                  Tutore desemnat: <strong className="text-slate-200">{offer.tutorName}</strong>
                 </span>
 
                 <div className="flex items-center gap-2">
                   {offer.isPreferred ? (
-                    <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 text-xs font-bold">
-                      <CheckCircle2 className="w-4 h-4 text-purple-600" />
+                    <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-950/40 text-purple-300 border border-purple-500/30 text-xs font-bold shadow-[0_0_10px_rgba(168,85,247,0.15)]">
+                      <CheckCircle2 className="w-4 h-4 text-purple-400" />
                       <span>În preferințele tale (Opțiunea #{offer.preferenceRank})</span>
                     </div>
                   ) : (
@@ -432,7 +430,7 @@ export function OffersExplorer({
                       type="button"
                       disabled={isPending}
                       onClick={() => handleAddPreference(offer.id, offer.title)}
-                      className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold text-xs transition flex items-center gap-1.5 shadow-sm"
+                      className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 font-bold text-xs transition flex items-center gap-1.5 shadow-[0_0_20px_rgba(14,165,233,0.35)]"
                     >
                       <Plus className="w-4 h-4" />
                       Adaugă la Preferințe
@@ -445,7 +443,7 @@ export function OffersExplorer({
         })}
 
         {filteredOffers.length === 0 && (
-          <div className="p-8 text-center bg-white rounded-2xl border border-slate-200 text-slate-500 text-xs">
+          <div className="p-8 text-center bg-[#0B1221]/88 rounded-2xl border border-sky-400/20 text-slate-400 text-xs">
             Nu a fost găsită nicio ofertă care să corespundă criteriilor de căutare.
           </div>
         )}

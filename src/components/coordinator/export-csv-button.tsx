@@ -30,12 +30,12 @@ export function ExportCsvButton() {
     <button
       onClick={handleExport}
       disabled={isPending}
-      className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 rounded-lg shadow-sm transition-colors cursor-pointer disabled:cursor-not-allowed"
+      className="inline-flex items-center gap-2 px-3.5 py-2.5 text-xs font-semibold text-sky-200 bg-[#070D19] hover:bg-sky-950/40 border border-sky-500/30 rounded-xl shadow-inner transition-colors cursor-pointer disabled:cursor-not-allowed"
     >
       {isPending ? (
-        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+        <Loader2 className="w-3.5 h-3.5 animate-spin text-sky-400" />
       ) : (
-        <Download className="w-3.5 h-3.5" />
+        <Download className="w-3.5 h-3.5 text-sky-400" />
       )}
       <span>Export CSV</span>
     </button>

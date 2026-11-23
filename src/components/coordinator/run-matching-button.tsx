@@ -40,16 +40,16 @@ export function RunMatchingButton() {
       <button
         onClick={handleRunMatching}
         disabled={isPending}
-        className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-semibold rounded-lg shadow-sm hover:shadow transition-all duration-150 cursor-pointer disabled:cursor-not-allowed"
+        className="inline-flex items-center gap-2 px-4 py-2.5 bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-sm font-bold rounded-xl shadow-[0_0_20px_rgba(14,165,233,0.35)] hover:shadow-[0_0_25px_rgba(14,165,233,0.5)] transition-all cursor-pointer disabled:cursor-not-allowed"
       >
         {isPending ? (
           <>
-            <Loader2 className="w-4 h-4 animate-spin text-white" />
+            <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
             <span>Se execută Gale-Shapley...</span>
           </>
         ) : (
           <>
-            <Play className="w-4 h-4 fill-white" />
+            <Play className="w-4 h-4 fill-slate-950" />
             <span>Rulează Gale-Shapley</span>
           </>
         )}
@@ -57,16 +57,16 @@ export function RunMatchingButton() {
 
       {feedback && (
         <div
-          className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border ${
+          className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl border ${
             feedback.type === "success"
-              ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800"
-              : "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:border-rose-800"
+              ? "bg-emerald-950/50 text-emerald-300 border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+              : "bg-rose-950/50 text-rose-300 border-rose-500/40 shadow-[0_0_10px_rgba(244,63,94,0.15)]"
           }`}
         >
           {feedback.type === "success" ? (
-            <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+            <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
           ) : (
-            <AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-600 dark:text-rose-400" />
+            <AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-400" />
           )}
           <span>{feedback.message}</span>
         </div>

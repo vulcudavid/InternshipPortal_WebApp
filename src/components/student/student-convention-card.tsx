@@ -104,8 +104,8 @@ export function StudentConventionCard({ placement }: StudentConventionCardProps)
   const getStatusBadge = () => {
     if (!conv) {
       return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-          <Clock className="w-3.5 h-3.5" /> Convenție Negenerată
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-[0_0_12px_rgba(245,158,11,0.15)]">
+          <Clock className="w-3.5 h-3.5 text-amber-400" /> Convenție Negenerată
         </span>
       );
     }
@@ -113,25 +113,25 @@ export function StudentConventionCard({ placement }: StudentConventionCardProps)
     switch (conv.status) {
       case ConventionStatus.APPROVED_BY_COORDINATOR:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-            <CheckCircle2 className="w-3.5 h-3.5" /> Aprobată de Coordonator
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.15)]">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Aprobată de Coordonator
           </span>
         );
       case ConventionStatus.SIGNED_BY_STUDENT:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
-            <ShieldCheck className="w-3.5 h-3.5" /> Semnată de Student (În Așteptare Aprobare)
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 shadow-[0_0_12px_rgba(99,102,241,0.15)]">
+            <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" /> Semnată de Student (În Așteptare Aprobare)
           </span>
         );
       case ConventionStatus.GENERATED:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-            <FileText className="w-3.5 h-3.5" /> Generată (Necesită Semnătură)
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/15 text-sky-300 border border-sky-500/30 shadow-[0_0_12px_rgba(14,165,233,0.15)]">
+            <FileText className="w-3.5 h-3.5 text-sky-400" /> Generată (Necesită Semnătură)
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">
             {conv.status}
           </span>
         );
@@ -139,30 +139,30 @@ export function StudentConventionCard({ placement }: StudentConventionCardProps)
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-6">
+    <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] p-6 space-y-6">
       {/* Header Plasament & Convenție */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-sky-500/15">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-              <CheckCircle2 className="w-3 h-3" /> Stagiu de Practică Confirmat
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-300 bg-emerald-500/15 px-2.5 py-0.5 rounded-full border border-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.15)]">
+              <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Stagiu de Practică Confirmat
             </span>
             {conv && (
-              <span className="text-xs font-medium text-slate-500">
+              <span className="text-xs font-mono text-slate-400">
                 Nr. {conv.conventionNumber}
               </span>
             )}
           </div>
-          <h2 className="text-xl font-bold text-slate-900 mt-1">
+          <h2 className="text-xl font-bold text-white mt-1">
             {placement.offer.title}
           </h2>
-          <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 mt-1">
-            <span className="inline-flex items-center gap-1 font-medium text-slate-700">
-              <Building className="w-3.5 h-3.5 text-slate-400" />
+          <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 mt-1">
+            <span className="inline-flex items-center gap-1 font-medium text-slate-200">
+              <Building className="w-3.5 h-3.5 text-sky-400" />
               {placement.offer.company.companyName} ({placement.offer.company.city})
             </span>
             <span className="inline-flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 text-slate-400" />
+              <Calendar className="w-3.5 h-3.5 text-sky-400" />
               05.07.2027 – 25.07.2027 (90 ore)
             </span>
             <span>Tutore: {placement.offer.tutorName}</span>
@@ -176,14 +176,14 @@ export function StudentConventionCard({ placement }: StudentConventionCardProps)
         <div
           className={`p-3.5 rounded-xl text-xs font-medium flex items-center gap-2 ${
             statusMsg.type === "success"
-              ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
-              : "bg-rose-50 text-rose-800 border border-rose-200"
+              ? "bg-emerald-950/40 text-emerald-200 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+              : "bg-rose-950/40 text-rose-200 border border-rose-500/40 shadow-[0_0_15px_rgba(244,63,94,0.15)]"
           }`}
         >
           {statusMsg.type === "success" ? (
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
           ) : (
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
           )}
           <span>{statusMsg.text}</span>
         </div>
@@ -191,20 +191,20 @@ export function StudentConventionCard({ placement }: StudentConventionCardProps)
 
       {/* Corpul acțiunilor convenției */}
       {!conv ? (
-        <div className="bg-slate-50 rounded-xl p-5 border border-slate-200/60 text-center space-y-3">
-          <FileText className="w-10 h-10 text-slate-400 mx-auto" />
+        <div className="bg-[#070D19]/70 rounded-xl p-5 border border-sky-500/20 text-center space-y-3">
+          <FileText className="w-10 h-10 text-sky-400 mx-auto" />
           <div>
-            <h3 className="text-sm font-bold text-slate-900">
+            <h3 className="text-sm font-bold text-white">
               Convenția de practică nu a fost generată încă
             </h3>
-            <p className="text-xs text-slate-500 max-w-md mx-auto mt-0.5">
+            <p className="text-xs text-slate-400 max-w-md mx-auto mt-0.5">
               Formularul oficial ULBS (cu datele Facultății de Inginerie, ale partenerului de practică și portofoliul de competențe) poate fi generat automat acum.
             </p>
           </div>
           <button
             onClick={handleGenerate}
             disabled={isPending}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-xs font-semibold rounded-lg shadow-sm transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-bold rounded-xl shadow-[0_0_20px_rgba(14,165,233,0.35)] transition cursor-pointer"
           >
             {isPending ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -217,13 +217,13 @@ export function StudentConventionCard({ placement }: StudentConventionCardProps)
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Pasul 1: Descărcare și Previzualizare */}
-          <div className="bg-slate-50 rounded-xl p-5 border border-slate-200/60 flex flex-col justify-between space-y-4">
+          <div className="bg-[#070D19]/70 rounded-xl p-5 border border-sky-500/20 flex flex-col justify-between space-y-4">
             <div>
-              <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
-                <Download className="w-4 h-4 text-blue-600" />
+              <div className="flex items-center gap-2 text-white font-bold text-sm">
+                <Download className="w-4 h-4 text-sky-400" />
                 <span>1. Descarcă Convenția Completată</span>
               </div>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 Documentul oficial A4 generat pe baza șablonului Facultății de Inginerie ULBS, cu toate datele precompletate și diacritice românești (ă, â, î, ș, ț).
               </p>
             </div>
@@ -233,7 +233,7 @@ export function StudentConventionCard({ placement }: StudentConventionCardProps)
                 href={`/api/conventions/${conv.id}/download`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm transition"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-bold rounded-xl shadow-[0_0_15px_rgba(14,165,233,0.3)] transition"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Descarcă PDF Oficial</span>
@@ -243,22 +243,22 @@ export function StudentConventionCard({ placement }: StudentConventionCardProps)
                 href={`/api/conventions/${conv.id}/preview`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg border border-slate-200 transition"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#0B1221] hover:bg-sky-500/10 text-slate-200 text-xs font-medium rounded-xl border border-sky-500/30 transition"
               >
-                <ExternalLink className="w-3.5 h-3.5" />
+                <ExternalLink className="w-3.5 h-3.5 text-sky-400" />
                 <span>Previzualizare</span>
               </a>
             </div>
           </div>
 
           {/* Pasul 2: Semnare / Încărcare Scan Semnat */}
-          <div className="bg-slate-50 rounded-xl p-5 border border-slate-200/60 flex flex-col justify-between space-y-4">
+          <div className="bg-[#070D19]/70 rounded-xl p-5 border border-sky-500/20 flex flex-col justify-between space-y-4">
             <div>
-              <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
-                <Upload className="w-4 h-4 text-indigo-600" />
+              <div className="flex items-center gap-2 text-white font-bold text-sm">
+                <Upload className="w-4 h-4 text-indigo-400" />
                 <span>2. Semnare Digitală sau Încărcare Scan</span>
               </div>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 Puteți marca documentul ca semnat direct din portal sau puteți încărca scanul semnat olograf (.pdf, .png, .jpg).
               </p>
             </div>
@@ -268,7 +268,7 @@ export function StudentConventionCard({ placement }: StudentConventionCardProps)
                 <button
                   onClick={handleMarkSigned}
                   disabled={isPending}
-                  className="w-full inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white text-xs font-semibold rounded-lg shadow-sm transition cursor-pointer"
+                  className="w-full inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-[0_0_15px_rgba(99,102,241,0.3)] transition cursor-pointer"
                 >
                   {isPending ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -284,13 +284,13 @@ export function StudentConventionCard({ placement }: StudentConventionCardProps)
                   type="file"
                   accept=".pdf,image/png,image/jpeg"
                   onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                  className="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-white file:text-slate-700 file:border file:border-slate-200 hover:file:bg-slate-50 cursor-pointer"
+                  className="block w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-950/60 file:text-sky-300 file:border file:border-sky-500/30 hover:file:bg-sky-900/60 cursor-pointer"
                 />
                 {selectedFile && (
                   <button
                     type="submit"
                     disabled={isPending}
-                    className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-600 text-white text-xs font-semibold rounded-lg shadow-sm transition cursor-pointer"
+                    className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-bold rounded-xl shadow-[0_0_15px_rgba(14,165,233,0.3)] transition cursor-pointer"
                   >
                     {isPending ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -308,7 +308,7 @@ export function StudentConventionCard({ placement }: StudentConventionCardProps)
                     href={`/api/conventions/${conv.id}/download?signed=true`}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-emerald-700 font-semibold hover:underline"
+                    className="inline-flex items-center gap-1 text-xs text-emerald-400 font-semibold hover:underline"
                   >
                     <Download className="w-3 h-3" />
                     <span>Descarcă Scanul Semnat Încărcat</span>

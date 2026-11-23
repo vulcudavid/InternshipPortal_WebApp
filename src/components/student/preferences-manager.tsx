@@ -44,7 +44,6 @@ export function PreferencesManager({ preferences: initialPreferences }: Preferen
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Reordonare locală și persistență
   const handleMove = (index: number, direction: "up" | "down") => {
     if (
       (direction === "up" && index === 0) ||
@@ -59,7 +58,6 @@ export function PreferencesManager({ preferences: initialPreferences }: Preferen
     newItems[index] = newItems[targetIndex];
     newItems[targetIndex] = temp;
 
-    // Actualizare ranguri vizuale
     const updated = newItems.map((item, idx) => ({
       ...item,
       rank: idx + 1,
@@ -67,7 +65,6 @@ export function PreferencesManager({ preferences: initialPreferences }: Preferen
 
     setPreferences(updated);
 
-    // Salvare în baza de date
     startTransition(async () => {
       try {
         await reorderStudentPreferences(updated.map((u) => u.id));
@@ -78,7 +75,6 @@ export function PreferencesManager({ preferences: initialPreferences }: Preferen
     });
   };
 
-  // Ștergere preferință
   const handleRemove = (preferenceId: string) => {
     const remaining = preferences
       .filter((p) => p.id !== preferenceId)
@@ -97,39 +93,39 @@ export function PreferencesManager({ preferences: initialPreferences }: Preferen
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
+    <div className="bg-[#0B1221]/88 backdrop-blur-xl rounded-2xl border border-sky-400/20 shadow-[0_0_25px_rgba(14,165,233,0.06)] p-6 space-y-6">
       {/* Header Secțiune & Contor */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-sky-500/15 pb-4">
         <div>
-          <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
-            <ListOrdered className="w-5 h-5 text-purple-600" />
+          <h3 className="font-bold text-white text-lg flex items-center gap-2">
+            <ListOrdered className="w-5 h-5 text-purple-400" />
             Preferințele Mele Ordonate (Clasament Gale-Shapley)
           </h3>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-400">
             Ordinea opțiunilor este crucială: algoritmul stabil va încerca să te aloce la prima ta opțiune posibilă.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">
+          <span className="px-3 py-1 rounded-full text-xs font-bold bg-purple-950/40 text-purple-300 border border-purple-500/30">
             {preferences.length} {preferences.length === 1 ? "preferință exprimată" : "preferințe exprimate"} (Nelimitat)
           </span>
         </div>
       </div>
 
       {errorMessage && (
-        <div className="p-3 bg-red-50 border border-red-200 text-red-800 rounded-xl text-xs flex items-center gap-2 animate-fadeIn">
-          <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+        <div className="p-3 bg-rose-950/40 border border-rose-500/40 text-rose-200 rounded-xl text-xs flex items-center gap-2 shadow-[0_0_15px_rgba(244,63,94,0.15)] animate-fadeIn">
+          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
           <span>{errorMessage}</span>
         </div>
       )}
 
       {/* Alertă explicativă algoritm Gale-Shapley */}
-      <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 text-xs text-slate-600">
-        <div className="flex items-center gap-1.5 font-bold text-slate-800">
-          <HelpCircle className="w-4 h-4 text-blue-600 shrink-0" />
+      <div className="p-4 bg-[#070D19]/70 border border-sky-500/20 rounded-xl space-y-1.5 text-xs text-slate-300">
+        <div className="flex items-center gap-1.5 font-bold text-sky-300">
+          <HelpCircle className="w-4 h-4 text-sky-400 shrink-0" />
           <span>Cum funcționează algoritmul stabil de matching?</span>
         </div>
-        <p className="text-[11px] leading-relaxed">
+        <p className="text-[11px] leading-relaxed text-slate-400">
           Platforma folosește varianta <em>Student-Proposing Deferred Acceptance (Gale-Shapley)</em>. 
           Poziția <strong>#1</strong> are prioritate absolută pentru tine. Dacă locurile de la Opțiunea #1 sunt ocupate de candidați cu clasament mai bun, ești propus automat pentru Opțiunea #2, și așa mai departe.
         </p>
@@ -137,33 +133,33 @@ export function PreferencesManager({ preferences: initialPreferences }: Preferen
 
       {/* Lista Preferințelor */}
       {preferences.length === 0 ? (
-        <div className="p-8 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 text-xs text-slate-500 space-y-2">
-          <p className="font-semibold text-slate-700">Nu ai adăugat nicio ofertă la preferințe.</p>
-          <p>Mergi în secțiunea „Explorare Oferte” și apasă pe butonul <strong>„Adaugă la Preferințe”</strong> pe pozițiile dorite.</p>
+        <div className="p-8 text-center border-2 border-dashed border-sky-500/20 rounded-2xl bg-[#070D19]/60 text-xs text-slate-400 space-y-2">
+          <p className="font-semibold text-white">Nu ai adăugat nicio ofertă la preferințe.</p>
+          <p>Mergi în secțiunea „Explorare Oferte” și apasă pe butonul <strong className="text-sky-300">„Adaugă la Preferințe”</strong> pe pozițiile dorite.</p>
         </div>
       ) : (
         <div className="space-y-3">
           {preferences.map((item, index) => (
             <div
               key={item.id}
-              className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-white hover:border-purple-300 transition shadow-2xs"
+              className="flex items-center justify-between p-4 rounded-xl border border-sky-500/20 bg-[#070D19]/80 hover:border-purple-400/40 transition shadow-inner"
             >
               {/* Rang & Detalii Ofertă */}
               <div className="flex items-center gap-3.5 min-w-0">
-                <div className="w-9 h-9 rounded-xl bg-purple-600 text-white font-extrabold text-sm flex items-center justify-center shrink-0 shadow-xs">
+                <div className="w-9 h-9 rounded-xl bg-purple-600 text-white font-extrabold text-sm flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(168,85,247,0.4)]">
                   #{item.rank}
                 </div>
 
                 <div className="min-w-0">
-                  <span className="text-[11px] font-bold text-indigo-600 uppercase tracking-wider block truncate">
+                  <span className="text-[11px] font-bold text-sky-400 uppercase tracking-wider block truncate">
                     {item.offer.company.companyName}
                   </span>
-                  <h5 className="font-bold text-slate-900 text-sm truncate">
+                  <h5 className="font-bold text-white text-sm truncate">
                     {item.offer.title}
                   </h5>
                   <div className="flex items-center gap-3 text-[11px] text-slate-400 mt-0.5">
                     <span className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3" />
+                      <MapPin className="w-3 h-3 text-sky-400" />
                       {item.offer.location}
                     </span>
                     <span>•</span>
@@ -178,7 +174,7 @@ export function PreferencesManager({ preferences: initialPreferences }: Preferen
                   type="button"
                   disabled={isPending || index === 0}
                   onClick={() => handleMove(index, "up")}
-                  className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 disabled:opacity-30 disabled:pointer-events-none text-slate-600 transition"
+                  className="p-1.5 rounded-lg border border-sky-500/20 bg-[#0B1221] hover:bg-sky-500/10 disabled:opacity-20 disabled:pointer-events-none text-slate-300 hover:text-white transition"
                   title="Mută mai sus în preferințe"
                 >
                   <ArrowUp className="w-4 h-4" />
@@ -188,7 +184,7 @@ export function PreferencesManager({ preferences: initialPreferences }: Preferen
                   type="button"
                   disabled={isPending || index === preferences.length - 1}
                   onClick={() => handleMove(index, "down")}
-                  className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 disabled:opacity-30 disabled:pointer-events-none text-slate-600 transition"
+                  className="p-1.5 rounded-lg border border-sky-500/20 bg-[#0B1221] hover:bg-sky-500/10 disabled:opacity-20 disabled:pointer-events-none text-slate-300 hover:text-white transition"
                   title="Mută mai jos în preferințe"
                 >
                   <ArrowDown className="w-4 h-4" />
@@ -198,7 +194,7 @@ export function PreferencesManager({ preferences: initialPreferences }: Preferen
                   type="button"
                   disabled={isPending}
                   onClick={() => handleRemove(item.id)}
-                  className="p-1.5 rounded-lg border border-slate-200 hover:bg-red-50 hover:border-red-200 text-slate-400 hover:text-red-600 transition ml-1"
+                  className="p-1.5 rounded-lg border border-rose-500/30 bg-[#0B1221] hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 transition ml-1"
                   title="Elimină din preferințe"
                 >
                   <Trash2 className="w-4 h-4" />

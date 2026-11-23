@@ -16,6 +16,7 @@
 # Uploads
 /public/uploads/cvs/*
 !/public/uploads/cvs/.gitkeep
+/storage/
 
 # Private storage (CVs, conventions) — keep .gitkeep
 /storage/**/*.pdf
