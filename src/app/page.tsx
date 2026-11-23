@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
 import { AuthCard } from "@/components/auth-card";
 import { RoleDashboardSkeleton } from "@/components/role-dashboard-skeleton";
 import { StudentDashboard } from "@/components/student/student-dashboard";
@@ -19,6 +20,10 @@ import { UserRole } from "@prisma/client";
 
 export default async function Home() {
   const currentUser = await getCurrentUser();
+
+  if (currentUser && currentUser.role === UserRole.ADMIN) {
+    redirect("/admin");
+  }
 
   // 1. Date necesare pentru Dashboard Student (Partea 1A)
   let studentData = null;

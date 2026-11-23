@@ -47,6 +47,36 @@ enum PlacementStatus {
   REFUSED_BY_STUDENT
   CANCELLED_BY_COMPANY
   CANCELLED_BY_COORDINATOR
+  NEPLASAT
+}
+
+enum CompanyStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AuditActionType {
+  COMPANY_APPROVE
+  COMPANY_REJECT
+  OFFER_WITHDRAW
+  OFFER_ACTIVATE
+  SETTINGS_UPDATE
+  GDPR_ANONYMIZE
+  USER_ROLE_CHANGE
+  USER_STATUS_CHANGE
+}
+
+enum NotificationType {
+  OFFER_WITHDRAWN
+  COMPANY_STATUS_CHANGED
+  SYSTEM_ALERT
+  PLACEMENT_CANCELLED
+}
+
+enum TieBreakerRule {
+  APPLICATION_ORDER
+  ACADEMIC_SCORE
 }
 
 enum ConventionStatus {
@@ -78,6 +108,8 @@ model User {
 
   studentProfile StudentProfile?
   companyProfile CompanyProfile?
+  auditLogs      AuditLog[]        @relation("AuditActor")
+  notifications  Notification[]
 
   @@map("users")
 }
@@ -155,6 +187,7 @@ model CompanyProfile {
   website      String?
   description  String?
   contactPhone String?           @map("contact_phone")
+  status       CompanyStatus     @default(APPROVED)
   createdAt    DateTime          @default(now()) @map("created_at")
   updatedAt    DateTime          @updatedAt @map("updated_at")
 
@@ -326,4 +359,44 @@ model FinalEvaluation {
   submittedAt          DateTime  @default(now()) @map("submitted_at")
 
   @@map("final_evaluations")
+}
+
+// 15. Setări Globale de Sistem
+model SystemSettings {
+  id             String         @id @default("global")
+  requiredHours  Int            @default(120) @map("required_hours")
+  tieBreakerRule TieBreakerRule @default(APPLICATION_ORDER) @map("tie_breaker_rule")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+}
+
+// 16. Jurnal de Audit pentru Acțiuni Administrative
+model AuditLog {
+  id           String          @id @default(uuid())
+  actorId      String          @map("actor_id")
+  actor        User            @relation("AuditActor", fields: [actorId], references: [id], onDelete: Cascade)
+  actionType   AuditActionType @map("action_type")
+  targetEntity String          @map("target_entity")
+  details      Json?
+  timestamp    DateTime        @default(now())
+
+  @@index([actorId])
+  @@index([actionType])
+  @@map("audit_logs")
+}
+
+// 17. Notificări de Sistem
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String           @map("user_id")
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      NotificationType @default(SYSTEM_ALERT)
+  isRead    Boolean          @default(false) @map("is_read")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@map("notifications")
 }
