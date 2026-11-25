@@ -6,7 +6,7 @@ Acest document descrie schema bazei de date, taxonomiile și contractele de secu
 
 | Tabel Prisma | Tabel BD (PostgreSQL) | Rol / Descriere | Constrângeri cheie |
 |---|---|---|---|
-| `User` | `users` | Utilizatori autentificabili și roluri sistem | `email` UNIQUE, Enum `UserRole` (STUDENT, COMPANY_TUTOR, COORDINATOR, ADMIN) |
+| `User` | `users` | Utilizatori autentificabili și roluri sistem | `email` UNIQUE, Enum `UserRole` (STUDENT, COMPANY_TUTOR, COORDINATOR, ADMIN), `emailVerified` (Boolean, default false), `verificationCodeHash` (String?), `verificationCodeExpiresAt` (DateTime?) |
 | `StudentProfile` | `student_profiles` | Profil academic, social bio și profesional student | `userId` UNIQUE (1:1 cu User), `cvUrl`, `githubUrl`, `linkedinUrl` |
 | `CompanyProfile` | `company_profiles` | Profil companie parteneră | `userId` UNIQUE (1:1 cu User), `cuiCif` UNIQUE |
 | `Tag` | `tags` | Taxonomie competențe (predefinite pe domenii Inginerie + custom) | `name` UNIQUE, Enum `EngineeringDomain`, `isPredefined` |
@@ -151,9 +151,73 @@ Unde:
 - `/plan` ([.agents/skills/plan/SKILL.md](../../.agents/skills/plan/SKILL.md)): Ghid de cercetare și elaborare a planului tehnic de implementare înaintea modificării de cod, cu respectarea strictă a regulilor din `AGENTS.md`.
 - `/build` ([.agents/skills/build/SKILL.md](../../.agents/skills/build/SKILL.md)): Ghid de execuție a planurilor aprobate, dezvoltare modulară, rulare teste automate (`privacy.test.ts`, `matching.test.ts`), linting registru (`ledger-lint.py`) și verificare build Next.js.
 
-## 9. Contracte Server Actions - Modul Coordonator & Matching Gale-Shapley (Partea 2A)
+## 9. Contracte Server Actions - Modul Convenții PDF (`src/app/actions/convention.ts`)
 
-### 9.1 Alocare Stabilă & Gestiune Plasamente (`src/app/actions/coordinator.ts`)
+### 9.1 Generare și Descărcare Convenție PDF
+- `generateConventionForPlacement(placementId)`: Accesibil coordonatorului sau tutorelui firmei (pentru plasamentul propriu). Compilează datele din `Placement` → `StudentProfile` / `User` → `InternshipOffer` → `CompanyProfile`, generează PDF prin `generateConventionPdf()` și îl stochează în `storage/conventions/`. Creează înregistrarea `InternshipConvention` cu status `GENERATED`.
+- `getConventionDetails(conventionId)`: Returnează detalii complete ale convenției. RBAC strict: STUDENT → doar dacă `placement.studentId === user.studentProfile.id`; COMPANY_TUTOR → doar dacă `placement.offer.companyId === user.companyProfile.id`; COORDINATOR/ADMIN → acces global.
+- `GET /api/conventions/[conventionId]/download`: Descărcare PDF. Autorizare per rol identică cu `getConventionDetails`. Returnează `401` dacă neautentificat, `403` dacă ownership check eșuează, `404` dacă PDF-ul nu există pe disc (re-generare automată din `prefilledData`).
+- `GET /api/conventions/[conventionId]/preview`: Preview PDF în browser (Content-Type `application/pdf`, inline).
+
+### 9.2 Flux de Semnare Convenție
+- `markConventionSignedByStudent(conventionId)`: Marchează digital convenția ca `SIGNED_BY_STUDENT`. Acces restricționat exclusiv studentului titular al plasamentului.
+- `uploadSignedConventionScan(conventionId, formData)`: Încarcă scanul semnat fizic (PDF, PNG, JPG, max 10MB) în `storage/conventions/signed/`. Accesibil studentului titular sau coordonatorului.
+- `approveConventionByCoordinator(conventionId)`: Marchează convenția ca `APPROVED_BY_COORDINATOR`. Accesibil exclusiv coordonatorului sau adminului.
+
+## 10. Contracte Server Actions - Jurnal Ore & Evaluare Finală
+
+### 10.1 Jurnal de Pontaj Săptămânal (`src/app/actions/work-log.ts`)
+- `createWorkLog({ placementId, date, hoursWorked, activitySummary })`: Adaugă o înregistrare de ore în jurnal. Accesibil exclusiv studentului al cărui plasament este `placementId` (ownership check pe `placement.studentId`). Validare: `hoursWorked` ∈ [0.5, 12], `date` ≤ azi.
+- `validateWorkLog(workLogId, feedback?)`: Tutorele firmei aprobă un pontaj (`status: APPROVED`), opțional cu feedback. Verificare: plasamentul asociat trebuie să aparțină companiei tutorelui autentificat.
+- `rejectWorkLog(workLogId, feedback)`: Tutorele respinge un pontaj (`status: REJECTED`) cu feedback obligatoriu. Aceleași constrângeri de ownership ca `validateWorkLog`.
+
+### 10.2 Fișă de Evaluare Finală (`src/app/actions/evaluation.ts`)
+- `submitFinalEvaluation({ placementId, grade, feedback, competenciesAcquired, evaluatorName })`: Creează sau actualizează fișa de evaluare finală. Accesibil exclusiv tutorelui firmei al cărui cont este asociat companiei din plasament. `grade` ∈ [1, 10].
+
+## 11. Contracte Server Actions - Notificări & Utilitare (`src/app/actions/notifications.ts`, `src/app/actions/gdpr.ts`)
+
+### 11.1 Notificări (`src/app/actions/notifications.ts`)
+- `getUserNotifications()`: Returnează ultimele 20 de notificări ale utilizatorului autentificat și numărul celor necitite.
+- `markNotificationAsRead(notificationId)`: Marchează o notificare individuală ca citită (ownership check: notificarea trebuie să aparțină utilizatorului curent).
+- `markAllNotificationsAsRead()`: Marchează toate notificările utilizatorului curent ca citite.
+
+### 11.2 Cerere GDPR de Ștergere Date Proprii (`src/app/actions/gdpr.ts`)
+- `requestDataErasure()`: Acțiunea de self-service prin care un student autentificat declanșează anonimizarea ireversibilă a propriilor date, apelând `anonymizeStudentProfile` din `src/lib/gdpr.ts`. Termină sesiunea curentă după execuție.
+
+## 12. Contracte Modul Admin, Setări Globale & API Administrare
+
+### 12.1 Server Actions Admin (`src/app/actions/admin.ts`)
+- `adminCreateUser(data)`: Creare utilizator de către Admin cu rolul specificat; setează automat `emailVerified: true`.
+
+### 12.2 API Routes Admin (`src/app/api/admin/*`)
+- `GET /api/admin/companies` + `PATCH /api/admin/companies/[companyId]/status`: Listare și aprobare/respingere companii, cu audit log și notificări.
+- `GET /api/admin/offers` + `PATCH /api/admin/offers/[offerId]/status`: Listare oferte și retragere (Twist P14: plasamentele asociate trec în `NEPLASAT`, se emit notificări).
+- `GET /api/admin/users` + `PATCH /api/admin/users/[userId]/role` + `PATCH /api/admin/users/[userId]/status`: Management utilizatori (protecție auto-demotare/dezactivare cont propriu).
+- `GET /api/admin/settings` + `PUT /api/admin/settings`: Setări globale (`requiredHours`, `tieBreakerRule`).
+- `POST /api/admin/gdpr/anonymize`: Anonimizare GDPR Art. 17 la cerere (admin) pentru un student specificat.
+- `GET /api/admin/audit-logs` + `GET /api/admin/notifications`: Read-only logs și notificări sistem.
+
+### 12.3 Modul Setări Globale (`src/lib/settings.ts`)
+- `getSystemSettings()`: Obține setările globale de sistem (`SystemSettings`). Dacă înregistrarea `id: "global"` nu există, o inițializează cu valorile implicite: `requiredHours: 120`, `tieBreakerRule: APPLICATION_ORDER`.
+
+## 13. Contracte Utilitare de Infrastructură (`src/lib/storage.ts`, `src/lib/audit.ts`, `src/lib/notifications.ts`)
+
+### 13.1 Stocare pe Disc (`src/lib/storage.ts`)
+- `getStorageRoot()`: Returnează directorul rădăcină de stocare; valoare: `process.env.STORAGE_PATH ?? cwd()/storage`. Configurabil pentru volume persistente Railway.
+- `getCvsDir()`: `<storageRoot>/cvs/` — CV-uri private.
+- `getConventionsDir()`: `<storageRoot>/conventions/` — Convenții PDF generate.
+- `getSignedConventionsDir()`: `<storageRoot>/conventions/signed/` — Scanuri convenții semnate.
+- `ensureStorageDirs()`: Creează asincron toate directoarele de stocare dacă nu există.
+
+### 13.2 Audit Log (`src/lib/audit.ts`)
+- `createAuditLog({ action, userId?, targetId?, targetType?, details? })`: Înregistrează evenimentele critice de sistem în tabelul `audit_logs` (acțiuni admin, retrageri oferte, anonimizări GDPR, schimbări de rol).
+
+### 13.3 Notificări de Sistem (`src/lib/notifications.ts`)
+- `createNotification({ userId, type, title, message, link? })`: Creează o notificare internă asincronă pentru un utilizator. Tipuri suportate: `PLACEMENT_CONFIRMED`, `PLACEMENT_CANCELLED`, `OFFER_WITHDRAWN`, `WORK_LOG_VALIDATED`, `WORK_LOG_REJECTED`, `COMPANY_STATUS_CHANGED`, `GENERAL`.
+
+## 14. Contracte Server Actions - Modul Coordonator & Matching Gale-Shapley (Partea 2A)
+
+### 14.1 Alocare Stabilă & Gestiune Plasamente (`src/app/actions/coordinator.ts`)
 - `runMatchingAction()`: Rulează Gale-Shapley (Many-to-One / Hospital-Residents) pentru toți studenții cu preferințe exprimate și ofertele active. Exclude studenții deja `CONFIRMED` (protecție D-005). Salvează noile alocări cu status `PENDING_CONFIRMATION`.
 - `confirmPlacement(placementId)`: Trecere din `PENDING_CONFIRMATION` în `CONFIRMED` (blochează plasamentul la re-rulări viitoare).
 - `confirmAllPlacements()`: Aprobare în masă a tuturor plasamentelor aflate în așteptare.
@@ -161,7 +225,8 @@ Unde:
 - `getCoordinatorDashboardData()`: Agregare indicatori KPI (studenți eligibili, confirmate, în așteptare, nealocați, convenții lipsă, jurnale pe săptămâna curentă) și ultimele 50 de plasamente cu date relaționate.
 - `exportPlacementsCsv()`: Generare raport CSV cu toate plasamentele (fără date personale de contact GDPR: fără telefon/email).
 
-### 9.2 Anulare Plasament Firmă & Realocare Minimală (`src/app/actions/company.ts`)
+### 14.2 Anulare Plasament Firmă & Realocare Minimală (`src/app/actions/company.ts`)
 - `cancelPlacementByCompany(placementId, reason)`: Firma anulează un plasament asociat ofertei sale (`CANCELLED_BY_COMPANY`) și declanșează `handleMinimalReallocation` pentru a găsi automat următorul candidat eligibil fără perturbarea studenților deja confirmați.
+
 
 

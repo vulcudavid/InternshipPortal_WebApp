@@ -51,13 +51,16 @@ async function main() {
 
   const coordinatorUser = await prisma.user.upsert({
     where: { email: coordinatorEmail },
-    update: {},
+    update: {
+      emailVerified: true,
+    },
     create: {
       email: coordinatorEmail,
       passwordHash: hashPassword(coordinatorPassword),
       role: UserRole.COORDINATOR,
       firstName: "Mihai",
       lastName: "Ionescu",
+      emailVerified: true,
     },
   });
 
@@ -67,13 +70,16 @@ async function main() {
 
   const adminUser = await prisma.user.upsert({
     where: { email: adminEmail },
-    update: {},
+    update: {
+      emailVerified: true,
+    },
     create: {
       email: adminEmail,
       passwordHash: hashPassword(adminPassword),
       role: UserRole.ADMIN,
       firstName: "Admin",
       lastName: "ULBS",
+      emailVerified: true,
     },
   });
 
@@ -93,13 +99,16 @@ async function main() {
   // Companie Parteneră & Tutore
   const companyUser = await prisma.user.upsert({
     where: { email: "recruitment@continental-sibiu.com" },
-    update: {},
+    update: {
+      emailVerified: true,
+    },
     create: {
       email: "recruitment@continental-sibiu.com",
       passwordHash: "demo_hash_company",
       role: UserRole.COMPANY_TUTOR,
       firstName: "Elena",
       lastName: "Popa",
+      emailVerified: true,
     },
   });
 
@@ -175,13 +184,16 @@ async function main() {
   // 5. Profil Student cu competențe
   const studentUser = await prisma.user.upsert({
     where: { email: "alexandru.radu@student.ulbsibiu.ro" },
-    update: {},
+    update: {
+      emailVerified: true,
+    },
     create: {
       email: "alexandru.radu@student.ulbsibiu.ro",
       passwordHash: "demo_hash_student",
       role: UserRole.STUDENT,
       firstName: "Alexandru",
       lastName: "Radu",
+      emailVerified: true,
     },
   });
 

@@ -1,13 +1,22 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { loginUser, registerUser, logoutUser } from "@/lib/auth";
+import {
+  loginUser,
+  registerUser,
+  registerStudent,
+  logoutUser,
+  verifyEmailCode,
+  resendVerificationCode,
+} from "@/lib/auth";
 import { UserRole, EngineeringDomain } from "@prisma/client";
 
 export type AuthState = {
   success: boolean;
   message?: string;
   error?: string;
+  requiresVerification?: boolean;
+  email?: string;
 };
 
 export async function loginAction(
@@ -27,6 +36,19 @@ export async function loginAction(
     return { success: true, message: "Autentificare reușită!" };
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : "Eroare la autentificare.";
+    const isEmailNotVerified =
+      errorMsg.includes("EMAIL_NOT_VERIFIED") ||
+      (err as any)?.code === "EMAIL_NOT_VERIFIED";
+
+    if (isEmailNotVerified) {
+      return {
+        success: false,
+        error: "Adresa de email nu a fost verificată. Introduceți codul de 6 cifre primit pe email pentru a vă activa contul.",
+        requiresVerification: true,
+        email: email.toLowerCase().trim(),
+      };
+    }
+
     return { success: false, error: errorMsg };
   }
 }
@@ -60,7 +82,7 @@ export async function registerAction(
     const city = (formData.get("city") as string) || undefined;
     const address = (formData.get("address") as string) || undefined;
 
-    await registerUser({
+    const result = await registerUser({
       email,
       password,
       firstName,
@@ -77,10 +99,54 @@ export async function registerAction(
     });
 
     revalidatePath("/");
+
+    if (result.requiresVerification) {
+      return {
+        success: true,
+        message: "Cont creat! Vă rugăm să introduceți codul de 6 cifre primit pe email pentru activarea contului.",
+        requiresVerification: true,
+        email: result.email,
+      };
+    }
+
     return { success: true, message: "Cont creat cu succes!" };
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : "Eroare la înregistrare.";
     return { success: false, error: errorMsg };
+  }
+}
+
+export async function verifyEmailAction(
+  email: string,
+  code: string
+): Promise<AuthState> {
+  if (!email || !code) {
+    return { success: false, error: "Adresa de email și codul sunt obligatorii.", requiresVerification: true, email };
+  }
+
+  try {
+    const res = await verifyEmailCode(email, code);
+    revalidatePath("/");
+    return { success: true, message: res.message };
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : "Eroare la verificarea codului.";
+    return { success: false, error: errorMsg, requiresVerification: true, email };
+  }
+}
+
+export async function resendVerificationCodeAction(
+  email: string
+): Promise<AuthState> {
+  if (!email) {
+    return { success: false, error: "Adresa de email este obligatorie." };
+  }
+
+  try {
+    const res = await resendVerificationCode(email);
+    return { success: true, message: res.message, requiresVerification: true, email };
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : "Eroare la retrimiterea codului.";
+    return { success: false, error: errorMsg, requiresVerification: true, email };
   }
 }
 

@@ -2,7 +2,12 @@
 
 import { useState, useActionState } from "react";
 import Image from "next/image";
-import { loginAction, registerAction } from "@/app/actions/auth";
+import {
+  loginAction,
+  registerAction,
+  verifyEmailAction,
+  resendVerificationCodeAction,
+} from "@/app/actions/auth";
 import { 
   GraduationCap, 
   Building2, 
@@ -12,7 +17,10 @@ import {
   Sparkles,
   Lock,
   Terminal,
-  Cpu
+  Cpu,
+  MailCheck,
+  RefreshCw,
+  ArrowLeft
 } from "lucide-react";
 
 export function AuthCard() {
@@ -32,6 +40,57 @@ export function AuthCard() {
   };
 
   const isDemoLoginEnabled = process.env.NEXT_PUBLIC_ENABLE_DEMO_LOGIN === "true";
+
+  const [manualOtpEmail, setManualOtpEmail] = useState("");
+  const [otpCode, setOtpCode] = useState("");
+  const [otpStatus, setOtpStatus] = useState<{ success?: boolean; message?: string; error?: string } | null>(null);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [isResendingOtp, setIsResendingOtp] = useState(false);
+
+  const activeVerificationEmail =
+    manualOtpEmail ||
+    (registerState?.requiresVerification ? registerState.email : "") ||
+    (loginState?.requiresVerification ? loginState.email : "");
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeVerificationEmail || !otpCode.trim()) return;
+    setIsVerifyingOtp(true);
+    setOtpStatus(null);
+    try {
+      const res = await verifyEmailAction(activeVerificationEmail, otpCode.trim());
+      setOtpStatus(res);
+      if (res.success) {
+        window.location.reload();
+      }
+    } catch (err: any) {
+      setOtpStatus({ success: false, error: err?.message || "Eroare la verificare." });
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!activeVerificationEmail) return;
+    setIsResendingOtp(true);
+    setOtpStatus(null);
+    try {
+      const res = await resendVerificationCodeAction(activeVerificationEmail);
+      setOtpStatus(res);
+    } catch (err: any) {
+      setOtpStatus({ success: false, error: err?.message || "Eroare la retrimitere." });
+    } finally {
+      setIsResendingOtp(false);
+    }
+  };
+
+  const handleCancelVerification = () => {
+    setManualOtpEmail("");
+    setOtpCode("");
+    setOtpStatus(null);
+    if (loginState) loginState.requiresVerification = false;
+    if (registerState) registerState.requiresVerification = false;
+  };
 
   return (
     <div className="bg-[#0B1221]/88 backdrop-blur-2xl border border-sky-400/25 shadow-2xl rounded-2xl overflow-hidden max-w-xl mx-auto w-full relative">
@@ -73,8 +132,86 @@ export function AuthCard() {
         </p>
       </div>
 
-      {/* Tab Switcher */}
-      <div className="flex border-b border-sky-500/20 bg-[#070D19]/40">
+      {/* Dacă este activă verificarea adresei de email prin cod OTP */}
+      {activeVerificationEmail ? (
+        <div className="p-6 sm:p-7 space-y-5">
+          <div className="text-center space-y-2">
+            <div className="inline-flex p-3 rounded-2xl bg-sky-500/10 border border-sky-400/30 text-sky-400 mb-1">
+              <MailCheck className="w-8 h-8" />
+            </div>
+            <h3 className="text-lg font-bold text-white">Verificare Adresă Email</h3>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Am expediat un cod de verificare din 6 cifre către adresa de student:<br />
+              <strong className="text-sky-300 font-mono text-sm">{activeVerificationEmail}</strong>
+            </p>
+          </div>
+
+          <form onSubmit={handleVerifyOtp} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-sky-300/90 uppercase tracking-wider mb-2 text-center">
+                Introduceți Codul OTP din 6 Cifre
+              </label>
+              <input
+                type="text"
+                maxLength={6}
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                placeholder="123456"
+                required
+                className="w-full text-center tracking-[0.5em] text-2xl font-bold font-mono px-4 py-3 rounded-xl bg-[#070D19]/90 border border-sky-500/40 text-white placeholder-slate-600 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/40 transition shadow-inner"
+              />
+              <p className="text-[11px] text-slate-400 text-center mt-1.5">
+                Codul este valabil timp de 15 minute.
+              </p>
+            </div>
+
+            {otpStatus?.error && (
+              <div className="p-3 bg-red-950/40 border border-red-500/40 text-red-200 rounded-xl text-xs font-medium">
+                {otpStatus.error}
+              </div>
+            )}
+
+            {otpStatus?.message && (
+              <div className="p-3 bg-emerald-950/40 border border-emerald-500/40 text-emerald-200 rounded-xl text-xs font-medium">
+                {otpStatus.message}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isVerifyingOtp || otpCode.trim().length !== 6}
+              className="w-full py-3 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(14,165,233,0.35)] hover:shadow-[0_0_30px_rgba(14,165,233,0.55)] disabled:opacity-50 text-sm tracking-wide uppercase flex items-center justify-center gap-2 active:scale-[0.99]"
+            >
+              <MailCheck className="w-4 h-4 text-slate-950" />
+              <span>{isVerifyingOtp ? "Se verifică..." : "Activează Contul"}</span>
+            </button>
+
+            <div className="flex items-center justify-between pt-2">
+              <button
+                type="button"
+                onClick={handleCancelVerification}
+                className="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 transition"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Înapoi la conectare</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleResendOtp}
+                disabled={isResendingOtp}
+                className="text-xs text-sky-400 hover:text-sky-300 font-medium flex items-center gap-1.5 disabled:opacity-50 transition"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isResendingOtp ? "animate-spin" : ""}`} />
+                <span>Retrimite codul</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      ) : (
+        <>
+          {/* Tab Switcher */}
+          <div className="flex border-b border-sky-500/20 bg-[#070D19]/40">
         <button
           type="button"
           onClick={() => setTab("login")}
@@ -428,7 +565,9 @@ export function AuthCard() {
             </button>
           </form>
         )}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

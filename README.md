@@ -21,7 +21,7 @@ Conform deciziei de arhitectură documentate în [DECISIONS.md](docs/agents/DECI
 
 Definită în [prisma/schema.prisma](prisma/schema.prisma) și detaliată în [CONTRACTS.md](docs/agents/CONTRACTS.md):
 
-1. **`User` (`users`)**: Autentificare și roluri (`STUDENT`, `COMPANY_TUTOR`, `COORDINATOR`, `ADMIN`).
+1. **`User` (`users`)**: Autentificare, verificare obligatorie email studenți (`@ulbsibiu.ro`) prin cod OTP din 6 cifre și roluri (`STUDENT`, `COMPANY_TUTOR`, `COORDINATOR`, `ADMIN`).
 2. **`StudentProfile` (`student_profiles`)**: Date academice (facultate, an, grupă), CV URL, competențe, disponibilitate.
 3. **`CompanyProfile` (`company_profiles`)**: Informații companie, CUI/CIF, descriere, persoană de contact.
 4. **`InternshipOffer` (`internship_offers`)**: Oferte de practică cu număr total de locuri, competențe cerute, perioadă și tutore.
@@ -61,6 +61,7 @@ Parametrii impliciți sunt deja preconfigurați pentru dezvoltare locală:
 - `STORAGE_PATH="./storage"`
 - `ADMIN_SEED_PASSWORD="AdminULBS2026!"`
 - `COORDINATOR_SEED_PASSWORD="CoordULBS2026!"`
+- `SMTP_HOST=""`, `SMTP_PORT="587"`, `SMTP_USER=""`, `SMTP_PASS=""`, `SMTP_FROM=""` *(opțional în mediul local — codurile OTP de verificare sunt afișate direct în consolă ca fallback)*
 
 ### 2. Pornirea bazei de date în Docker
 
@@ -158,6 +159,12 @@ Convențiile PDF generate și CV-urile încărcate necesită persistență într
 | `NEXT_PUBLIC_ENABLE_DEMO_LOGIN` | `"false"` (*obligatoriu în producție pentru a dezactiva accesul rapid demo*) |
 | `STORAGE_PATH` | `"/storage"` (directorul unde este montat volumul Railway) |
 | `ADMIN_SEED_PASSWORD` | O parolă complexă dedicată contului de administrator în producție |
+| `COORDINATOR_SEED_PASSWORD` | O parolă complexă dedicată contului de coordonator în producție |
+| `SMTP_HOST` | Host-ul serverului SMTP (ex: `smtp.sendgrid.net`, `smtp.mailgun.org` sau server universitar) |
+| `SMTP_PORT` | Portul SMTP (ex: `587` TLS sau `465` SSL) |
+| `SMTP_USER` | Utilizatorul de autentificare SMTP |
+| `SMTP_PASS` | Parola sau API Key-ul pentru SMTP |
+| `SMTP_FROM` | Adresa expeditorului (ex: `"Portal Practica ULBS" <no-reply@ulbsibiu.ro>`) |
 | `COORDINATOR_SEED_PASSWORD` | O parolă complexă dedicată contului de coordonator în producție |
 
 ### 5. Inițializarea Bazei de Date în Producție
