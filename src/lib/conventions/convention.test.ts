@@ -67,7 +67,7 @@ describe("Convenție de Practică ULBS (PDF & Diacritice)", () => {
     assert.ok(html.includes("TABEL NOMINAL"), "Trebuie să conțină titlul Tabelului nominal");
   });
 
-  it("generează fișier PDF real prin LibreOffice headless și îl salvează în storage/conventions/", async () => {
+  it("generează fișier PDF real nativ (fără LibreOffice) și îl salvează în storage/conventions/", async () => {
     const uniquePrefix = `convtest-${Date.now()}`;
 
     const studentUser = await prisma.user.create({

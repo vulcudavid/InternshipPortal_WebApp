@@ -6,8 +6,9 @@ import path from "path";
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { getDomainForSpecialization } from "@/lib/specializations";
-import { ProficiencyLevel, UserRole, EngineeringDomain } from "@prisma/client";
+import { ProficiencyLevel, UserRole, EngineeringDomain, PlacementStatus, NotificationType } from "@prisma/client";
 import { ensureStorageDirs, getPrivateCvPath } from "@/lib/storage";
+import { createNotification, notifyCoordinators } from "@/lib/notifications";
 
 /**
  * Verifică autentificarea și obține profilul de student al utilizatorului curent
@@ -326,10 +327,17 @@ export async function reorderStudentPreferences(orderedPreferenceIds: string[]) 
  * 8. Rezervare slot de interviu de către student
  */
 export async function bookInterviewSlot(slotId: string) {
-  const { profile } = await requireStudentProfile();
+  const { user, profile } = await requireStudentProfile();
 
   const slot = await prisma.interviewSlot.findUnique({
     where: { id: slotId },
+    include: {
+      offer: {
+        include: {
+          company: true,
+        },
+      },
+    },
   });
 
   if (!slot) {
@@ -360,6 +368,27 @@ export async function bookInterviewSlot(slotId: string) {
     },
   });
 
+  const formattedDate = new Date(slot.startTime).toLocaleString("ro-RO", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+
+  // Notificare Companie (Tutore)
+  await createNotification({
+    userId: slot.offer.company.userId,
+    title: "Interviu programat de un student",
+    message: `Studentul ${user.firstName} ${user.lastName} (${profile.specialization}) a rezervat un interviu pentru oferta "${slot.offer.title}" la data de ${formattedDate}.`,
+    type: NotificationType.SYSTEM_ALERT,
+  });
+
+  // Notificare Student (Confirmare)
+  await createNotification({
+    userId: user.id,
+    title: "Confirmare programare interviu",
+    message: `Ai programat cu succes interviul pentru oferta "${slot.offer.title}" la compania ${slot.offer.company.companyName} pe ${formattedDate}.`,
+    type: NotificationType.SYSTEM_ALERT,
+  });
+
   revalidatePath("/");
   return { success: true };
 }
@@ -368,10 +397,17 @@ export async function bookInterviewSlot(slotId: string) {
  * 9. Anulare rezervare slot de interviu de către student
  */
 export async function cancelInterviewBooking(slotId: string) {
-  const { profile } = await requireStudentProfile();
+  const { user, profile } = await requireStudentProfile();
 
   const slot = await prisma.interviewSlot.findUnique({
     where: { id: slotId },
+    include: {
+      offer: {
+        include: {
+          company: true,
+        },
+      },
+    },
   });
 
   if (!slot || slot.studentId !== profile.id) {
@@ -386,6 +422,73 @@ export async function cancelInterviewBooking(slotId: string) {
     },
   });
 
+  // Notificare Companie (Tutore)
+  await createNotification({
+    userId: slot.offer.company.userId,
+    title: "Interviu anulat de student",
+    message: `Studentul ${user.firstName} ${user.lastName} a anulat programarea la interviu pentru oferta "${slot.offer.title}".`,
+    type: NotificationType.SYSTEM_ALERT,
+  });
+
   revalidatePath("/");
   return { success: true };
+}
+
+/**
+ * 10. Refuzul locului repartizat de către student (Cerința 9)
+ * Setează statusul la REFUSED_BY_STUDENT, eliberează locul la ofertă și notifică coordonatorul academic.
+ */
+export async function refusePlacement(placementId: string) {
+  const { user, profile } = await requireStudentProfile();
+
+  const placement = await prisma.placement.findUnique({
+    where: { id: placementId },
+    include: {
+      offer: {
+        include: {
+          company: true,
+        },
+      },
+    },
+  });
+
+  if (!placement || placement.studentId !== profile.id) {
+    throw new Error("Plasamentul nu a fost găsit sau nu vă aparține.");
+  }
+
+  if (placement.status !== PlacementStatus.PENDING_CONFIRMATION) {
+    throw new Error("Doar plasamentele în așteptare de confirmare (PENDING_CONFIRMATION) pot fi refuzate.");
+  }
+
+  await prisma.$transaction(async (tx) => {
+    // 1. Setăm statusul la REFUSED_BY_STUDENT
+    await tx.placement.update({
+      where: { id: placementId },
+      data: {
+        status: PlacementStatus.REFUSED_BY_STUDENT,
+        cancelledAt: new Date(),
+        cancelReason: "Refuzat de către student",
+      },
+    });
+
+    // 2. Eliberăm locul la oferta de practică
+    await tx.internshipOffer.update({
+      where: { id: placement.offerId },
+      data: {
+        slotsAvailable: {
+          increment: 1,
+        },
+      },
+    });
+  });
+
+  // 3. Notificăm coordonatorii academici
+  await notifyCoordinators({
+    title: "Loc de practică refuzat de student",
+    message: `Studentul ${user.firstName} ${user.lastName} (${profile.specialization}, Gr. ${profile.group}) a refuzat locul repartizat la oferta "${placement.offer.title}" (${placement.offer.company.companyName}).`,
+    type: NotificationType.PLACEMENT_CANCELLED,
+  });
+
+  revalidatePath("/");
+  return { success: true, message: "Ați refuzat locul repartizat. Coordonatorul a fost notificat." };
 }

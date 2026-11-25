@@ -33,6 +33,7 @@ export interface PlacementItem {
   confirmedAt: Date | null;
   cancelledAt: Date | null;
   cancelReason: string | null;
+  validatedHours?: number;
   student: {
     id: string;
     specialization: string;
@@ -284,6 +285,7 @@ export function PlacementsTable({ placements }: PlacementsTableProps) {
                 <th className="py-3.5 px-4">Specializare & An</th>
                 <th className="py-3.5 px-4">Companie & Poziție</th>
                 <th className="py-3.5 px-4">Status</th>
+                <th className="py-3.5 px-4">Ore Validate</th>
                 <th className="py-3.5 px-4">Convenție Practică</th>
                 <th className="py-3.5 px-4">Data Alocării</th>
                 <th className="py-3.5 px-4 text-right">Acțiuni</th>
@@ -331,6 +333,12 @@ export function PlacementsTable({ placements }: PlacementsTableProps) {
                     </td>
                     <td className="py-3.5 px-4">
                       {getStatusBadge(p.status, p.cancelReason)}
+                    </td>
+                    {/* Coloana Ore Validate (Cerința 8) */}
+                    <td className="py-3.5 px-4">
+                      <span className="inline-flex items-center gap-1 font-mono text-xs font-semibold px-2 py-0.5 rounded bg-emerald-950/40 text-emerald-300 border border-emerald-500/30">
+                        {p.validatedHours || 0} ore
+                      </span>
                     </td>
                     {/* Coloana Convenție Practică */}
                     <td className="py-3.5 px-4">

@@ -3,6 +3,7 @@ import { CoordinatorDashboardData } from "@/app/actions/coordinator";
 import { StatsCard } from "./stats-card";
 import { PlacementsTable } from "./placements-table";
 import { RunMatchingButton } from "./run-matching-button";
+import { MinimalReallocationButton } from "./minimal-reallocation-button";
 import { ExportCsvButton } from "./export-csv-button";
 import {
   Users,
@@ -56,6 +57,7 @@ export function CoordinatorDashboard({ user, data }: CoordinatorDashboardProps) 
 
         <div className="flex flex-wrap items-center gap-3">
           <ExportCsvButton />
+          <MinimalReallocationButton />
           <RunMatchingButton />
         </div>
       </div>
@@ -159,15 +161,15 @@ export function CoordinatorDashboard({ user, data }: CoordinatorDashboardProps) 
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="flex items-center gap-1.5 text-slate-300 font-medium">
-                <CalendarCheck2 className="w-4 h-4 text-sky-400" /> Jurnale ore săptămâna curentă:
+                <CalendarCheck2 className="w-4 h-4 text-emerald-400" /> Ore validate tutore:
               </span>
-              <span className="font-bold text-white">
-                {stats.workLogsThisWeek}
+              <span className="font-bold text-emerald-300 font-mono">
+                {stats.totalValidatedHours} ore
               </span>
             </div>
           </div>
-          <div className="mt-3 pt-3 border-t border-sky-500/15 text-[11px] text-slate-500">
-            Modulul de generare convenții PDF va fi activ în Partea 2B.
+          <div className="mt-3 pt-3 border-t border-sky-500/15 text-[11px] text-slate-400">
+            Generare convenții PDF activă nativ cu suport complet UTF-8.
           </div>
         </div>
       </div>

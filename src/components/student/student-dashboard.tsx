@@ -215,6 +215,31 @@ export function StudentDashboard({
                 {profile.cvUrl ? "Activ" : "Lipsă"}
               </span>
             </div>
+
+            <div className="px-3.5 py-2 rounded-2xl bg-[#070D19]/80 backdrop-blur border border-sky-500/20 text-center shadow-inner">
+              <span className="text-[10px] uppercase tracking-wider text-slate-400 block font-semibold">
+                Status
+              </span>
+              <span
+                className={`text-xs font-bold block ${
+                  placement?.status === "CONFIRMED"
+                    ? "text-emerald-400"
+                    : placement?.status === "PENDING_CONFIRMATION"
+                    ? "text-amber-400"
+                    : placement?.status === "REFUSED_BY_STUDENT"
+                    ? "text-rose-400"
+                    : "text-slate-400"
+                }`}
+              >
+                {placement?.status === "CONFIRMED"
+                  ? "Confirmat"
+                  : placement?.status === "PENDING_CONFIRMATION"
+                  ? "Provizoriu"
+                  : placement?.status === "REFUSED_BY_STUDENT"
+                  ? "Refuzat"
+                  : "Nealocat"}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -290,14 +315,32 @@ export function StudentDashboard({
             }}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
               activeTab === "convention"
-                ? "bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+                ? placement.status === "CONFIRMED"
+                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+                  : placement.status === "PENDING_CONFIRMATION"
+                  ? "bg-amber-500/20 text-amber-300 border border-amber-400/40 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+                  : "bg-rose-500/20 text-rose-300 border border-rose-400/40 shadow-[0_0_15px_rgba(244,63,94,0.2)]"
                 : "text-slate-400 hover:text-emerald-200 hover:bg-emerald-500/5"
             }`}
           >
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>Stagiu & Convenție</span>
+            <span>
+              {placement.status === "CONFIRMED"
+                ? "Stagiu Confirmat & Convenție"
+                : placement.status === "PENDING_CONFIRMATION"
+                ? "Plasament Provizoriu"
+                : placement.status === "REFUSED_BY_STUDENT"
+                ? "Plasament Refuzat"
+                : "Stare Plasament"}
+            </span>
             {placement.status === "CONFIRMED" && (
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+            )}
+            {placement.status === "PENDING_CONFIRMATION" && (
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.8)]" />
+            )}
+            {placement.status === "REFUSED_BY_STUDENT" && (
+              <span className="w-2 h-2 rounded-full bg-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.8)]" />
             )}
           </button>
         )}

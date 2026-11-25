@@ -1,14 +1,12 @@
 import fs from "fs/promises";
 import path from "path";
-import { execFile } from "child_process";
-import { promisify } from "util";
 import prisma from "@/lib/prisma";
-import { ConventionStatus, PlacementStatus } from "@prisma/client";
+import { ConventionStatus } from "@prisma/client";
 import { ConventionData } from "./types";
-import { generateConventionHtml } from "./template-html";
 import { ensureStorageDirs, getConventionsDir } from "../storage";
+import { buildConventionPdfBuffer } from "./pdf-builder";
 
-const execFileAsync = promisify(execFile);
+export { buildConventionPdfBuffer };
 
 /**
  * Compilează obiectul ConventionData complet pentru un plasament.
@@ -97,7 +95,8 @@ export async function buildConventionData(placementId: string): Promise<Conventi
 }
 
 /**
- * Generează fișierul PDF oficial al convenției ULBS utilizând LibreOffice headless.
+ * Generează fișierul PDF oficial al convenției ULBS nativ în Node.js (fără dependență de LibreOffice).
+ * Compatibil 100% cu macOS, Linux (Railway) și Docker cu diacritice UTF-8.
  */
 export async function generateConventionPdf(placementId: string): Promise<{
   conventionId: string;
@@ -109,41 +108,16 @@ export async function generateConventionPdf(placementId: string): Promise<{
   await ensureStorageDirs();
 
   const data = await buildConventionData(placementId);
-  const htmlContent = generateConventionHtml(data);
+  const pdfBuffer = await buildConventionPdfBuffer(data);
 
   const conventionsDir = getConventionsDir();
-  const tempHtmlFilename = `temp_${placementId}.html`;
-  const tempHtmlPath = path.join(conventionsDir, tempHtmlFilename);
   const targetPdfFilename = `convention_${placementId}.pdf`;
   const targetPdfPath = path.join(conventionsDir, targetPdfFilename);
 
-  // 1. Scriem fișierul HTML intermediar UTF-8
-  await fs.writeFile(tempHtmlPath, htmlContent, "utf-8");
+  // Scriem fișierul PDF binar pe disc
+  await fs.writeFile(targetPdfPath, pdfBuffer);
 
-  // 2. Rulăm conversia cu soffice
-  try {
-    await execFileAsync("soffice", [
-      "--headless",
-      "--convert-to",
-      "pdf",
-      "--outdir",
-      conventionsDir,
-      tempHtmlPath,
-    ]);
-
-    // LibreOffice va crea temp_${placementId}.pdf
-    const generatedPdfPath = path.join(conventionsDir, `temp_${placementId}.pdf`);
-    await fs.rename(generatedPdfPath, targetPdfPath);
-  } finally {
-    // Curățăm fișierul HTML temporar
-    try {
-      await fs.unlink(tempHtmlPath);
-    } catch {
-      // Ignorăm dacă fișierul a fost deja șters
-    }
-  }
-
-  // 3. Salvăm sau actualizăm înregistrarea în baza de date
+  // Salvăm sau actualizăm înregistrarea în baza de date
   const convention = await prisma.internshipConvention.upsert({
     where: { placementId },
     update: {

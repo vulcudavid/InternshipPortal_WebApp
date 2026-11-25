@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { UserRole } from "@prisma/client";
 import { getConventionPath, getSignedConventionPath } from "@/lib/storage";
+import { generateConventionPdf } from "@/lib/conventions/generator";
 
 export async function GET(
   req: NextRequest,
@@ -73,28 +74,41 @@ export async function GET(
     filePath = getSignedConventionPath(path.basename(convention.signedPdfUrl));
   }
 
-  if (!filePath) {
+  let fileBuffer: Buffer | null = null;
+
+  if (filePath) {
+    try {
+      fileBuffer = await fs.readFile(filePath);
+    } catch {
+      fileBuffer = null;
+    }
+  }
+
+  // Fallback nativ garantat: dacă fișierul generat lipsește de pe disc, îl regenerăm pe loc
+  if (!fileBuffer && (!preferSigned || !convention.signedPdfUrl)) {
+    try {
+      const generated = await generateConventionPdf(convention.placementId);
+      fileBuffer = await fs.readFile(generated.pdfPath);
+      contentType = "application/pdf";
+    } catch (err: any) {
+      console.error("Eroare la regenerarea automată a PDF-ului:", err);
+    }
+  }
+
+  if (!fileBuffer) {
     return NextResponse.json(
-      { error: "Convenția nu are un fișier generat sau încărcat încă." },
+      { error: "Fișierul convenției nu a putut fi găsit sau generat." },
       { status: 404 }
     );
   }
 
-  try {
-    const fileBuffer = await fs.readFile(filePath);
-    const safeNum = convention.conventionNumber.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const safeNum = convention.conventionNumber.replace(/[^a-zA-Z0-9_-]/g, "_");
 
-    return new Response(fileBuffer, {
-      status: 200,
-      headers: {
-        "Content-Type": contentType,
-        "Content-Disposition": `inline; filename="Conventie_${safeNum}.pdf"`,
-      },
-    });
-  } catch (err) {
-    return NextResponse.json(
-      { error: "Fișierul convenției nu a fost găsit pe disc." },
-      { status: 404 }
-    );
-  }
+  return new Response(fileBuffer as any, {
+    status: 200,
+    headers: {
+      "Content-Type": contentType,
+      "Content-Disposition": `inline; filename="Conventie_${safeNum}.pdf"`,
+    },
+  });
 }

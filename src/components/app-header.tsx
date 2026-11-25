@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { logoutAction } from "@/app/actions/auth";
 import { LogOut } from "lucide-react";
+import { NotificationsBell } from "@/components/notifications-bell";
 
 export interface HeaderUser {
   firstName: string;
@@ -77,6 +78,7 @@ export function AppHeader({ currentUser }: AppHeaderProps) {
         <div className="flex items-center gap-3">
           {currentUser ? (
             <div className="flex items-center gap-3">
+              <NotificationsBell />
               <div className="text-right hidden sm:block">
                 <p className="text-xs font-bold text-white tracking-wide">
                   {currentUser.firstName} {currentUser.lastName}

@@ -2,8 +2,9 @@
 
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { UserRole, EngineeringDomain, OfferStatus, PlacementStatus } from "@prisma/client";
+import { UserRole, EngineeringDomain, OfferStatus, PlacementStatus, NotificationType } from "@prisma/client";
 import { handleMinimalReallocation, OfferPreferences, StudentPreferences } from "@/lib/matching";
+import { createNotification } from "@/lib/notifications";
 import { revalidatePath } from "next/cache";
 
 /**
@@ -418,6 +419,30 @@ export async function createInterviewSlot(data: {
       isBooked: false,
     },
   });
+
+  const formattedStart = start.toLocaleString("ro-RO", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+
+  // Notificăm candidații care au aplicat sau au această ofertă în preferințe
+  const applicants = await prisma.companyApplicantRank.findMany({
+    where: { offerId: data.offerId },
+    include: {
+      student: {
+        include: { user: true },
+      },
+    },
+  });
+
+  for (const app of applicants) {
+    await createNotification({
+      userId: app.student.user.id,
+      title: "Interval nou de interviu disponibil",
+      message: `Compania ${profile.companyName} a adăugat un nou slot de interviu pentru oferta "${offer.title}" la data de ${formattedStart}.`,
+      type: NotificationType.SYSTEM_ALERT,
+    });
+  }
 
   revalidatePath("/");
   return { success: true, slotId: slot.id };
