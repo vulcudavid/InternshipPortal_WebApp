@@ -6,19 +6,20 @@ Platformă universitară dedicată gestionării stagiilor de practică: publicar
 
 ## 🚀 Stivă Tehnologică
 
-Conform deciziei de arhitectură documentate în [DECISIONS.md](file:///home/david/Work/web2-lab/docs/agents/DECISIONS.md) (**ADR-001** - status `approved`):
+Conform deciziei de arhitectură documentate în [DECISIONS.md](docs/agents/DECISIONS.md) (**ADR-001** - status `approved`):
 
 - **Framework**: [Next.js 15 (App Router)](https://nextjs.org/) cu **React 19** și **TypeScript**
 - **Bază de date**: **PostgreSQL 16** (containerizată cu Docker Compose)
 - **ORM & Migrations**: [Prisma ORM](https://www.prisma.io/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) & [Lucide Icons](https://lucide.dev/)
 - **Infrastructură locală**: [Docker Compose](https://docs.docker.com/compose/)
+- **Deploy Producție**: [Railway](https://railway.app/) (Next.js Node.js runtime + PostgreSQL + Railway Volume)
 
 ---
 
 ## 🗄️ Schema Bazei de Date (11 Tabele Relaționale)
 
-Definită în [prisma/schema.prisma](file:///home/david/Work/web2-lab/prisma/schema.prisma) și detaliată în [CONTRACTS.md](file:///home/david/Work/web2-lab/docs/agents/CONTRACTS.md):
+Definită în [prisma/schema.prisma](prisma/schema.prisma) și detaliată în [CONTRACTS.md](docs/agents/CONTRACTS.md):
 
 1. **`User` (`users`)**: Autentificare și roluri (`STUDENT`, `COMPANY_TUTOR`, `COORDINATOR`, `ADMIN`).
 2. **`StudentProfile` (`student_profiles`)**: Date academice (facultate, an, grupă), CV URL, competențe, disponibilitate.
@@ -43,36 +44,39 @@ Asigurați-vă că aveți instalate pe sistem:
 
 ---
 
-## 🛠️ Instrucțiuni de Pornire
+## 🛠️ Instrucțiuni de Pornire Locală (cu Docker Compose)
 
 ### 1. Clonare și configurare variabile de mediu
 
-Fișierul `.env` este deja configurat pentru mediul local. Puteți verifica sau ajusta setările în caz de nevoie:
+Copiați fișierul de configurare șablon:
 
 ```bash
 cp .env.example .env
 ```
 
-Parametrii impliciți:
-- `POSTGRES_USER=postgres`
-- `POSTGRES_PASSWORD=postgrespassword`
-- `POSTGRES_DB=web2_lab`
-- `POSTGRES_PORT=5432`
+Parametrii impliciți sunt deja preconfigurați pentru dezvoltare locală:
 - `DATABASE_URL="postgresql://postgres:postgrespassword@localhost:5432/web2_lab?schema=public"`
+- `NEXT_PUBLIC_APP_URL="http://localhost:3000"`
+- `NEXT_PUBLIC_ENABLE_DEMO_LOGIN="true"`
+- `STORAGE_PATH="./storage"`
+- `ADMIN_SEED_PASSWORD="AdminULBS2026!"`
+- `COORDINATOR_SEED_PASSWORD="CoordULBS2026!"`
 
 ### 2. Pornirea bazei de date în Docker
 
-Porniți containerul PostgreSQL rulând:
+Lansați containerul PostgreSQL în fundal:
 
 ```bash
-npm run db:up
-# sau direct: docker compose up -d
+docker compose up -d
+# sau folosind scriptul npm:
+# npm run db:up
 ```
 
-Verificați starea containerului:
+Verificați că serviciul este pornit și sănătos:
+
 ```bash
-npm run db:status
-# sau: docker compose ps
+docker compose ps
+# sau: npm run db:status
 ```
 
 ### 3. Instalarea dependențelor
@@ -83,19 +87,33 @@ Instalați pachetele Node.js:
 npm install
 ```
 
-*(Comanda va rula automat și `prisma generate` pentru generarea tipurilor TypeScript).*
+*(Comanda va rula automat și `prisma generate` pentru generarea clientului TypeScript Prisma).*
 
-### 4. Aplicarea schemei în baza de date
+### 4. Sincronizarea schemei în baza de date
 
-Aplicați schema Prisma în containerul PostgreSQL activ:
+Aplicați schema Prisma direct pe baza de date din Docker:
 
 ```bash
-npm run db:push
-# sau pentru migrații versionate:
-npm run db:migrate
+npx prisma db push
+# sau folosind scriptul npm:
+# npm run db:push
 ```
 
-### 5. Pornirea serverului de dezvoltare
+### 5. Popularea bazei de date (Seeding)
+
+Inițializați conturile de sistem universitare (Administrator, Coordonator) și datele demo de test:
+
+```bash
+npm run db:seed
+```
+
+> **Conturi create implicit pentru testare:**
+> - **Administrator**: `admin@universitate.ro` (Parolă: `AdminULBS2026!`)
+> - **Coordonator**: `coordonator@universitate.ro` (Parolă: `CoordULBS2026!`)
+> - **Companii demo**: Continental, Bitdefender, Marquardt
+> - **Studenți demo**: Popescu Ion, Ionescu Maria, Radu Andrei, Dumitrescu Elena, Stan Cristian
+
+### 6. Pornirea serverului de dezvoltare
 
 Lansați aplicația Next.js:
 
@@ -107,9 +125,55 @@ Aplicația va fi accesibilă în browser la: **[http://localhost:3000](http://lo
 
 ---
 
+## ☁️ Ghid de Configurare și Deploy pe Railway
+
+Platforma poate fi publicată facil pe [Railway](https://railway.app/) urmând pașii:
+
+### 1. Creare Proiect și Bază de Date PostgreSQL
+1. Accesați dashboard-ul Railway și creați un proiect nou (**New Project**).
+2. Adăugați serviciul **PostgreSQL** (*Database -> Add PostgreSQL*).
+3. Railway va aloca automat o variabilă de mediu `${{Postgres.DATABASE_URL}}`.
+
+### 2. Adăugare Serviciu Web (Aplicația Next.js)
+1. Conectați repository-ul GitHub sau creați un serviciu gol și trimiteți codul prin Railway CLI.
+2. Railway va detecta automat proiectul Next.js și va folosi `npm run build` urmat de `npm run start`.
+
+### 3. Atașare Persistent Volume (Stocare Fișiere)
+Convențiile PDF generate și CV-urile încărcate necesită persistență între redeploy-uri:
+1. În setările serviciului web, navigați la secțiunea **Volumes**.
+2. Adăugați un volum persistent nou:
+   - **Mount Path**: `/storage`
+3. În secțiunea **Variables**, setați variabila:
+   ```env
+   STORAGE_PATH="/storage"
+   ```
+
+### 4. Configurare Variabile de Mediu pe Railway
+În fila **Variables** a serviciului web Next.js, adăugați următoarele chei:
+
+| Variabilă | Valoare Recomandată / Notă |
+|---|---|
+| `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` (referință dinamică la serviciul Postgres) |
+| `NEXT_PUBLIC_APP_URL` | `https://${{RAILWAY_PUBLIC_DOMAIN}}` (sau domeniul dvs. personalizat) |
+| `NEXT_PUBLIC_ENABLE_DEMO_LOGIN` | `"false"` (*obligatoriu în producție pentru a dezactiva accesul rapid demo*) |
+| `STORAGE_PATH` | `"/storage"` (directorul unde este montat volumul Railway) |
+| `ADMIN_SEED_PASSWORD` | O parolă complexă dedicată contului de administrator în producție |
+| `COORDINATOR_SEED_PASSWORD` | O parolă complexă dedicată contului de coordonator în producție |
+
+### 5. Inițializarea Bazei de Date în Producție
+După primul deployment reușit:
+1. Deschideți terminalul serviciului din Railway Dashboard (*Deployments -> View Logs / Exec Terminal*) sau rulați local prin Railway CLI:
+   ```bash
+   railway run npx prisma db push
+   railway run npm run db:seed
+   ```
+2. Deoarece `NEXT_PUBLIC_ENABLE_DEMO_LOGIN="false"`, comanda `db:seed` va genera exclusiv conturile administrative securizate (`admin@universitate.ro` și `coordonator@universitate.ro`), fără înregistrări fictive de test.
+
+---
+
 ## 🔍 Prisma Studio (Interfață vizuală pentru Baza de Date)
 
-Pentru a vizualiza și gestiona înregistrările din baza de date:
+Pentru a vizualiza și gestiona înregistrările din baza de date în dezvoltare locală:
 
 ```bash
 npm run db:studio
@@ -126,10 +190,13 @@ Aceasta va deschide Prisma Studio la adresa `http://localhost:5555`.
 | `npm run dev` | Pornește serverul Next.js în mod dezvoltare (port 3000) |
 | `npm run build` | Compilează aplicația pentru producție |
 | `npm run start` | Pornește serverul compilat în producție |
+| `npm run lint` | Validează codul sursă cu ESLint |
+| `npm run test` | Rulează suita de teste automate cu Vitest |
 | `npm run db:up` | Pornește containerul PostgreSQL în fundal prin Docker Compose |
 | `npm run db:down` | Oprește containerul PostgreSQL |
 | `npm run db:status` | Afișează starea containerelor Docker |
 | `npm run db:push` | Sincronizează schema Prisma direct în baza de date PostgreSQL |
+| `npm run db:seed` | Populează baza de date cu date inițiale / demo |
 | `npm run db:migrate` | Creează și aplică o migrație Prisma nouă |
 | `npm run db:generate` | Generează clientul TypeScript `@prisma/client` |
 | `npm run db:studio` | Pornește interfața grafică Prisma Studio pe portul 5555 |
@@ -139,9 +206,9 @@ Aceasta va deschide Prisma Studio la adresa `http://localhost:5555`.
 ## 📁 Structura Proiectului
 
 ```text
-web2-lab/
+InternshipPortal_WebApp/
 ├── AGENTS.md                  # Regulile de lucru pentru agenți AI
-├── docker-compose.yml         # Serviciul PostgreSQL pentru dev local
+├── docker-compose.yml         # Serviciul PostgreSQL pentru mediul de dezvoltare
 ├── docs/
 │   ├── brief.md               # Cerințele oficiale de proiect (P14)
 │   └── agents/
@@ -150,17 +217,34 @@ web2-lab/
 │       ├── OPEN-QUESTIONS.md  # Întrebări deschise și clarificări viitoare
 │       └── PATTERNS.md        # Șabloane de cod și bune practici
 ├── prisma/
-│   └── schema.prisma          # Schema completă a bazei de date (11 tabele)
+│   ├── schema.prisma          # Schema completă a bazei de date (11 tabele)
+│   └── seed.ts                # Script de populare (conturi universitare + opțional demo)
 ├── src/
 │   ├── app/
-│   │   ├── globals.css        # Stiluri globale Tailwind CSS
+│   │   ├── actions/           # Server Actions (auth, student, company, coordinator, gdpr, convention)
+│   │   ├── admin/             # Panoul de administrare universitar și conformitate GDPR
+│   │   ├── api/               # Rute API protejate (conventions/download, cv/download, gdpr/anonymize)
+│   │   ├── globals.css        # Stiluri Tailwind CSS
 │   │   ├── layout.tsx         # Root layout Next.js
-│   │   └── page.tsx           # Pagină de pornire și sumar arhitectură
-│   └── lib/
-│       └── prisma.ts          # Singleton Prisma Client pentru Next.js
+│   │   ├── not-found.tsx      # Pagină de eroare 404 personalizată
+│   │   └── page.tsx           # Pagină principală și dashboard-uri dinamice pe roluri
+│   ├── components/            # Componente React organizate pe roluri
+│   │   ├── admin/             # Tab-uri administrare, audit log, setări, utilizatori GDPR
+│   │   ├── company/           # Gestionare oferte, interviuri, ierarhizare candidați
+│   │   ├── coordinator/       # Panou coordonator, execuție algoritm Gale-Shapley, export CSV
+│   │   └── student/           # Gestionare profil, încărcare CV, selecție preferințe, convenție
+│   ├── lib/                   # Module de logică de business și utilitare
+│   │   ├── conventions/       # Generare și șablonare convenții de practică PDF
+│   │   ├── matching.ts        # Implementare algoritm Gale-Shapley cu cote de capacitate
+│   │   ├── gdpr.ts            # Mecanism anonimizare și descărcare date conform GDPR Art. 17
+│   │   ├── storage.ts         # Manager stocare fișiere pe disc / volum persistent
+│   │   ├── auth.ts            # Sesiune utilizator securizată pe cookies HTTP-only
+│   │   └── prisma.ts          # Singleton Prisma Client pentru Next.js
+│   └── middleware.ts          # Middleware securitate și rutare protejată
+├── storage/                   # Director local pentru stocare fișiere (CV-uri, PDF-uri)
 ├── .env                       # Variabile de mediu locale
-├── .env.example               # Șablon variabile de mediu
+├── .env.example               # Șablon variabile de mediu (local & Railway)
 ├── package.json               # Dependențe și scripturi npm
 ├── tsconfig.json              # Configurare compilator TypeScript
-└── README.md                  # Documentație de instalare și pornire
+└── README.md                  # Documentație completă a proiectului
 ```

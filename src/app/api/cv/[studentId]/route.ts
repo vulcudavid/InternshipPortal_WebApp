@@ -68,7 +68,6 @@ export async function GET(
   const filename = path.basename(cvUrl);
   const candidatePaths = [
     getPrivateCvPath(filename),
-    path.join(process.cwd(), "storage", "cvs", filename),
     path.join(process.cwd(), "public", "uploads", "cvs", filename),
     path.join(process.cwd(), "public", cvUrl.replace(/^\//, "")),
   ];

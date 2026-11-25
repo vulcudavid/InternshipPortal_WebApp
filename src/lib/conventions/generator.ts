@@ -6,10 +6,9 @@ import prisma from "@/lib/prisma";
 import { ConventionStatus, PlacementStatus } from "@prisma/client";
 import { ConventionData } from "./types";
 import { generateConventionHtml } from "./template-html";
-import { ensureStorageDirs, getConventionPath } from "../storage";
+import { ensureStorageDirs, getConventionsDir } from "../storage";
 
 const execFileAsync = promisify(execFile);
-const PROJECT_ROOT = path.resolve(process.cwd());
 
 /**
  * Compilează obiectul ConventionData complet pentru un plasament.
@@ -112,7 +111,7 @@ export async function generateConventionPdf(placementId: string): Promise<{
   const data = await buildConventionData(placementId);
   const htmlContent = generateConventionHtml(data);
 
-  const conventionsDir = path.join(PROJECT_ROOT, "storage", "conventions");
+  const conventionsDir = getConventionsDir();
   const tempHtmlFilename = `temp_${placementId}.html`;
   const tempHtmlPath = path.join(conventionsDir, tempHtmlFilename);
   const targetPdfFilename = `convention_${placementId}.pdf`;

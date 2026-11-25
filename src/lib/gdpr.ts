@@ -1,8 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { prisma } from "./prisma";
-
-const PROJECT_ROOT = path.resolve(process.cwd());
+import { getPrivateCvPath } from "./storage";
 
 /**
  * Anonimizează profilul unui student conform GDPR.
@@ -19,8 +18,8 @@ export async function anonymizeStudentProfile(studentId: string): Promise<void> 
   if (profile.cvUrl) {
     const filename = path.basename(profile.cvUrl);
     const candidatePaths = [
-      path.join(PROJECT_ROOT, "storage", "cvs", filename),
-      path.join(PROJECT_ROOT, "public", "uploads", "cvs", filename),
+      getPrivateCvPath(filename),
+      path.join(process.cwd(), "public", "uploads", "cvs", filename),
     ];
     for (const cvPath of candidatePaths) {
       try {

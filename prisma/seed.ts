@@ -1,13 +1,20 @@
-import { PrismaClient, UserRole, EngineeringDomain, ProficiencyLevel } from "@prisma/client";
+import crypto from "crypto";
+import { PrismaClient, UserRole, EngineeringDomain, ProficiencyLevel, TieBreakerRule } from "@prisma/client";
 import { PREDEFINED_ENGINEERING_TAGS } from "../src/lib/tags";
 import { calculateCompatibilityScore } from "../src/lib/scoring";
 
 const prisma = new PrismaClient();
 
+function hashPassword(password: string): string {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const derivedKey = crypto.scryptSync(password, salt, 64);
+  return `${salt}:${derivedKey.toString("hex")}`;
+}
+
 async function main() {
   console.log("🌱 Începe popularea bazei de date (Seeding)...");
 
-  // 1. Populare Nomenclator Tag-uri Predefinite Inginerie ULBS
+  // 1. Populare Nomenclator Tag-uri Predefinite Inginerie ULBS (întotdeauna)
   console.log("📌 Populare tag-uri predefinite pentru Facultatea de Inginerie...");
   for (const tagDef of PREDEFINED_ENGINEERING_TAGS) {
     await prisma.tag.upsert({
@@ -26,33 +33,64 @@ async function main() {
 
   console.log(`✅ ${PREDEFINED_ENGINEERING_TAGS.length} tag-uri predefinite create/actualizate.`);
 
-  // 2. Utilizator Coordonator Facultate
-  const coordinatorUser = await prisma.user.upsert({
-    where: { email: "coordonator.practica@ulbsibiu.ro" },
+  // 2. Setări implicite ale platformei (întotdeauna)
+  await prisma.systemSettings.upsert({
+    where: { id: "global" },
     update: {},
     create: {
-      email: "coordonator.practica@ulbsibiu.ro",
-      passwordHash: "demo_hash_coordonator",
+      id: "global",
+      requiredHours: 120,
+      tieBreakerRule: TieBreakerRule.APPLICATION_ORDER,
+    },
+  });
+  console.log("⚙️  Setările implicite ale platformei (SystemSettings) au fost inițializate.");
+
+  // 3. Utilizator Coordonator Facultate / Profesor (întotdeauna)
+  const coordinatorEmail = "coordonator.practica@ulbsibiu.ro";
+  const coordinatorPassword = process.env.COORDINATOR_SEED_PASSWORD || "CoordULBS2026!";
+
+  const coordinatorUser = await prisma.user.upsert({
+    where: { email: coordinatorEmail },
+    update: {},
+    create: {
+      email: coordinatorEmail,
+      passwordHash: hashPassword(coordinatorPassword),
       role: UserRole.COORDINATOR,
       firstName: "Mihai",
       lastName: "Ionescu",
     },
   });
 
-  // 2.1 Utilizator Administrator Sistem
+  // 4. Utilizator Administrator Sistem (întotdeauna)
+  const adminEmail = "admin@ulbsibiu.ro";
+  const adminPassword = process.env.ADMIN_SEED_PASSWORD || "AdminULBS2026!";
+
   const adminUser = await prisma.user.upsert({
-    where: { email: "admin@ulbsibiu.ro" },
+    where: { email: adminEmail },
     update: {},
     create: {
-      email: "admin@ulbsibiu.ro",
-      passwordHash: "demo_hash_admin",
+      email: adminEmail,
+      passwordHash: hashPassword(adminPassword),
       role: UserRole.ADMIN,
       firstName: "Admin",
       lastName: "ULBS",
     },
   });
 
-  // 3. Companie Parteneră & Tutore
+  console.log("🔐 Date de autentificare conturi administrative create/verificate:");
+  console.log(`   - Admin:       email="${adminUser.email}" | parolă="${adminPassword}"`);
+  console.log(`   - Coordonator: email="${coordinatorUser.email}" | parolă="${coordinatorPassword}"`);
+
+  // 5. Date Demo (doar dacă NEXT_PUBLIC_ENABLE_DEMO_LOGIN === "true")
+  if (process.env.NEXT_PUBLIC_ENABLE_DEMO_LOGIN !== "true") {
+    console.log("ℹ️  NEXT_PUBLIC_ENABLE_DEMO_LOGIN nu este 'true'. Datele demo (firme, oferte, studenți) au fost omise.");
+    console.log("✨ Seeding de producție finalizat cu succes!");
+    return;
+  }
+
+  console.log("🧪 Mod DEMO activat — se inserează compania, oferta și studentul demo...");
+
+  // Companie Parteneră & Tutore
   const companyUser = await prisma.user.upsert({
     where: { email: "recruitment@continental-sibiu.com" },
     update: {},

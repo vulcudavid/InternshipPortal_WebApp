@@ -5,8 +5,7 @@ import { logAuditEvent } from "@/lib/audit";
 import { AuditActionType } from "@prisma/client";
 import fs from "fs/promises";
 import path from "path";
-
-const PROJECT_ROOT = path.resolve(process.cwd());
+import { getPrivateCvPath } from "@/lib/storage";
 
 export async function POST(request: NextRequest) {
   const auth = await checkAdminApiAuth();
@@ -50,8 +49,8 @@ export async function POST(request: NextRequest) {
     if (studentProfile.cvUrl) {
       const filename = path.basename(studentProfile.cvUrl);
       const candidatePaths = [
-        path.join(PROJECT_ROOT, "storage", "cvs", filename),
-        path.join(PROJECT_ROOT, "public", "uploads", "cvs", filename),
+        getPrivateCvPath(filename),
+        path.join(process.cwd(), "public", "uploads", "cvs", filename),
       ];
       for (const cvPath of candidatePaths) {
         try {
