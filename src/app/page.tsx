@@ -8,6 +8,7 @@ import { StudentDashboard } from "@/components/student/student-dashboard";
 import { CompanyDashboard } from "@/components/company/company-dashboard";
 import { CoordinatorDashboard } from "@/components/coordinator/coordinator-dashboard";
 import { getCoordinatorDashboardData } from "@/app/actions/coordinator";
+import { getSystemSettings } from "@/lib/settings";
 import { sanitizeStudentProfileForCompany } from "@/lib/privacy";
 import { 
   Building2, 
@@ -29,7 +30,7 @@ export default async function Home() {
   // 1. Date necesare pentru Dashboard Student (Partea 1A)
   let studentData = null;
   if (currentUser && currentUser.role === UserRole.STUDENT && currentUser.studentProfile) {
-    const [availableTags, offers, preferences, placement] = await Promise.all([
+    const [availableTags, offers, preferences, placement, settings] = await Promise.all([
       prisma.tag.findMany({
         orderBy: { name: "asc" },
         select: { id: true, name: true, domain: true, isPredefined: true },
@@ -75,8 +76,13 @@ export default async function Home() {
             },
           },
           convention: true,
+          workLogs: {
+            orderBy: { date: "desc" },
+          },
+          evaluation: true,
         },
       }),
+      getSystemSettings(),
     ]);
 
     studentData = {
@@ -84,6 +90,7 @@ export default async function Home() {
       offers,
       preferences,
       placement,
+      requiredHours: settings.requiredHours,
     };
   }
 
@@ -129,6 +136,25 @@ export default async function Home() {
             },
             orderBy: { startTime: "asc" },
           },
+          placements: {
+            where: {
+              status: "CONFIRMED",
+            },
+            include: {
+              offer: {
+                select: { id: true, title: true },
+              },
+              student: {
+                include: {
+                  user: { select: { firstName: true, lastName: true, email: true } },
+                },
+              },
+              workLogs: {
+                orderBy: { date: "desc" },
+              },
+              evaluation: true,
+            },
+          },
         },
         orderBy: { createdAt: "desc" },
       }),
@@ -155,10 +181,13 @@ export default async function Home() {
       sanitizeStudentProfileForCompany(s, appliedStudentIds.has(s.id))
     );
 
+    const companyPlacements = offers.flatMap((o) => (o as any).placements || []);
+
     companyData = {
       offers,
       availableTags,
       allStudents: sanitizedStudents,
+      placements: companyPlacements,
     };
   }
 
@@ -190,6 +219,7 @@ export default async function Home() {
               offers={studentData.offers}
               preferences={studentData.preferences}
               placement={studentData.placement}
+              requiredHours={studentData.requiredHours}
             />
           ) : currentUser.role === UserRole.COMPANY_TUTOR && currentUser.companyProfile && companyData ? (
             /* VEDERE COMPLETĂ DASHBOARD COMPANIE / TUTORE (PARTEA 1B) */
@@ -199,6 +229,7 @@ export default async function Home() {
               offers={companyData.offers}
               availableTags={companyData.availableTags}
               allStudents={companyData.allStudents}
+              placements={companyData.placements}
             />
           ) : currentUser.role === UserRole.COORDINATOR && coordinatorData ? (
             /* VEDERE COMPLETĂ DASHBOARD COORDONATOR (PARTEA 2A - GALE-SHAPLEY) */

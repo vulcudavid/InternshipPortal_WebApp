@@ -9,6 +9,7 @@ import { CvManager } from "./cv-manager";
 import { OffersExplorer, OfferData } from "./offers-explorer";
 import { PreferencesManager, PreferenceItem } from "./preferences-manager";
 import { StudentConventionCard } from "./student-convention-card";
+import { WorkLogManager } from "./work-log-manager";
 import { 
   GraduationCap, 
   Sparkles, 
@@ -21,6 +22,7 @@ import {
   Users, 
   CheckCircle2, 
   ShieldCheck,
+  CalendarCheck2,
   Edit3,
   ExternalLink,
   Globe,
@@ -77,6 +79,7 @@ interface StudentDashboardProps {
   offers: OfferData[];
   preferences: PreferenceItem[];
   placement?: any;
+  requiredHours?: number;
 }
 
 export function StudentDashboard({
@@ -86,9 +89,10 @@ export function StudentDashboard({
   offers,
   preferences,
   placement,
+  requiredHours = 90,
 }: StudentDashboardProps) {
   // Implicit se deschide tabul de STAGIU & CONVENȚIE dacă este confirmat, altfel OFERTE
-  const [activeTab, setActiveTab] = useState<"offers" | "preferences" | "profile" | "convention">(
+  const [activeTab, setActiveTab] = useState<"offers" | "preferences" | "profile" | "convention" | "worklog">(
     placement && placement.status === "CONFIRMED" ? "convention" : "offers"
   );
   
@@ -294,6 +298,28 @@ export function StudentDashboard({
             <span>Stagiu & Convenție</span>
             {placement.status === "CONFIRMED" && (
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+            )}
+          </button>
+        )}
+
+        {/* TAB 5: JURNAL ORE & EVALUARE (Dacă există plasament) */}
+        {placement && (
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab("worklog");
+              setIsEditingProfile(false);
+            }}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+              activeTab === "worklog"
+                ? "bg-sky-500/20 text-sky-300 border border-sky-400/40 shadow-[0_0_15px_rgba(14,165,233,0.2)]"
+                : "text-slate-400 hover:text-sky-200 hover:bg-sky-500/5"
+            }`}
+          >
+            <CalendarCheck2 className="w-4 h-4 text-sky-400" />
+            <span>Jurnal Ore & Evaluare</span>
+            {placement.workLogs && placement.workLogs.some((w: any) => w.status === "PENDING") && (
+              <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.8)]" />
             )}
           </button>
         )}
@@ -575,6 +601,18 @@ export function StudentDashboard({
       {/* TAB 4: STAGIU & CONVENȚIE DE PRACTICĂ */}
       {activeTab === "convention" && placement && (
         <StudentConventionCard placement={placement} />
+      )}
+
+      {/* TAB 5: JURNAL ORE & EVALUARE FINALĂ */}
+      {activeTab === "worklog" && placement && (
+        <WorkLogManager
+          placementId={placement.id}
+          workLogs={placement.workLogs || []}
+          requiredHours={requiredHours || 90}
+          evaluation={placement.evaluation || null}
+          offerTitle={placement.offer?.title || "Stagiu de practică"}
+          companyName={placement.offer?.company?.companyName || "Companie parteneră"}
+        />
       )}
     </div>
   );

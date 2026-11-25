@@ -5,6 +5,8 @@ import { CompanyProfileEditor } from "./company-profile-editor";
 import { OfferManager } from "./offer-manager";
 import { ApplicantsManager, StudentData } from "./applicants-manager";
 import { InterviewManager } from "./interview-manager";
+import { WorkLogValidator } from "./work-log-validator";
+import { FinalEvaluationForm } from "./final-evaluation-form";
 import { 
   Building2, 
   Briefcase, 
@@ -15,7 +17,8 @@ import {
   Globe, 
   Phone,
   ShieldCheck,
-  Sparkles
+  Sparkles,
+  CalendarCheck2
 } from "lucide-react";
 import { EngineeringDomain, OfferStatus, ProficiencyLevel } from "@prisma/client";
 
@@ -46,6 +49,7 @@ interface CompanyDashboardProps {
   offers: any[];
   availableTags: TagItem[];
   allStudents: StudentData[];
+  placements?: any[];
 }
 
 export function CompanyDashboard({
@@ -54,14 +58,20 @@ export function CompanyDashboard({
   offers,
   availableTags,
   allStudents,
+  placements = [],
 }: CompanyDashboardProps) {
-  const [activeTab, setActiveTab] = useState<"OFFERS" | "APPLICANTS" | "INTERVIEWS" | "PROFILE">("OFFERS");
+  const [activeTab, setActiveTab] = useState<"OFFERS" | "APPLICANTS" | "INTERVIEWS" | "WORKLOGS" | "EVALUATION" | "PROFILE">("OFFERS");
 
   const totalOffers = offers.length;
   const activeOffers = offers.filter((o) => o.status === OfferStatus.ACTIVE).length;
   const totalApplicants = offers.reduce((acc, o) => acc + (o.preferences?.length || 0), 0);
   const totalRanked = offers.reduce((acc, o) => acc + (o.applicantRanks?.length || 0), 0);
   const totalSlots = offers.reduce((acc, o) => acc + (o.interviewSlots?.length || 0), 0);
+  const totalInterns = placements.length;
+  const pendingLogsCount = placements.reduce(
+    (acc, p) => acc + (p.workLogs?.filter((w: any) => w.status === "PENDING").length || 0),
+    0
+  );
 
   return (
     <div className="space-y-8 animate-in fade-in duration-200">
@@ -199,6 +209,35 @@ export function CompanyDashboard({
         </button>
 
         <button
+          onClick={() => setActiveTab("WORKLOGS")}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            activeTab === "WORKLOGS"
+              ? "bg-sky-500/20 text-sky-300 border border-sky-400/40 shadow-[0_0_15px_rgba(14,165,233,0.2)]"
+              : "text-slate-400 hover:text-sky-200 hover:bg-sky-500/5"
+          }`}
+        >
+          <CalendarCheck2 className="w-4 h-4 text-sky-400" />
+          <span>Validare Jurnale Ore ({totalInterns} practicanți)</span>
+          {pendingLogsCount > 0 && (
+            <span className="px-1.5 py-0.5 rounded-full bg-amber-500 text-slate-950 font-black text-[10px] animate-pulse">
+              {pendingLogsCount} noi
+            </span>
+          )}
+        </button>
+
+        <button
+          onClick={() => setActiveTab("EVALUATION")}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            activeTab === "EVALUATION"
+              ? "bg-sky-500/20 text-sky-300 border border-sky-400/40 shadow-[0_0_15px_rgba(14,165,233,0.2)]"
+              : "text-slate-400 hover:text-sky-200 hover:bg-sky-500/5"
+          }`}
+        >
+          <Award className="w-4 h-4 text-sky-400" />
+          <span>Evaluare Finală</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab("PROFILE")}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             activeTab === "PROFILE"
@@ -233,6 +272,17 @@ export function CompanyDashboard({
 
         {activeTab === "INTERVIEWS" && (
           <InterviewManager offers={offers} />
+        )}
+
+        {activeTab === "WORKLOGS" && (
+          <WorkLogValidator placements={placements} />
+        )}
+
+        {activeTab === "EVALUATION" && (
+          <FinalEvaluationForm
+            interns={placements}
+            defaultEvaluatorName={`${user.firstName} ${user.lastName}`}
+          />
         )}
 
         {activeTab === "PROFILE" && (
