@@ -38,17 +38,13 @@ export async function generateConventionForPlacement(placementId: string) {
   }
 
   // Verificare drepturi de acces
-  if (
-    user.role === UserRole.STUDENT &&
-    user.studentProfile?.id !== placement.studentId
-  ) {
-    throw new Error("Nu aveți permisiunea de a genera convenția pentru acest plasament.");
-  }
+  const isAllowed =
+    user.role === UserRole.ADMIN ||
+    user.role === UserRole.COORDINATOR ||
+    (user.role === UserRole.STUDENT && user.studentProfile?.id === placement.studentId) ||
+    (user.role === UserRole.COMPANY_TUTOR && user.companyProfile?.id === placement.offer.companyId);
 
-  if (
-    user.role === UserRole.COMPANY_TUTOR &&
-    user.companyProfile?.id !== placement.offer.companyId
-  ) {
+  if (!isAllowed) {
     throw new Error("Nu aveți permisiunea de a genera convenția pentru acest plasament.");
   }
 
@@ -78,10 +74,10 @@ export async function markConventionSignedByStudent(conventionId: string) {
   }
 
   if (
-    user.role === UserRole.STUDENT &&
+    user.role !== UserRole.STUDENT ||
     user.studentProfile?.id !== convention.placement.studentId
   ) {
-    throw new Error("Doar studentul asociat poate semna această convenție.");
+    throw new Error("Acces neautorizat: Doar studentul titular asociat poate semna această convenție.");
   }
 
   const updated = await prisma.internshipConvention.update({
@@ -115,10 +111,10 @@ export async function uploadSignedConventionScan(
   }
 
   if (
-    user.role === UserRole.STUDENT &&
+    user.role !== UserRole.STUDENT ||
     user.studentProfile?.id !== convention.placement.studentId
   ) {
-    throw new Error("Nu aveți permisiunea de a încărca scanul acestei convenții.");
+    throw new Error("Acces neautorizat: Doar studentul titular asociat poate încărca scanul acestei convenții.");
   }
 
   const file = formData.get("signedScan") as File | null;
@@ -178,11 +174,12 @@ export async function approveConventionByCoordinator(conventionId: string) {
 }
 
 /**
- * Returnează detaliile unei convenții după ID.
+ * Returnează detaliile unei convenții după ID (cu verificare strictă de autorizare și ownership).
  */
 export async function getConventionDetails(conventionId: string) {
-  await requireAuth();
-  return prisma.internshipConvention.findUnique({
+  const user = await requireAuth();
+
+  const convention = await prisma.internshipConvention.findUnique({
     where: { id: conventionId },
     include: {
       placement: {
@@ -193,4 +190,18 @@ export async function getConventionDetails(conventionId: string) {
       },
     },
   });
+
+  if (!convention) return null;
+
+  const isAllowed =
+    user.role === UserRole.ADMIN ||
+    user.role === UserRole.COORDINATOR ||
+    (user.role === UserRole.STUDENT && user.studentProfile?.id === convention.placement.studentId) ||
+    (user.role === UserRole.COMPANY_TUTOR && user.companyProfile?.id === convention.placement.offer.companyId);
+
+  if (!isAllowed) {
+    throw new Error("Acces interzis: Nu aveți permisiunea de a vizualiza această convenție.");
+  }
+
+  return convention;
 }

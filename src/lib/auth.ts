@@ -91,16 +91,27 @@ export async function registerUser(params: {
   }
 
   // Setare sesiune în cookie
-  const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE_NAME, newUser.id, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7, // 7 zile
-  });
+  try {
+    const cookieStore = await cookies();
+    cookieStore.set(SESSION_COOKIE_NAME, newUser.id, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7, // 7 zile
+    });
+  } catch {
+    // ignoră în context de test/scripturi
+  }
 
   return newUser;
+}
+
+/**
+ * Verifică dacă autentificarea demonstrativă (1-click demo login) este activată
+ */
+export function isDemoLoginEnabled(): boolean {
+  return process.env.NEXT_PUBLIC_ENABLE_DEMO_LOGIN === "true";
 }
 
 /**
@@ -119,6 +130,14 @@ export async function loginUser(email: string, password: string) {
     throw new Error("Date de autentificare incorecte (email sau parolă greșită).");
   }
 
+  // Protecție Producție: blocare încercări demo login dacă flag-ul nu este "true"
+  const isDemoAccountOrPass =
+    user.passwordHash.startsWith("demo_") || password.startsWith("demo_");
+
+  if (isDemoAccountOrPass && !isDemoLoginEnabled()) {
+    throw new Error("403 Forbidden: Autentificarea demo este blocată pe server în acest mediu.");
+  }
+
   // Verificare hash parolă (suportă atât scrypt, cât și demo hashes)
   const isMatch =
     user.passwordHash.includes(":") 
@@ -129,14 +148,18 @@ export async function loginUser(email: string, password: string) {
     throw new Error("Date de autentificare incorecte (email sau parolă greșită).");
   }
 
-  const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE_NAME, user.id, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
-  });
+  try {
+    const cookieStore = await cookies();
+    cookieStore.set(SESSION_COOKIE_NAME, user.id, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+  } catch {
+    // ignoră în context de test/scripturi
+  }
 
   return user;
 }
@@ -145,8 +168,12 @@ export async function loginUser(email: string, password: string) {
  * Deconectare utilizator
  */
 export async function logoutUser() {
-  const cookieStore = await cookies();
-  cookieStore.delete(SESSION_COOKIE_NAME);
+  try {
+    const cookieStore = await cookies();
+    cookieStore.delete(SESSION_COOKIE_NAME);
+  } catch {
+    // ignoră în context de test
+  }
 }
 
 /**
@@ -175,6 +202,8 @@ export async function getCurrentUser() {
         },
       },
     });
+
+    if (!user || !user.isActive) return null;
 
     return user;
   } catch {

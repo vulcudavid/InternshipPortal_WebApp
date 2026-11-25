@@ -31,6 +31,8 @@ export function AuthCard() {
     setQuickLoginPassword(pass);
   };
 
+  const isDemoLoginEnabled = process.env.NEXT_PUBLIC_ENABLE_DEMO_LOGIN === "true";
+
   return (
     <div className="bg-[#0B1221]/88 backdrop-blur-2xl border border-sky-400/25 shadow-2xl rounded-2xl overflow-hidden max-w-xl mx-auto w-full relative">
       {/* Glow Line Top */}
@@ -155,65 +157,67 @@ export function AuthCard() {
             </button>
 
             {/* Quick Demo Logins (Cele 4 Roluri) */}
-            <div className="pt-5 border-t border-sky-500/20 space-y-2.5">
-              <p className="text-xs text-sky-300/80 font-semibold flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-                <span>Acces rapid demo (1-click):</span>
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {/* 1. Student */}
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill("alexandru.radu@student.ulbsibiu.ro", "demo_hash_student")}
-                  className="p-2.5 rounded-xl border border-sky-500/30 bg-sky-950/30 hover:bg-sky-900/40 hover:border-sky-400 text-sky-200 transition flex flex-col items-start gap-1 group text-left shadow-[0_0_10px_rgba(14,165,233,0.08)]"
-                >
-                  <GraduationCap className="w-4 h-4 text-sky-400 group-hover:scale-110 transition shrink-0" />
-                  <div className="truncate w-full">
-                    <span className="block font-bold text-xs text-white">Student</span>
-                    <span className="text-[10px] text-sky-400/80 truncate block">Alexandru (CTI)</span>
-                  </div>
-                </button>
+            {isDemoLoginEnabled && (
+              <div className="pt-5 border-t border-sky-500/20 space-y-2.5">
+                <p className="text-xs text-sky-300/80 font-semibold flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-sky-400" />
+                  <span>Acces rapid demo (1-click):</span>
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {/* 1. Student */}
+                  <button
+                    type="button"
+                    onClick={() => handleQuickFill("alexandru.radu@student.ulbsibiu.ro", "demo_hash_student")}
+                    className="p-2.5 rounded-xl border border-sky-500/30 bg-sky-950/30 hover:bg-sky-900/40 hover:border-sky-400 text-sky-200 transition flex flex-col items-start gap-1 group text-left shadow-[0_0_10px_rgba(14,165,233,0.08)]"
+                  >
+                    <GraduationCap className="w-4 h-4 text-sky-400 group-hover:scale-110 transition shrink-0" />
+                    <div className="truncate w-full">
+                      <span className="block font-bold text-xs text-white">Student</span>
+                      <span className="text-[10px] text-sky-400/80 truncate block">Alexandru (CTI)</span>
+                    </div>
+                  </button>
 
-                {/* 2. Tutore Firmă */}
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill("recruitment@continental-sibiu.com", "demo_hash_company")}
-                  className="p-2.5 rounded-xl border border-cyan-500/30 bg-cyan-950/30 hover:bg-cyan-900/40 hover:border-cyan-400 text-cyan-200 transition flex flex-col items-start gap-1 group text-left shadow-[0_0_10px_rgba(6,182,212,0.08)]"
-                >
-                  <Building2 className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition shrink-0" />
-                  <div className="truncate w-full">
-                    <span className="block font-bold text-xs text-white">Tutore Firmă</span>
-                    <span className="text-[10px] text-cyan-400/80 truncate block">Continental</span>
-                  </div>
-                </button>
+                  {/* 2. Tutore Firmă */}
+                  <button
+                    type="button"
+                    onClick={() => handleQuickFill("recruitment@continental-sibiu.com", "demo_hash_company")}
+                    className="p-2.5 rounded-xl border border-cyan-500/30 bg-cyan-950/30 hover:bg-cyan-900/40 hover:border-cyan-400 text-cyan-200 transition flex flex-col items-start gap-1 group text-left shadow-[0_0_10px_rgba(6,182,212,0.08)]"
+                  >
+                    <Building2 className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition shrink-0" />
+                    <div className="truncate w-full">
+                      <span className="block font-bold text-xs text-white">Tutore Firmă</span>
+                      <span className="text-[10px] text-cyan-400/80 truncate block">Continental</span>
+                    </div>
+                  </button>
 
-                {/* 3. Coordonator */}
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill("coordonator.practica@ulbsibiu.ro", "demo_hash_coordonator")}
-                  className="p-2.5 rounded-xl border border-indigo-500/30 bg-indigo-950/30 hover:bg-indigo-900/40 hover:border-indigo-400 text-indigo-200 transition flex flex-col items-start gap-1 group text-left shadow-[0_0_10px_rgba(99,102,241,0.08)]"
-                >
-                  <ShieldCheck className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition shrink-0" />
-                  <div className="truncate w-full">
-                    <span className="block font-bold text-xs text-white">Coordonator</span>
-                    <span className="text-[10px] text-indigo-400/80 truncate block">Cadru Didactic</span>
-                  </div>
-                </button>
+                  {/* 3. Coordonator */}
+                  <button
+                    type="button"
+                    onClick={() => handleQuickFill("coordonator.practica@ulbsibiu.ro", "demo_hash_coordonator")}
+                    className="p-2.5 rounded-xl border border-indigo-500/30 bg-indigo-950/30 hover:bg-indigo-900/40 hover:border-indigo-400 text-indigo-200 transition flex flex-col items-start gap-1 group text-left shadow-[0_0_10px_rgba(99,102,241,0.08)]"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition shrink-0" />
+                    <div className="truncate w-full">
+                      <span className="block font-bold text-xs text-white">Coordonator</span>
+                      <span className="text-[10px] text-indigo-400/80 truncate block">Cadru Didactic</span>
+                    </div>
+                  </button>
 
-                {/* 4. Administrator */}
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill("admin@ulbsibiu.ro", "demo_hash_admin")}
-                  className="p-2.5 rounded-xl border border-amber-500/30 bg-amber-950/30 hover:bg-amber-900/40 hover:border-amber-400 text-amber-200 transition flex flex-col items-start gap-1 group text-left shadow-[0_0_10px_rgba(245,158,11,0.08)]"
-                >
-                  <Terminal className="w-4 h-4 text-amber-400 group-hover:scale-110 transition shrink-0" />
-                  <div className="truncate w-full">
-                    <span className="block font-bold text-xs text-white">Administrator</span>
-                    <span className="text-[10px] text-amber-400/80 truncate block">Admin ULBS</span>
-                  </div>
-                </button>
+                  {/* 4. Administrator */}
+                  <button
+                    type="button"
+                    onClick={() => handleQuickFill("admin@ulbsibiu.ro", "demo_hash_admin")}
+                    className="p-2.5 rounded-xl border border-amber-500/30 bg-amber-950/30 hover:bg-amber-900/40 hover:border-amber-400 text-amber-200 transition flex flex-col items-start gap-1 group text-left shadow-[0_0_10px_rgba(245,158,11,0.08)]"
+                  >
+                    <Terminal className="w-4 h-4 text-amber-400 group-hover:scale-110 transition shrink-0" />
+                    <div className="truncate w-full">
+                      <span className="block font-bold text-xs text-white">Administrator</span>
+                      <span className="text-[10px] text-amber-400/80 truncate block">Admin ULBS</span>
+                    </div>
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </form>
         )}
 

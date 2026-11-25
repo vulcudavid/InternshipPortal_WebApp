@@ -88,3 +88,33 @@ export async function logoutAction() {
   await logoutUser();
   revalidatePath("/");
 }
+
+export async function demoLoginAction(role: "STUDENT" | "COMPANY_TUTOR" | "COORDINATOR" | "ADMIN"): Promise<AuthState> {
+  if (process.env.NEXT_PUBLIC_ENABLE_DEMO_LOGIN !== "true") {
+    return {
+      success: false,
+      error: "403 Forbidden: Autentificarea demo este dezactivată în acest mediu.",
+    };
+  }
+
+  const demoAccounts: Record<string, { email: string; pass: string }> = {
+    STUDENT: { email: "alexandru.radu@student.ulbsibiu.ro", pass: "demo_hash_student" },
+    COMPANY_TUTOR: { email: "recruitment@continental-sibiu.com", pass: "demo_hash_company" },
+    COORDINATOR: { email: "coordonator.practica@ulbsibiu.ro", pass: "demo_hash_coordonator" },
+    ADMIN: { email: "admin@ulbsibiu.ro", pass: "demo_hash_admin" },
+  };
+
+  const account = demoAccounts[role];
+  if (!account) {
+    return { success: false, error: "Rol demo invalid." };
+  }
+
+  try {
+    await loginUser(account.email, account.pass);
+    revalidatePath("/");
+    return { success: true, message: `Autentificare demo ca ${role} reușită!` };
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : "Eroare la autentificare demo.";
+    return { success: false, error: errorMsg };
+  }
+}

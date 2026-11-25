@@ -254,11 +254,21 @@ export async function removeStudentPreference(preferenceId: string) {
   const { profile } = await requireStudentProfile();
 
   await prisma.$transaction(async (tx) => {
-    // Șterge preferința vizată
-    await tx.studentPreference.delete({
+    // Verifică apartenența preferinței pentru prevenire IDOR
+    const existing = await tx.studentPreference.findFirst({
       where: {
         id: preferenceId,
         studentId: profile.id,
+      },
+    });
+
+    if (!existing) {
+      throw new Error("Preferința specificată nu a fost găsită sau nu vă aparține.");
+    }
+
+    await tx.studentPreference.delete({
+      where: {
+        id: preferenceId,
       },
     });
 
