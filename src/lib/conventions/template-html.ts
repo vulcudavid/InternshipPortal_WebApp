@@ -57,26 +57,26 @@ export function generateConventionHtml(data: ConventionData): string {
   <style>
     @page {
       size: A4;
-      margin: 20mm 18mm 15mm 18mm;
+      margin: 15mm 18mm;
     }
     *, *::before, *::after {
       box-sizing: border-box;
     }
     body {
-      font-family: "Times New Roman", Times, serif;
-      font-size: 11pt;
-      line-height: 1.35;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.38;
       color: #000000;
       background: #ffffff;
       margin: 0;
-      padding: 20px 30px;
+      padding: 0;
     }
     .page-break {
       page-break-before: always;
       break-before: page;
-      margin-top: 2rem;
+      margin-top: 0;
     }
-    .text-center { text-align: center; }
+    .text-center { text-align: center !important; text-indent: 0 !important; }
     .text-right { text-align: right; }
     .text-justify { text-align: justify; }
     .font-bold { font-weight: bold; }
@@ -84,31 +84,38 @@ export function generateConventionHtml(data: ConventionData): string {
       font-size: 13pt;
       font-weight: bold;
       margin-bottom: 2px;
+      text-align: center;
+      text-indent: 0 !important;
     }
     .subtitle-main {
       font-size: 11.5pt;
       font-weight: bold;
       margin-bottom: 4px;
+      text-align: center;
+      text-indent: 0 !important;
     }
     .article-title {
       font-weight: bold;
-      margin-top: 10px;
-      margin-bottom: 3px;
+      margin-top: 8px;
+      margin-bottom: 4px;
+      text-indent: 24px;
+      text-align: justify;
     }
     p {
-      margin-top: 4px;
+      margin-top: 0;
       margin-bottom: 4px;
       text-align: justify;
+      text-indent: 24px;
     }
     .table-custom {
       width: 100%;
       border-collapse: collapse;
-      margin: 8px 0;
-      font-size: 9.5pt;
+      margin: 6px 0;
+      font-size: 8.5pt;
     }
     .table-custom th, .table-custom td {
       border: 1px solid #000000;
-      padding: 4px 6px;
+      padding: 3px 5px;
       vertical-align: top;
       color: #000000;
     }
@@ -121,15 +128,26 @@ export function generateConventionHtml(data: ConventionData): string {
       display: flex;
       justify-content: space-between;
       page-break-inside: avoid;
+      break-inside: avoid;
     }
     .signature-side {
       width: 48%;
-      line-height: 1.35;
+      line-height: 1.38;
+      text-indent: 0 !important;
     }
     .anexa-header {
       font-weight: bold;
       font-size: 11pt;
       margin-bottom: 4px;
+      text-indent: 0 !important;
+    }
+    .anexa-item {
+      margin-top: 0;
+      margin-bottom: 3px;
+      text-align: justify;
+      text-indent: 0 !important;
+      font-size: 9pt;
+      line-height: 1.3;
     }
   </style>
 </head>
@@ -153,7 +171,7 @@ export function generateConventionHtml(data: ConventionData): string {
   </div>
 
   <div>
-    <p style="text-indent: 20px;">Prezenta convenţie se încheie între:</p>
+    <p>Prezenta convenţie se încheie între:</p>
     <p>
       <strong>${data.facultyName}</strong> din cadrul <strong>${data.universityName}</strong>, cu sediul în Sibiu, ${data.universityAddress}, reprezentată prin decan, <strong>${data.decanName}</strong>, numită în continuare <em>organizator de practică</em>,
     </p>
@@ -170,19 +188,19 @@ export function generateConventionHtml(data: ConventionData): string {
     <p>(2) Stagiul de practică este realizat de studenţi în vederea dobândirii competenţelor profesionale menţionate în portofoliul de practică, parte integrantă a prezentei convenţii, şi a elaborării proiectului de diplomă.</p>
     <p>(3) Modalităţile de derulare şi conţinutul stagiului de pregătire practică sunt descrise în prezenta convenţie şi în portofoliul de practică cuprins în anexa la prezenta convenţie.</p>
 
-    <div class="article-title">ART. 2    Statutul practicanţilor</div>
+    <div class="article-title">ART. 2 Statutul practicanţilor</div>
     <p>Practicanţii rămân, pe toată durata stagiului de pregătire practică, studenţi ai Universităţii „Lucian Blaga” din Sibiu.</p>
 
-    <div class="article-title">ART. 3    Durata şi perioada desfăşurării stagiului de practică</div>
-    <p>Stagiul de practică se va desfăşura în perioada  ${data.periodStart || "01.07.2026"} – ${data.periodEnd || "30.09.2026"}.</p>
+    <div class="article-title">ART. 3 Durata şi perioada desfăşurării stagiului de practică</div>
+    <p>Stagiul de practică se va desfăşura în perioada ${data.periodStart || "01.07.2026"} – ${data.periodEnd || "30.09.2026"}.</p>
 
-    <div class="article-title">ART. 4    Responsabilităţile practicanţilor</div>
+    <div class="article-title">ART. 4 Responsabilităţile practicanţilor</div>
     <p>(1) Practicanţii au obligaţia ca, pe durata derulării stagiului de practică, să respecte programul de lucru stabilit şi să execute activităţile specificate de tutore în conformitate cu portofoliul de practică, în condiţiile respectării cadrului legal cu privire la volumul şi dificultatea acestora.</p>
     <p>(2) Pe durata stagiului, practicanţii respectă regulamentul de ordine interioară al partenerului de practică. În cazul nerespectării acestui regulament, conducătorul partenerului de practică îşi rezervă dreptul de a anula convenţia, după ce în prealabil a ascultat punctul de vedere al practicantului şi al tutorelui şi a înştiinţat conducătorul instituţiei de învăţământ şi după primirea confirmării de primire a acestei informaţii.</p>
     <p>(3) Practicanţii au obligaţia de a respecta normele de securitate şi sănătate în muncă pe care şi le-au însuşit de la reprezentantul partenerului de practică înainte de începerea stagiului de practică.</p>
     <p>(4) De asemenea, practicanţii se angajează să nu folosească, în niciun caz, informaţiile la care au acces în timpul stagiului despre partenerul de practică sau clienţii săi, pentru a le comunica unui terţ sau pentru a le publica, chiar după terminarea stagiului, decât cu acordul respectivului partener de practică.</p>
 
-    <div class="article-title">ART. 5    Responsabilităţile partenerului de practică</div>
+    <div class="article-title">ART. 5 Responsabilităţile partenerului de practică</div>
     <p>(1) Partenerul de practică va stabili un tutore pentru stagiul de practică, selectat dintre salariaţii proprii şi ale cărui obligaţii sunt menţionate în portofoliul de practică.</p>
     <p>(2) În cazul nerespectării obligaţiilor de către practicant/practicanţi, tutorele va contacta cadrul didactic supervizor, aplicându-se sancţiuni conform regulamentului de organizare şi funcţionare al Universităţii “Lucian Blaga” Sibiu, Facultatea de Inginerie.</p>
     <p>(3) Înainte de începerea stagiului de practică, partenerul are obligaţia de a face practicanţilor instructajul cu privire la normele de securitate şi sănătate în muncă, în conformitate cu legislaţia în vigoare. Printre responsabilităţile sale, partenerul de practică va lua măsurile necesare pentru securitatea şi sănătatea în muncă a practicanţilor, precum şi pentru comunicarea regulilor de prevenire asupra riscurilor profesionale.</p>
@@ -190,13 +208,13 @@ export function generateConventionHtml(data: ConventionData): string {
     <p>(5) Partenerul de practică trebuie să pună la dispoziţia practicanţilor toate mijloacele necesare pentru dobândirea competenţelor precizate în portofoliul de practică pentru studenţii Facultăţii de Inginerie.</p>
     <p>(6) Partenerul de practică are obligaţia de a asigura practicanţilor accesul liber la serviciul de medicina muncii, pe durata derulării pregătirii practice.</p>
 
-    <div class="article-title">ART. 6    Obligaţiile organizatorului de practică</div>
+    <div class="article-title">ART. 6 Obligaţiile organizatorului de practică</div>
     <p>(1) Organizatorul de practică desemnează un cadru didactic supervizor, responsabil cu planificarea, organizarea şi supravegherea desfăşurării pregătirii practice. Cadrul didactic supervizor, împreună cu tutorele desemnat de partenerul de practică, stabilesc tematica de practică şi competenţele profesionale care fac obiectul stagiului de pregătire practică.</p>
     <p>(2) În cazul în care derularea stagiului de pregătire practică nu este conformă cu angajamentele luate de către partenerul de practică în cadrul prezentei convenţii, conducătorul instituţiei de învăţământ superior poate decide întreruperea stagiului de pregătire practică conform convenţiei, după informarea prealabilă a conducătorului partenerului de practică şi după primirea confirmării de primire a acestei informaţii.</p>
     <p>(3) În urma desfăşurării cu succes a stagiului de practică, organizatorul va acorda practicantului numărul de credite aferente.</p>
 
-    <div class="article-title">ART. 7    Persoane desemnate de organizatorul de practică şi partenerul de practică</div>
-    <p>Tutorii (persoanele care vor avea responsabilitatea practicantului din partea partenerului de practică):</p>
+    <div class="article-title">ART. 7 Persoane desemnate de organizatorul de practică şi partenerul de practică</div>
+    <p>(1) Tutorii (persoanele care vor avea responsabilitatea practicantului din partea partenerului de practică):</p>
     <table class="table-custom">
       <tbody>
         <tr>
@@ -223,26 +241,24 @@ export function generateConventionHtml(data: ConventionData): string {
       Email: ${data.supervisorEmail || ".............................@ulbsibiu.ro"}
     </p>
 
-    <div class="article-title">ART. 8    Evaluarea stagiului de pregătire practică prin credite transferabile</div>
+    <div class="article-title">ART. 8 Evaluarea stagiului de pregătire practică prin credite transferabile</div>
     <p>Numărul de credite transferabile ce vor fi obţinute în urma desfăşurării stagiului de practică este de ${data.creditsCount || 4} credite.</p>
 
-    <div class="article-title">ART. 9    Raportul privind stagiul de pregătire practică</div>
+    <div class="article-title">ART. 9 Raportul privind stagiul de pregătire practică</div>
     <p>(1) În timpul derulării stagiului de practică, tutorele împreună cu cadrul didactic supervizor vor evalua practicantul în permanenţă, pe baza unei fişe de observaţie/evaluare. Vor fi evaluate atât nivelul de dobândire a competenţelor profesionale, cât şi comportamentul şi modalitatea de integrare a practicantului în activitatea partenerului de practică (disciplină, punctualitate, responsabilitate în rezolvarea sarcinilor, respectarea regulamentului de ordine interioară al societăţăţii etc.).</p>
     <p>(2) La finalul stagiului de practică, tutorele elaborează un raport, pe baza evaluării nivelului de dobândire a competenţelor de către practicant/practicanţi. Rezultatul acestei evaluări va sta la baza notării practicantului de către cadrul didactic supervizor.</p>
     <p>(3) Periodic şi după încheierea stagiului de practică, practicanţii vor prezenta un caiet de practică care va cuprinde:</p>
-    <ul style="margin: 4px 0 4px 20px;">
-      <li>denumirea modulului de pregătire;</li>
-      <li>competenţe exersate;</li>
-      <li>activităţi desfăşurate pe perioada stagiului de practică;</li>
-      <li>observaţii personale privitoare la activitatea depusă.</li>
-    </ul>
+    <p style="text-indent: 36px; margin-bottom: 2px;">– denumirea modulului de pregătire;</p>
+    <p style="text-indent: 36px; margin-bottom: 2px;">– competenţe exersate;</p>
+    <p style="text-indent: 36px; margin-bottom: 2px;">– activităţi desfăşurate pe perioada stagiului de practică;</p>
+    <p style="text-indent: 36px; margin-bottom: 4px;">– observaţii personale privitoare la activitatea depusă.</p>
 
-    <div class="article-title">ART. 10    Sănătatea şi securitatea în muncă. Protecţia socială a practicanţilor</div>
+    <div class="article-title">ART. 10 Sănătatea şi securitatea în muncă. Protecţia socială a practicanţilor</div>
     <p>(1) Partenerul de practică are obligaţia respectării prevederilor legale cu privire la sănătatea şi securitatea în muncă a practicanţilor pe durata stagiului de practică.</p>
     <p>(2) Practicanţilor li se asigură protecţie socială conform legislaţiei în vigoare. Ca urmare, conform dispoziţiilor Legii nr. 346/2002 privind asigurările pentru accidente de muncă şi boli profesionale, cu modificările şi completările ulterioare, practicanţii beneficiază de legislaţia privitoare la accidentele de muncă pe toată durata efectuării pregătirii practice.</p>
     <p>(4) În cazul unui accident suportat de practicanţi, fie în cursul lucrului, fie în timpul deplasării la lucru, partenerul de practică se angajează să înştiinţeze asigurătorul cu privire la accidentul care a avut loc.</p>
 
-    <div class="article-title">Art. 11 Confidențialitate</div>
+    <div class="article-title">ART. 11 Confidențialitate</div>
     <p>Organizatorul de practică se obligă:</p>
     <p>să păstreze secretul și confidențialitatea tuturor INFORMAȚIILOR primite sau care i-au fost puse la dispoziție de către partenerul de practică și să împiedice orice divulgare a acestor INFORMAȚII unor terțe părți;</p>
     <p>să limiteze în cadrul instituției circulația INFORMAȚIILOR doar către persoane a căror activitate justifică divulgarea acestora și să se asigure că aceste persoane au înțeles pe deplin obligația lor de a păstra secretul și de a restrânge utilizarea acestor INFORMAȚII în scopurile definite în cadrul prezentei convenții;</p>
@@ -256,7 +272,7 @@ export function generateConventionHtml(data: ConventionData): string {
     <p>(2) Prezenta convenţie reprezintă voinţa părţilor şi înlătură orice altă înţelegere verbală dintre acestea, anterioară sau ulterioară încheierii ei.</p>
     <p>(3) Soluţionarea neînţelegerilor se efectuează pe cale amiabilă, în caz contrar, de instanţele judecătoreşti competente.</p>
     <p>(4) Anexele 1-2 fac parte integrantă din prezenta convenţie.</p>
-    <p style="text-indent: 20px;">Prezenta convenţie s-a încheiat azi, în două exemplare originale, cu aceeaşi valoare juridică.</p>
+    <p>Prezenta convenţie s-a încheiat azi, în două exemplare originale, cu aceeaşi valoare juridică.</p>
 
     <div class="signatures-block">
       <div class="signature-side">
@@ -286,18 +302,18 @@ export function generateConventionHtml(data: ConventionData): string {
       <div style="font-size: 10pt;">la Convenţia privind efectuarea stagiului de practică nr. ${data.conventionNumber || "......................."}</div>
     </div>
 
-    <p>1. Durata totală a pregătirii practice: 90 ore/semestru</p>
-    <p>2. Calendarul pregătirii: ${data.workSchedule || "luni-vineri"}</p>
-    <p>3. Perioada stagiului, timpul de lucru şi orarul (de precizat zilele de pregătire practică în cazul timpului de lucru parţial): ${data.periodStart || "01.07.2026"} – ${data.periodEnd || "30.09.2026"}, ${data.dailyHours || 6} ore/zi, interval orar 09:00 - 15:00</p>
-    <p>4. Adresa unde se va derula stagiul de pregătire practică: ${data.locationAddress || data.companyAddress || ".................................................................."}</p>
-    <p>5. Deplasarea în afara locului unde este repartizat practicantul vizează următoarele locaţii: .................. nu este cazul ..................</p>
-    <p>6. Condiţii de primire a studenţilor în stagiul de practică – conform reglementărilor existente în legătură cu prevenirea răspândirii COVID19</p>
-    <p>7. Modalităţi prin care se asigură complementaritatea între pregătirea dobândită de studenţi în instituţia de învăţământ superior şi în cadrul stagiului de practică: - completarea caietului/raportului de practică</p>
-    <p>8. Numele şi prenumele cadrelor  didactice care asigură supravegherea pedagogică a practicantului pe perioada stagiului de practică: ${data.supervisorName || "........................................"}</p>
-    <p>9. Drepturi şi responsabilităţi ale cadrului didactic din unitatea de învăţământ - organizator al practicii, pe perioada stagiului de practică: - să monitorizeze și evalueze stagiul de practică desfășurat de către student/ți</p>
-    <p>10. Numele şi prenumele tutorelui/tutorilor  desemnat/i de societate care va asigura respectarea condiţiilor de pregătire şi dobândirea de către practicant a competenţelor profesionale planificate pentru perioada stagiului de practică: ${data.tutorName || "..........................................................................................."}</p>
-    <p>11. Drepturi şi responsabilităţi ale tutorelui de practică desemnat de partenerul de practică: să asigure respectarea condițiilor de pregătire şi dobândire de către practicant a competenţelor profesionale planificate pentru perioada stagiului de practică.</p>
-    <p>12. Definirea competenţelor care vor fi dobândite pe perioada stagiului de practică</p>
+    <p class="anexa-item">1. Durata totală a pregătirii practice: 90 ore/semestru</p>
+    <p class="anexa-item">2. Calendarul pregătirii: ${data.workSchedule || "luni-vineri"}</p>
+    <p class="anexa-item">3. Perioada stagiului, timpul de lucru şi orarul (de precizat zilele de pregătire practică în cazul timpului de lucru parţial): ${data.periodStart || "01.07.2026"} – ${data.periodEnd || "30.09.2026"}, ${data.dailyHours || 6} ore/zi, interval orar 09:00 - 15:00</p>
+    <p class="anexa-item">4. Adresa unde se va derula stagiul de pregătire practică: ${data.locationAddress || data.companyAddress || ".................................................................."}</p>
+    <p class="anexa-item">5. Deplasarea în afara locului unde este repartizat practicantul vizează următoarele locaţii: .................. nu este cazul ..................</p>
+    <p class="anexa-item">6. Condiţii de primire a studenţilor în stagiul de practică – conform reglementărilor existente în legătură cu prevenirea răspândirii COVID19</p>
+    <p class="anexa-item">7. Modalităţi prin care se asigură complementaritatea între pregătirea dobândită de studenţi în instituţia de învăţământ superior şi în cadrul stagiului de practică: - completarea caietului/raportului de practică</p>
+    <p class="anexa-item">8. Numele şi prenumele cadrelor  didactice care asigură supravegherea pedagogică a practicantului pe perioada stagiului de practică: ${data.supervisorName || "........................................"}</p>
+    <p class="anexa-item">9. Drepturi şi responsabilităţi ale cadrului didactic din unitatea de învăţământ - organizator al practicii, pe perioada stagiului de practică: - să monitorizeze și evalueze stagiul de practică desfășurat de către student/ți</p>
+    <p class="anexa-item">10. Numele şi prenumele tutorelui/tutorilor  desemnat/i de societate care va asigura respectarea condiţiilor de pregătire şi dobândirea de către practicant a competenţelor profesionale planificate pentru perioada stagiului de practică: ${data.tutorName || "..........................................................................................."}</p>
+    <p class="anexa-item">11. Drepturi şi responsabilităţi ale tutorelui de practică desemnat de partenerul de practică: să asigure respectarea condițiilor de pregătire şi dobândire de către practicant a competenţelor profesionale planificate pentru perioada stagiului de practică.</p>
+    <p class="anexa-item">12. Definirea competenţelor care vor fi dobândite pe perioada stagiului de practică</p>
 
     <table class="table-custom">
       <thead>
@@ -409,10 +425,10 @@ export function generateConventionHtml(data: ConventionData): string {
 
     <div class="text-center" style="margin-bottom: 12px;">
       <div class="title-main">TABEL NOMINAL</div>
-      <p style="margin: 4px 0; font-size: 10.5pt;">
+      <p class="anexa-item" style="margin: 4px 0; font-size: 10pt; text-align: center;">
         Cuprinzând studenţii anului ${data.studyYear || "............"}, an universitar 2026-2027, specializarea <strong>${data.specialization || "........................................"}</strong>,  Facultatea de Inginerie, care vor efectua stagiul de practică la partenerul de practică
       </p>
-      <p style="margin: 4px 0; font-weight: bold;">
+      <p class="anexa-item" style="margin: 4px 0; font-weight: bold; text-align: center;">
         ${data.companyName || "...................................................................."}
       </p>
     </div>
