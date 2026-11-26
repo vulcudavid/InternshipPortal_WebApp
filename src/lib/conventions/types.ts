@@ -7,12 +7,14 @@ export interface ConventionData {
   universityAddress: string;
   decanName: string;
   supervisorName: string;
+  supervisorRole?: string;
   supervisorPhone: string;
   supervisorEmail: string;
   // Partener / Companie
   companyName: string;
   companyAddress: string;
   companyCity: string;
+  regCom?: string;
   cuiCif: string;
   bankAccount?: string;
   bankName?: string;

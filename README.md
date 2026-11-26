@@ -37,11 +37,16 @@ Definită în [prisma/schema.prisma](prisma/schema.prisma) și detaliată în [C
 
 ## 📄 Verificare Vizuală — Convenția de Practică (PDF)
 
-Generatorul nativ Node.js bazat pe `pdfkit` produce documentul oficial al Convenției-cadru ULBS (3 pagini, format A4, suport complet diacritice UTF-8 cu fonturi Roboto). Toate câmpurile sunt conforme cu formularul universitar: datele studentului, companiei partenere, tutorelui din firmă, cadrului didactic supervizor, calendarul/orarul de lucru, numărul de credite ECTS (4 credite / 90 ore), precum și **Anexa 1** (Portofoliu de practică cu definirea competențelor și comisia de evaluare) și **Anexa 2** (Tabel nominal cu studenții repartizați).
+Generatorul nativ Node.js bazat pe `pdfkit` produce documentul oficial al Convenției-cadru ULBS (format A4, fundal alb curat, margini standard și suport complet pentru diacritice UTF-8 cu fonturi Roboto). Formatul și textul sunt 100% conforme cuvânt cu cuvânt cu șablonul oficial al Facultății de Inginerie (`Template_Conventie-pentru-efectuarea-stagiului-de-practica-Licenta_2026-2027.docx`):
+- **Preambul complet**: datele Facultății de Inginerie și ale partenerului de practică (sediu, Registrul Comerțului, cod fiscal, cont bancar IBAN, reprezentant legal) și temeiul legal (Legea nr. 258/2007 și Ordinul 3955/2008).
+- **Toate cele 12 Articole integrale**: Obiectul stagiului (Art. 1), Statutul studenților (Art. 2), Durata și calendarul 90h/6h/zi (Art. 3), Obligațiile practicantului (Art. 4), Obligațiile partenerului (Art. 5), Obligațiile facultății (Art. 6), Tabelul cu cele două coloane pentru tutori și datele cadrului didactic supervizor (Art. 7), Evaluarea prin 4 credite ECTS (Art. 8), Raportul și caietul săptămânal de practică (Art. 9), Normele SSM și protecția socială Legea 346/2002 (Art. 10), Cele 6 clauze de confidențialitate (Art. 11) și Prevederile finale (Art. 12).
+- **Bloc oficial de semnături**: Decan Prof.univ.dr.ing. Maria VINȚAN și Director / Partener de practică.
+- **ANEXA 1 (Portofoliu de practică)**: începe pe pagină nouă, cuprinde punctele 1–13, tabelul detaliat cu cele 4 categorii de competențe (cognitive, explicare/interpretare, instrumental-aplicative, atitudinale), tabelul nominal de evaluare și semnăturile oficiale.
+- **ANEXA 2 (Tabel nominal)**: începe pe pagină nouă, antet dedicat pentru anul universitar 2026-2027, tabelul cu 5 coloane (Nume student, Grupa, Semnătură student, Cadru didactic coordonator, Semnătură cadru didactic coordonator) și blocul Decan / Director.
 
 <div align="center">
   <img src="docs/images/conventie-pdf-preview.png" alt="Previzualizare Convenție de Practică ULBS PDF" width="700" style="border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
-  <p><em>Figura 1: Previzualizarea primei pagini a Convenției Oficiale de Practică ULBS generată dinamic de platformă</em></p>
+  <p><em>Figura 1: Previzualizarea Convenției Oficiale de Practică ULBS generată dinamic (100% conformă cu șablonul oficial Facultatea de Inginerie)</em></p>
 </div>
 
 ---

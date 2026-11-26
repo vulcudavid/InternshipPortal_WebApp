@@ -180,21 +180,25 @@ model StudentTag {
 
 // 5. Profiluri Firme Partenere
 model CompanyProfile {
-  id           String            @id @default(uuid())
-  userId       String            @unique @map("user_id")
-  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  companyName  String            @map("company_name")
-  cuiCif       String            @unique @map("cui_cif")
-  address      String
-  city         String
-  website      String?
-  description  String?
-  contactPhone String?           @map("contact_phone")
-  status       CompanyStatus     @default(APPROVED)
-  createdAt    DateTime          @default(now()) @map("created_at")
-  updatedAt    DateTime          @updatedAt @map("updated_at")
+  id                  String            @id @default(uuid())
+  userId              String            @unique @map("user_id")
+  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyName         String            @map("company_name")
+  cuiCif              String            @unique @map("cui_cif")
+  regCom              String?           @map("reg_com")
+  bankAccount         String?           @map("bank_account")
+  bankName            String?           @map("bank_name")
+  legalRepresentative String?           @map("legal_representative")
+  address             String
+  city                String
+  website             String?
+  description         String?
+  contactPhone        String?           @map("contact_phone")
+  status              CompanyStatus     @default(APPROVED)
+  createdAt           DateTime          @default(now()) @map("created_at")
+  updatedAt           DateTime          @updatedAt @map("updated_at")
 
-  offers       InternshipOffer[]
+  offers              InternshipOffer[]
 
   @@map("company_profiles")
 }

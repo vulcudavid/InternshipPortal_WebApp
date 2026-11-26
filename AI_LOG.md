@@ -181,3 +181,31 @@
 **Decizii luate / ADR**: Aliniere completă Definition of Done conform cerințelor de laborator și caietului de sarcini P14.
 **Fișiere modificate**: `prisma/seed.ts`, `src/lib/matching.test.ts`, `src/lib/cv-auth.test.ts`, `src/app/actions/coordinator.ts`, `src/components/coordinator/placements-table.tsx`, `src/components/coordinator/coordinator-dashboard.tsx`, `src/components/coordinator/stats-card.tsx`, `scripts/generate-pdf-preview.ts`, `docs/images/conventie-pdf-preview.png`, `README.md`, `AI_LOG.md`
 **Status final**: ✅ done
+
+---
+
+### S-011 | 2026-11-26 | Gemini 3.8 Flash | Autor: Agent AI & David Vulcu
+**Scop sesiune**: Aliniere 100% cuvânt cu cuvânt a generatorului oficial de Convenții PDF cu documentul oficial al Facultății de Inginerie ULBS (`Template_Conventie-pentru-efectuarea-stagiului-de-practica-Licenta_2026-2027.docx`).
+**Realizat**:
+- **Inspecție profundă șablon oficial**: extrasă structura exactă XML, stiluri, margini A4, text și tabele din `.docx`.
+- **Generator PDF nativ (`src/lib/pdf/generate-convention-pdf.ts` & `src/lib/conventions/pdf-builder.ts`)**:
+  - Eliminat antetul gri din versiunea veche; fundal alb curat, margini standard A4 și font Roboto cu suport UTF-8 complet pentru diacritice românești.
+  - Titlu centrat exact ca în template: `CONVENŢIE` / `PRIVIND EFECTUAREA STAGIULUI DE PRACTICĂ` / `NR. ...`.
+  - Preambul complet cu datele partenerului (Registrul Comerțului, cod fiscal, cont bancar, bancă, reprezentant legal) și temeiul legal (Legea nr. 258/2007 și Ordinul 3955/2008).
+  - Toate cele 12 articole reproduse integral: Art. 1 Obiectul, Art. 2 Statutul, Art. 3 Durata (05.07.2027 – 25.07.2027), Art. 4 Obligațiile practicantului, Art. 5 Obligațiile partenerului, Art. 6 Obligațiile facultății, Art. 7 Persoane desemnate (cu tabelul pe două coloane pentru Tutori și datele Cadrului didactic supervizor), Art. 8 Credite transferabile (4 credite), Art. 9 Raportul și caietul de practică, Art. 10 SSM și protecția socială Legea 346/2002, Art. 11 Confidențialitate (cele 6 puncte integrale), Art. 12 Prevederi finale.
+  - Subsol oficial de semnături: Decan Prof.univ.dr.ing. Maria VINȚAN și Director / Partener.
+  - **ANEXA 1 (Portofoliu de practică)**: forțată pe pagină nouă (`doc.addPage()`), conține punctele 1–13, tabelul oficial cu cele 4 categorii de competențe, tabelul de evaluatori și semnături.
+  - **ANEXA 2 (Tabel nominal)**: forțată pe pagină nouă (`doc.addPage()`), antet pentru anul universitar 2026-2027, tabel cu cele 5 coloane oficiale și semnături.
+- **Bază de date (`prisma/schema.prisma`)**:
+  - Extins modelul `CompanyProfile` cu câmpurile opționale: `regCom`, `bankAccount`, `bankName`, `legalRepresentative`. Sincronizat cu `prisma db push` și `prisma generate`.
+- **Sincronizare HTML Preview & Types**:
+  - Actualizat `src/lib/conventions/template-html.ts` și `src/lib/conventions/types.ts` pentru consistență absolută între preview-ul web și PDF-ul descărcabil.
+- **Dovezi & Documentație**:
+  - Regenerat fișierul PDF de test `docs/images/sample-conventie.pdf` și previzualizarea PNG `docs/images/conventie-pdf-preview.png` via `scripts/generate-pdf-preview.ts`.
+  - Actualizat `README.md` secțiunea *Verificare Vizuală — Convenția de Practică (PDF)*.
+- **Validare**:
+  - Toate cele 52 de teste automate trec cu succes (`npm test`).
+  - Build-ul complet Next.js (`npm run build`) validat fără erori.
+**Decizii luate / ADR**: Conformitate 100% cu documentele administrative oficiale ULBS Licență 2026-2027.
+**Fișiere modificate**: `prisma/schema.prisma`, `prisma/seed.ts`, `src/lib/pdf/generate-convention-pdf.ts`, `src/lib/conventions/pdf-builder.ts`, `src/lib/conventions/template-html.ts`, `src/lib/conventions/types.ts`, `src/lib/conventions/generator.ts`, `src/lib/auth.ts`, `docs/images/conventie-pdf-preview.png`, `docs/images/sample-conventie.pdf`, `README.md`, `AI_LOG.md`
+**Status final**: ✅ done
