@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useActionState } from "react";
+import { useState, useActionState, useEffect } from "react";
 import Image from "next/image";
 import {
   loginAction,
@@ -20,7 +20,10 @@ import {
   Cpu,
   MailCheck,
   RefreshCw,
-  ArrowLeft
+  ArrowLeft,
+  CheckCircle2,
+  AlertCircle,
+  Clock
 } from "lucide-react";
 
 export function AuthCard() {
@@ -41,55 +44,96 @@ export function AuthCard() {
 
   const isDemoLoginEnabled = process.env.NEXT_PUBLIC_ENABLE_DEMO_LOGIN === "true";
 
-  const [manualOtpEmail, setManualOtpEmail] = useState("");
+  // Stări pentru fluxul de verificare email prin cod OTP (6 cifre)
+  const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState<number>(60);
   const [otpCode, setOtpCode] = useState("");
   const [otpStatus, setOtpStatus] = useState<{ success?: boolean; message?: string; error?: string } | null>(null);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [isResendingOtp, setIsResendingOtp] = useState(false);
 
-  const activeVerificationEmail =
-    manualOtpEmail ||
-    (registerState?.requiresVerification ? registerState.email : "") ||
-    (loginState?.requiresVerification ? loginState.email : "");
+  // Activare ecran de verificare când login-ul sau înregistrarea semnalează necesitatea verificării
+  useEffect(() => {
+    const isUnverified =
+      loginState?.requiresVerification ||
+      loginState?.error?.includes("EMAIL_NOT_VERIFIED");
+
+    if (isUnverified) {
+      const targetEmail = loginState?.email || quickLoginEmail.trim().toLowerCase();
+      if (targetEmail) {
+        setVerificationEmail(targetEmail);
+        setCountdown(60);
+        setOtpCode("");
+        setOtpStatus({
+          error: loginState?.error || "Adresa de email nu a fost verificată. Introduceți codul de 6 cifre primit pe email."
+        });
+      }
+    }
+  }, [loginState, quickLoginEmail]);
+
+  useEffect(() => {
+    if (registerState?.requiresVerification && registerState.email) {
+      setVerificationEmail(registerState.email);
+      setCountdown(60);
+      setOtpCode("");
+      setOtpStatus({
+        message: registerState.message || "Cont creat cu succes! Introduceți codul de 6 cifre primit pe email pentru activarea contului."
+      });
+    }
+  }, [registerState]);
+
+  // Timer descrescător (cooldown 60s) pentru retrimiterea codului
+  useEffect(() => {
+    if (!verificationEmail || countdown <= 0) return;
+    const timer = setInterval(() => {
+      setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [verificationEmail, countdown]);
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!activeVerificationEmail || !otpCode.trim()) return;
+    if (!verificationEmail || otpCode.trim().length !== 6 || isVerifyingOtp) return;
     setIsVerifyingOtp(true);
     setOtpStatus(null);
     try {
-      const res = await verifyEmailAction(activeVerificationEmail, otpCode.trim());
+      const res = await verifyEmailAction(verificationEmail, otpCode.trim());
       setOtpStatus(res);
       if (res.success) {
-        window.location.reload();
+        // Redirecționare în dashboard la succes
+        window.location.href = "/";
       }
     } catch (err: any) {
-      setOtpStatus({ success: false, error: err?.message || "Eroare la verificare." });
+      setOtpStatus({ success: false, error: err?.message || "Eroare la verificarea codului OTP." });
     } finally {
       setIsVerifyingOtp(false);
     }
   };
 
   const handleResendOtp = async () => {
-    if (!activeVerificationEmail) return;
+    if (!verificationEmail || countdown > 0 || isResendingOtp) return;
     setIsResendingOtp(true);
     setOtpStatus(null);
     try {
-      const res = await resendVerificationCodeAction(activeVerificationEmail);
+      const res = await resendVerificationCodeAction(verificationEmail);
       setOtpStatus(res);
+      if (res.success) {
+        setCountdown(60);
+      }
     } catch (err: any) {
-      setOtpStatus({ success: false, error: err?.message || "Eroare la retrimitere." });
+      setOtpStatus({ success: false, error: err?.message || "Eroare la retrimiterea codului OTP." });
     } finally {
       setIsResendingOtp(false);
     }
   };
 
   const handleCancelVerification = () => {
-    setManualOtpEmail("");
+    if (verificationEmail) {
+      setQuickLoginEmail(verificationEmail);
+    }
+    setVerificationEmail(null);
     setOtpCode("");
     setOtpStatus(null);
-    if (loginState) loginState.requiresVerification = false;
-    if (registerState) registerState.requiresVerification = false;
   };
 
   return (
@@ -132,78 +176,99 @@ export function AuthCard() {
         </p>
       </div>
 
-      {/* Dacă este activă verificarea adresei de email prin cod OTP */}
-      {activeVerificationEmail ? (
+      {/* Ecranul de Verificare Email Instituțional */}
+      {verificationEmail ? (
         <div className="p-6 sm:p-7 space-y-5">
-          <div className="text-center space-y-2">
-            <div className="inline-flex p-3 rounded-2xl bg-sky-500/10 border border-sky-400/30 text-sky-400 mb-1">
+          <div className="text-center space-y-3">
+            <div className="inline-flex p-3 rounded-2xl bg-sky-500/10 border border-sky-400/30 text-sky-400 mb-1 shadow-[0_0_20px_rgba(14,165,233,0.2)]">
               <MailCheck className="w-8 h-8" />
             </div>
-            <h3 className="text-lg font-bold text-white">Verificare Adresă Email</h3>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Am expediat un cod de verificare din 6 cifre către adresa de student:<br />
-              <strong className="text-sky-300 font-mono text-sm">{activeVerificationEmail}</strong>
+            <h3 className="text-xl font-bold text-white tracking-tight">
+              Verificare Email Instituțional
+            </h3>
+            <p className="text-xs text-slate-300 leading-relaxed max-w-md mx-auto">
+              Am expediat un cod de verificare din 6 cifre către adresa de student:
+            </p>
+            <div className="inline-block bg-[#070D19]/90 border border-sky-400/40 rounded-xl px-4 py-2 shadow-inner">
+              <span className="text-sky-300 font-mono font-bold text-sm tracking-wide">
+                {verificationEmail}
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-sky-400" />
+              <span>Codul este valabil timp de 15 minute. Verificați și dosarul de Spam.</span>
             </p>
           </div>
 
-          <form onSubmit={handleVerifyOtp} className="space-y-4">
+          <form onSubmit={handleVerifyOtp} className="space-y-4 pt-1">
             <div>
               <label className="block text-xs font-semibold text-sky-300/90 uppercase tracking-wider mb-2 text-center">
                 Introduceți Codul OTP din 6 Cifre
               </label>
               <input
                 type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                pattern="[0-9]*"
                 maxLength={6}
                 value={otpCode}
                 onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
                 placeholder="123456"
+                autoFocus
                 required
-                className="w-full text-center tracking-[0.5em] text-2xl font-bold font-mono px-4 py-3 rounded-xl bg-[#070D19]/90 border border-sky-500/40 text-white placeholder-slate-600 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/40 transition shadow-inner"
+                className="w-full text-center tracking-[0.45em] text-3xl font-extrabold font-mono px-4 py-3.5 rounded-xl bg-[#070D19]/90 border border-sky-500/40 text-white placeholder-slate-600 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/40 transition shadow-inner"
               />
-              <p className="text-[11px] text-slate-400 text-center mt-1.5">
-                Codul este valabil timp de 15 minute.
-              </p>
             </div>
 
             {otpStatus?.error && (
-              <div className="p-3 bg-red-950/40 border border-red-500/40 text-red-200 rounded-xl text-xs font-medium">
-                {otpStatus.error}
+              <div className="p-3 bg-red-950/40 border border-red-500/40 text-red-200 rounded-xl text-xs font-medium flex items-start gap-2 shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+                <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                <span>{otpStatus.error}</span>
               </div>
             )}
 
             {otpStatus?.message && (
-              <div className="p-3 bg-emerald-950/40 border border-emerald-500/40 text-emerald-200 rounded-xl text-xs font-medium">
-                {otpStatus.message}
+              <div className="p-3 bg-emerald-950/40 border border-emerald-500/40 text-emerald-200 rounded-xl text-xs font-medium flex items-start gap-2 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                <span>{otpStatus.message}</span>
               </div>
             )}
 
+            {/* Buton „Confirmă și activează contul” */}
             <button
               type="submit"
               disabled={isVerifyingOtp || otpCode.trim().length !== 6}
-              className="w-full py-3 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(14,165,233,0.35)] hover:shadow-[0_0_30px_rgba(14,165,233,0.55)] disabled:opacity-50 text-sm tracking-wide uppercase flex items-center justify-center gap-2 active:scale-[0.99]"
+              className="w-full py-3.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(14,165,233,0.35)] hover:shadow-[0_0_30px_rgba(14,165,233,0.55)] disabled:opacity-50 text-sm tracking-wide uppercase flex items-center justify-center gap-2 active:scale-[0.99] cursor-pointer disabled:cursor-not-allowed"
             >
               <MailCheck className="w-4 h-4 text-slate-950" />
-              <span>{isVerifyingOtp ? "Se verifică..." : "Activează Contul"}</span>
+              <span>{isVerifyingOtp ? "Se verifică..." : "Confirmă și activează contul"}</span>
             </button>
 
-            <div className="flex items-center justify-between pt-2">
+            {/* Revenire & Retrimitere cod cu timer (60s) */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-sky-500/15">
               <button
                 type="button"
                 onClick={handleCancelVerification}
-                className="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 transition"
+                className="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 transition order-2 sm:order-1 cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Înapoi la conectare</span>
+                <span>Înapoi / Schimbă adresa de email</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleResendOtp}
-                disabled={isResendingOtp}
-                className="text-xs text-sky-400 hover:text-sky-300 font-medium flex items-center gap-1.5 disabled:opacity-50 transition"
+                disabled={isResendingOtp || countdown > 0}
+                className="text-xs text-sky-400 hover:text-sky-300 font-medium flex items-center gap-1.5 disabled:text-slate-500 disabled:opacity-60 transition order-1 sm:order-2 cursor-pointer disabled:cursor-not-allowed"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isResendingOtp ? "animate-spin" : ""}`} />
-                <span>Retrimite codul</span>
+                <span>
+                  {isResendingOtp
+                    ? "Se retrimite..."
+                    : countdown > 0
+                    ? `Retrimite codul (${countdown}s)`
+                    : "Retrimite codul"}
+                </span>
               </button>
             </div>
           </form>
@@ -437,16 +502,35 @@ export function AuthCard() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-sky-300/90 uppercase tracking-wider mb-1.5">
-                Email
+              <label className="block text-xs font-semibold text-sky-300/90 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                <span>Adresă de Email</span>
+                {selectedRole === "STUDENT" && (
+                  <span className="text-[10px] text-sky-400 font-normal">Obligatoriu @student.ulbsibiu.ro</span>
+                )}
+                {selectedRole === "COORDINATOR" && (
+                  <span className="text-[10px] text-indigo-400 font-normal">Obligatoriu @ulbsibiu.ro</span>
+                )}
               </label>
               <input
                 type="email"
                 name="email"
                 required
-                placeholder="ion.popescu@example.com"
+                placeholder={
+                  selectedRole === "STUDENT"
+                    ? "prenume.nume@student.ulbsibiu.ro"
+                    : selectedRole === "COORDINATOR"
+                    ? "prenume.nume@ulbsibiu.ro"
+                    : "reprezentant@companie.ro"
+                }
                 className="w-full px-3 py-2 rounded-xl bg-[#070D19]/90 border border-sky-500/30 text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/30 text-sm"
               />
+              <p className="text-[11px] text-slate-400 mt-1">
+                {selectedRole === "STUDENT"
+                  ? "Se acceptă exclusiv adrese instituționale (@student.ulbsibiu.ro sau @ulbsibiu.ro)."
+                  : selectedRole === "COORDINATOR"
+                  ? "Se acceptă exclusiv adrese instituționale ale cadrelor didactice (@ulbsibiu.ro)."
+                  : "Adresa de email profesională a tutorelui / reprezentantului companiei."}
+              </p>
             </div>
 
             <div>

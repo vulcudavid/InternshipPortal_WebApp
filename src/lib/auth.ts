@@ -28,6 +28,16 @@ export function verifyPassword(password: string, combinedHash: string): boolean 
 }
 
 /**
+ * Verifică dacă adresa de email aparține domeniului instituțional ULBS (@ulbsibiu.ro sau subdomenii precum @student.ulbsibiu.ro)
+ */
+export function isUlbsEmail(email: string): boolean {
+  if (!email || !email.includes("@")) return false;
+  const domain = email.toLowerCase().trim().split("@")[1];
+  if (!domain) return false;
+  return domain === "ulbsibiu.ro" || domain.endsWith(".ulbsibiu.ro");
+}
+
+/**
  * Înregistrare student cu verificare obligatorie prin cod OTP din 6 cifre (@ulbsibiu.ro)
  */
 export async function registerStudent(params: {
@@ -41,6 +51,12 @@ export async function registerStudent(params: {
   domain?: EngineeringDomain;
 }) {
   const email = params.email.toLowerCase().trim();
+
+  if (!isUlbsEmail(email)) {
+    throw new Error(
+      "Înregistrarea studenților este permisă exclusiv cu adresa de email instituțională (@student.ulbsibiu.ro sau @ulbsibiu.ro)."
+    );
+  }
 
   const existingUser = await prisma.user.findUnique({
     where: { email },
@@ -117,7 +133,7 @@ export async function registerUser(params: {
   city?: string;
   address?: string;
 }) {
-  // Dacă rolul este STUDENT, aplicăm fluxul obligatoriu cu verificare email prin OTP
+  // Dacă rolul este STUDENT, aplicăm fluxul obligatoriu cu verificare email prin OTP (@ulbsibiu.ro)
   if (params.role === UserRole.STUDENT) {
     return registerStudent({
       email: params.email,
@@ -129,6 +145,13 @@ export async function registerUser(params: {
       group: params.group,
       domain: params.domain,
     });
+  }
+
+  // Pentru cadre didactice / coordonatori, verificăm apartenența la domeniul instituțional @ulbsibiu.ro
+  if (params.role === UserRole.COORDINATOR && !isUlbsEmail(params.email)) {
+    throw new Error(
+      "Înregistrarea coordonatorilor este permisă exclusiv cu adresa de email instituțională (@ulbsibiu.ro)."
+    );
   }
 
   const existingUser = await prisma.user.findUnique({

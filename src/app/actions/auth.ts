@@ -8,6 +8,7 @@ import {
   logoutUser,
   verifyEmailCode,
   resendVerificationCode,
+  isUlbsEmail,
 } from "@/lib/auth";
 import { UserRole, EngineeringDomain } from "@prisma/client";
 
@@ -69,6 +70,21 @@ export async function registerAction(
 
   if (password.length < 6) {
     return { success: false, error: "Parola trebuie să aibă cel puțin 6 caractere." };
+  }
+
+  // Verificare domeniu instituțional pentru rolurile academice ULBS
+  if (role === UserRole.STUDENT && !isUlbsEmail(email)) {
+    return {
+      success: false,
+      error: "Înregistrarea studenților este permisă exclusiv cu adresa de email instituțională (@student.ulbsibiu.ro sau @ulbsibiu.ro).",
+    };
+  }
+
+  if (role === UserRole.COORDINATOR && !isUlbsEmail(email)) {
+    return {
+      success: false,
+      error: "Înregistrarea coordonatorilor este permisă exclusiv cu adresa de email instituțională (@ulbsibiu.ro).",
+    };
   }
 
   try {

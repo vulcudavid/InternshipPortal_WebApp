@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { UserRole } from "@prisma/client";
 import {
   registerStudent,
+  registerUser,
   verifyEmailCode,
   resendVerificationCode,
   loginUser,
@@ -169,5 +170,41 @@ describe("Email Verification (OTP) & Student Auth Suite", () => {
     });
 
     expect(createdByAdmin.emailVerified).toBe(true);
+  });
+
+  it("8. respinge înregistrarea rolurilor academice (Student și Coordonator) cu adrese non-ULBS", async () => {
+    // 8.1 Student cu email extern (@gmail.com)
+    await expect(
+      registerStudent({
+        email: `student-${timestamp}@gmail.com`,
+        password: "Password123!",
+        firstName: "Ion",
+        lastName: "Popescu",
+      })
+    ).rejects.toThrow(/instituțională/i);
+
+    // 8.2 Coordonator cu email extern (@yahoo.com)
+    await expect(
+      registerUser({
+        email: `prof-${timestamp}@yahoo.com`,
+        password: "Password123!",
+        firstName: "Vasile",
+        lastName: "Ionescu",
+        role: UserRole.COORDINATOR,
+      })
+    ).rejects.toThrow(/instituțională/i);
+
+    // 8.3 Reprezentant companie parteneră (COMPANY_TUTOR) se poate înregistra cu email corporativ (non-ULBS)
+    const companyUser = await registerUser({
+      email: `tutor-${timestamp}@partner-company.com`,
+      password: "Password123!",
+      firstName: "Dan",
+      lastName: "Tutore",
+      role: UserRole.COMPANY_TUTOR,
+      companyName: "Partener Tech",
+      cuiCif: `RO${Date.now().toString().slice(-8)}`,
+    });
+    expect(companyUser).toBeDefined();
+    expect(companyUser.email).toBe(`tutor-${timestamp}@partner-company.com`);
   });
 });
