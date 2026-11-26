@@ -1,4 +1,19 @@
+import path from "path";
+import fs from "fs";
 import { ConventionData } from "./types";
+
+let cachedLogoBase64: string | null = null;
+function getLogoBase64(): string {
+  if (cachedLogoBase64) return cachedLogoBase64;
+  try {
+    const p = path.join(process.cwd(), "src/lib/conventions/assets/ulbs-logo.png");
+    if (fs.existsSync(p)) {
+      cachedLogoBase64 = fs.readFileSync(p).toString("base64");
+      return cachedLogoBase64;
+    }
+  } catch {}
+  return "";
+}
 
 /**
  * Generează documentul HTML complet pentru Convenția de Practică ULBS
@@ -7,6 +22,7 @@ import { ConventionData } from "./types";
  */
 export function generateConventionHtml(data: ConventionData): string {
   const dateFormatted = data.dateStr || new Date().toLocaleDateString("ro-RO");
+  const logoBase64 = getLogoBase64();
   const regComText = data.regCom ? `sub nr. ${data.regCom}` : "sub nr. ............................";
   const bankText = data.bankAccount
     ? `Cont bancar nr. ${data.bankAccount}   deschis la ${data.bankName || "..............................."}`
@@ -98,6 +114,16 @@ export function generateConventionHtml(data: ConventionData): string {
   </style>
 </head>
 <body>
+
+  <!-- ANTET OFICIAL CU LOGO ULBS -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; border-bottom: 2px solid #0b2f63; padding-bottom: 6px;">
+    ${logoBase64 ? `<img src="data:image/png;base64,${logoBase64}" alt="ULBS Logo" style="height: 42px;" />` : `<div style="font-weight: bold; color: #0b2f63;">ULBS</div>`}
+    <div style="text-align: right; font-size: 8.5pt; color: #0b2f63; line-height: 1.3;">
+      <strong>Ministerul Educației și Cercetării</strong><br>
+      Universitatea „Lucian Blaga” din Sibiu<br>
+      Facultatea de Inginerie
+    </div>
+  </div>
 
   <!-- CONVENȚIE CADRU -->
   <div class="text-center" style="margin-bottom: 12px;">

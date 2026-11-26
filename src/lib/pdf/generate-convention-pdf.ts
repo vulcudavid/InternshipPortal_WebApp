@@ -175,6 +175,36 @@ export async function buildConventionPdfBuffer(data: ConventionData): Promise<Bu
       // SECȚIUNEA 1: CONVENȚIE-CADRU (Paginile 1 - 2)
       // ─────────────────────────────────────────────────────────────────────────
 
+      // Antet oficial ULBS cu Logo extras din șablonul .docx
+      const logoPath = path.join(process.cwd(), "src/lib/conventions/assets/ulbs-logo.png");
+      const linePath = path.join(process.cwd(), "src/lib/conventions/assets/ulbs-header-line.png");
+
+      if (fs.existsSync(logoPath)) {
+        const logoWidth = 145;
+        doc.image(logoPath, leftMargin, doc.page.margins.top - 18, { width: logoWidth });
+
+        doc.font(bold).fontSize(8.5).fillColor("#0b2f63");
+        doc.text("Ministerul Educației și Cercetării", leftMargin, doc.page.margins.top - 15, {
+          width: pageWidth,
+          align: "right",
+        });
+        doc.font(regular).fontSize(8.5).fillColor("#0b2f63");
+        doc.text("Universitatea „Lucian Blaga” din Sibiu", leftMargin, doc.page.margins.top - 2, {
+          width: pageWidth,
+          align: "right",
+        });
+        doc.text("Facultatea de Inginerie", leftMargin, doc.page.margins.top + 11, {
+          width: pageWidth,
+          align: "right",
+        });
+
+        if (fs.existsSync(linePath)) {
+          doc.image(linePath, leftMargin, doc.page.margins.top + 28, { width: pageWidth, height: 3 });
+        }
+
+        doc.y = doc.page.margins.top + 40;
+      }
+
       // Titlu centrat exact ca în docx
       doc.font(bold).fontSize(12).fillColor("#000000").text("CONVENŢIE", { align: "center" });
       doc.font(bold).fontSize(11).text("PRIVIND EFECTUAREA STAGIULUI DE PRACTICĂ", { align: "center" });
