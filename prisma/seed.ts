@@ -89,6 +89,14 @@ async function main() {
   console.log(`   - Coordonator: ${coordinatorUser.email} (Parola: ${coordinatorPassword})`);
   console.log(`   - Admin:       ${adminUser.email} (Parola: ${adminPassword})`);
 
+  if (process.env.NODE_ENV === "production") {
+    console.log("🚀 Mod de producție detectat (NODE_ENV === 'production').");
+    console.log("ℹ️  Au fost creați exclusiv utilizatorii de sistem (ADMIN, COORDINATOR), setările globale și nomenclatorul de tag-uri.");
+    console.log("ℹ️  Firmele și studenții demonstrativi sunt omiși pe producție (vor fi înregistrați de utilizatori reali).");
+    console.log("🎉 Inițializare producție finalizată cu succes!");
+    return;
+  }
+
   // 5. Companii Partenere Reale (Minim 3 firme reale conform DoD)
   console.log("🏢 4. Populare Companii Partenere reale și Oferte de Practică active...");
 
