@@ -155,22 +155,29 @@
 
 ---
 
-### S-009 | 2026-11-25 | Antigravity | Autor: Agent AI & David Vulcu
-**Scop sesiune**: Implementare Verificare Obligatorie Email OTP din 6 Cifre pentru Studenți (`@ulbsibiu.ro`).
+### S-010 | 2026-11-26 | Gemini 3.8 Flash | Autor: Agent AI & David Vulcu
+**Scop sesiune**: Audit complet și aliniere conform Definition of Done (DoD): Date seed extinse (3 firme + 10 studenți), scenariu de testare Gale-Shapley cu identificare studenți neplasați, previzualizare oficială convenție PDF în README, audit securitate IDOR descărcare CV, filtru rapid studenți neplasați în panoul Coordonatorului.
 **Realizat**:
-- Extindere model Prisma `User`: `emailVerified Boolean @default(false)`, `verificationCodeHash String?`, `verificationCodeExpiresAt DateTime?`.
-- Migrare Prisma aplicată curat: `prisma/migrations/20261125204019_add_email_verification`.
-- Sincronizare `prisma/seed.ts` și `src/app/actions/admin.ts` (`adminCreateUser` setează `emailVerified: true`).
-- Serviciu de email `src/lib/mailer.ts` bazat pe `nodemailer`, cu suport pentru configurare `SMTP_*` și fallback de consolă în dev/test (`[MAILER FALLBACK] Code for <email>: <code>`).
-- Actualizare `.env.example` cu variabilele `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`.
-- Logică auth completă în `src/lib/auth.ts` și Server Actions în `src/app/actions/auth.ts`:
-  - `registerStudent`: hash-uire cod OTP cu `bcryptjs` (salt 10), expirare 15 minute, expediere email, returnare `{ requiresVerification: true, email }` fără emitere sesiune.
-  - `verifyEmailCode`: validare cod, trecere `emailVerified: true`, curățare hash/expirare și logare automată.
-  - `resendVerificationCode`: rate-limiting cu cooldown strict de 60 de secunde (`COOLDOWN_ACTIVE`).
-  - `loginUser`: blocare autentificare dacă `user.emailVerified === false` cu codul `EMAIL_NOT_VERIFIED`.
-- Interfață UI în `src/components/auth-card.tsx` cu formular dedicat introducere OTP 6 cifre și timer de cooldown pentru retrimitere.
-- Suită de teste automate dedicată `src/lib/email-verification.test.ts` (7 teste unitare). Toate cele 10 fișiere de test trecute (47/47 teste).
-- Verificare build complet de producție `npm run build` reușit.
-**Decizii luate / ADR**: ADR-009
-**Fișiere modificate**: `prisma/schema.prisma`, `prisma/migrations/*`, `prisma/seed.ts`, `src/lib/mailer.ts`, `.env.example`, `src/lib/auth.ts`, `src/app/actions/auth.ts`, `src/app/actions/admin.ts`, `src/components/auth-card.tsx`, `src/lib/email-verification.test.ts`, `docs/agents/DECISIONS.md`, `docs/agents/CONTRACTS.md`, `README.md`
+- **Date inițiale complete (Seed)** (`prisma/seed.ts`):
+  - 3 firme partenere reprezentative: Continental Sibiu (4 locuri pe 2 oferte), Marquardt Sibiu (2 locuri pe 1 ofertă), KeepCalling Sibiu (1 loc pe 1 ofertă) — total 7 locuri disponibile.
+  - 10 studenți cu date academice complete, conturi verificate `@ulbsibiu.ro`, CV-uri atașate și seturi de competențe tehnice din cele 41 de tag-uri ULBS.
+  - Preferințe ordonate ale studenților și clasamente ale companiilor pentru a genera un scenariu Gale-Shapley cu 7 studenți plasați și 3 studenți neplasați.
+- **Scenarii automate de matching Gale-Shapley** (`src/lib/matching.test.ts`):
+  - Adăugat testul `TC-DOD-1: Scenariu complet DoD - 3 companii, 7 locuri, 10 studenți cu Gale-Shapley și determinare neplasați`.
+  - Verificat: stabilitatea alocărilor, respectarea strictă a capacităților per ofertă, calculul exact al studenților neplasați (3 studenți liberi).
+- **Previzualizare Convenție PDF în documentație** (`README.md` & `docs/images/conventie-pdf-preview.png`):
+  - Generat preview PNG de înaltă rezoluție al Convenției-cadru oficiale ULBS folosind scriptul `scripts/generate-pdf-preview.ts` și generatorul nativ PDFKit (`src/lib/pdf/generate-convention-pdf.ts`).
+  - Documentat detaliat în `README.md` secțiunea *Verificare Vizuală — Convenția de Practică (PDF)* cu imagine centrată și descrierea anexelor (Portofoliu și Tabel nominal).
+- **Securitate descărcare CV împotriva IDOR** (`src/app/api/cv/[filename]/route.ts` & `src/lib/cv-auth.test.ts`):
+  - Verificare strictă de autorizare: descărcarea CV-ului este permisă exclusiv studentului proprietar, companiilor la care studentul a aplicat activ (`StudentPreference`), coordonatorului academic și administratorului.
+  - Teste unitare dedicate (5 teste în `cv-auth.test.ts`) pentru prevenirea accesului neautorizat (401 neautentificat, 403 firmă neautorizată sau alt student).
+- **Filtru rapid studenți neplasați pentru Coordonator** (`src/components/coordinator/*`):
+  - Adăugat tab de filtrare rapidă `Neplasați (<count>)` în `PlacementsTable`, alături de filtrele existente (`Toate`, `Confirmate`, `În așteptare`).
+  - Extins `getCoordinatorDashboardData` în `src/app/actions/coordinator.ts` pentru a interoga toți studenții din sistem și a calcula lista completă a celor neplasați.
+  - Badge distinctiv `NEPLASAT` (#EF4444) și afișare clară în interfața coordonatorului.
+- **Validare completă**:
+  - Suita de 52 de teste automate trece cu succes (`npm test`).
+  - Build de producție Next.js (`npm run build`) trece fără erori de compilare sau de tipuri.
+**Decizii luate / ADR**: Aliniere completă Definition of Done conform cerințelor de laborator și caietului de sarcini P14.
+**Fișiere modificate**: `prisma/seed.ts`, `src/lib/matching.test.ts`, `src/lib/cv-auth.test.ts`, `src/app/actions/coordinator.ts`, `src/components/coordinator/placements-table.tsx`, `src/components/coordinator/coordinator-dashboard.tsx`, `src/components/coordinator/stats-card.tsx`, `scripts/generate-pdf-preview.ts`, `docs/images/conventie-pdf-preview.png`, `README.md`, `AI_LOG.md`
 **Status final**: ✅ done

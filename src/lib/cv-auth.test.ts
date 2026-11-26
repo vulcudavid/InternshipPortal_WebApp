@@ -206,9 +206,9 @@ describe("CV Authorization & Privacy Gate (RBAC)", () => {
     assert.strictEqual(res.allowed, true);
   });
 
-  it("returnează 403 pentru compania la a cărei ofertă studentul NU a aplicat", async () => {
+  it("DoD IDOR Guard: returnează 403 Forbidden pentru compania la a cărei ofertă studentul NU a aplicat și nu este plasat", async () => {
     const res = await checkCvAccess(userCompany2, studentAProfileId);
-    assert.strictEqual(res.status, 403);
+    assert.strictEqual(res.status, 403, "Trebuie să returneze 403 Forbidden la încercare IDOR de către o firmă neautorizată");
     assert.strictEqual(res.allowed, false);
   });
 

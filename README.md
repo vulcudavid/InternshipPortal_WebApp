@@ -35,6 +35,17 @@ Definită în [prisma/schema.prisma](prisma/schema.prisma) și detaliată în [C
 
 ---
 
+## 📄 Verificare Vizuală — Convenția de Practică (PDF)
+
+Generatorul nativ Node.js bazat pe `pdfkit` produce documentul oficial al Convenției-cadru ULBS (3 pagini, format A4, suport complet diacritice UTF-8 cu fonturi Roboto). Toate câmpurile sunt conforme cu formularul universitar: datele studentului, companiei partenere, tutorelui din firmă, cadrului didactic supervizor, calendarul/orarul de lucru, numărul de credite ECTS (4 credite / 90 ore), precum și **Anexa 1** (Portofoliu de practică cu definirea competențelor și comisia de evaluare) și **Anexa 2** (Tabel nominal cu studenții repartizați).
+
+<div align="center">
+  <img src="docs/images/conventie-pdf-preview.png" alt="Previzualizare Convenție de Practică ULBS PDF" width="700" style="border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
+  <p><em>Figura 1: Previzualizarea primei pagini a Convenției Oficiale de Practică ULBS generată dinamic de platformă</em></p>
+</div>
+
+---
+
 ## 📋 Cerințe Preliminare
 
 Asigurați-vă că aveți instalate pe sistem:

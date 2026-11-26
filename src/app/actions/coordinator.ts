@@ -479,16 +479,71 @@ export async function getCoordinatorDashboardData() {
   const totalUnplaced = Math.max(0, totalEligibleStudents - activePlacedCount);
   const totalValidatedHours = validatedHoursAgg._sum.hoursWorked || 0;
 
+  // 7. Lista detaliată a studenților neplasați (pentru vizibilitate imediată a Coordonatorului - DoD #5)
+  const placedStudentIds = new Set(
+    recentPlacements
+      .filter((p) => p.status === PlacementStatus.CONFIRMED || p.status === PlacementStatus.PENDING_CONFIRMATION)
+      .map((p) => p.student.id)
+  );
+
+  const allEligibleStudents = await prisma.studentProfile.findMany({
+    where: {
+      preferences: { some: {} },
+    },
+    include: {
+      user: {
+        select: {
+          firstName: true,
+          lastName: true,
+          email: true,
+        },
+      },
+      preferences: {
+        include: {
+          offer: {
+            include: {
+              company: {
+                select: { companyName: true },
+              },
+            },
+          },
+        },
+        orderBy: { rank: "asc" },
+      },
+      placement: true,
+    },
+  });
+
+  const unplacedStudents = allEligibleStudents
+    .filter((s) => !placedStudentIds.has(s.id))
+    .map((s) => ({
+      id: s.id,
+      firstName: s.user.firstName,
+      lastName: s.user.lastName,
+      email: s.user.email,
+      specialization: s.specialization,
+      studyYear: s.studyYear,
+      group: s.group,
+      phone: s.phone,
+      preferencesCount: s.preferences.length,
+      topPreference: s.preferences[0]
+        ? `${s.preferences[0].offer.title} (${s.preferences[0].offer.company.companyName})`
+        : "Nicio preferință",
+      placementStatus: s.placement?.status || PlacementStatus.NEPLASAT,
+      cancelReason: s.placement?.cancelReason || null,
+    }));
+
   return {
     stats: {
       totalEligibleStudents,
       totalConfirmed,
       totalPending,
-      totalUnplaced,
+      totalUnplaced: unplacedStudents.length > 0 ? unplacedStudents.length : totalUnplaced,
       totalCancelled,
       conventionsMissing,
       totalValidatedHours,
     },
+    unplacedStudents,
     recentPlacements: recentPlacements.map((p) => ({
       id: p.id,
       status: p.status,

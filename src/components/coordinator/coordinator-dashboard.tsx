@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { CoordinatorDashboardData } from "@/app/actions/coordinator";
 import { StatsCard } from "./stats-card";
 import { PlacementsTable } from "./placements-table";
@@ -27,6 +29,7 @@ interface CoordinatorDashboardProps {
 
 export function CoordinatorDashboard({ user, data }: CoordinatorDashboardProps) {
   const { stats, recentPlacements } = data;
+  const [activeFilter, setActiveFilter] = useState<"ALL" | "CONFIRMED" | "PENDING" | "UNPLACED">("ALL");
 
   const placementRate =
     stats.totalEligibleStudents > 0
@@ -85,6 +88,7 @@ export function CoordinatorDashboard({ user, data }: CoordinatorDashboardProps) 
           sub="Studenți cu preferințe exprimate"
           variant="info"
           icon={<Users className="w-5 h-5" />}
+          onClick={() => setActiveFilter("ALL")}
         />
         <StatsCard
           label="Plasamente Confirmate"
@@ -92,6 +96,7 @@ export function CoordinatorDashboard({ user, data }: CoordinatorDashboardProps) 
           sub="Locuri protejate la re-rulări"
           variant="success"
           icon={<CheckCircle2 className="w-5 h-5" />}
+          onClick={() => setActiveFilter("CONFIRMED")}
         />
         <StatsCard
           label="În Așteptare"
@@ -99,13 +104,15 @@ export function CoordinatorDashboard({ user, data }: CoordinatorDashboardProps) 
           sub="Necesită aprobare coordonator"
           variant="warning"
           icon={<Clock className="w-5 h-5" />}
+          onClick={() => setActiveFilter("PENDING")}
         />
         <StatsCard
           label="Studenți Neplasați"
           value={stats.totalUnplaced}
-          sub="Fără ofertă acceptată în runda curentă"
+          sub="Click pentru a vedea lista studenților nealocați"
           variant="error"
           icon={<UserX className="w-5 h-5" />}
+          onClick={() => setActiveFilter("UNPLACED")}
         />
       </div>
 
@@ -175,7 +182,12 @@ export function CoordinatorDashboard({ user, data }: CoordinatorDashboardProps) 
       </div>
 
       {/* ── Tabel Plasamente & Gestiune Gale-Shapley ────────────────────────── */}
-      <PlacementsTable placements={recentPlacements} />
+      <PlacementsTable
+        placements={recentPlacements}
+        unplacedStudents={data.unplacedStudents || []}
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+      />
     </div>
   );
 }

@@ -23,8 +23,26 @@ import {
   ChevronRight,
   Download,
   ExternalLink,
+  UserX,
+  Users,
+  Filter,
 } from "lucide-react";
 import { PlacementStatus, ConventionStatus } from "@prisma/client";
+
+export interface UnplacedStudentItem {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  specialization: string;
+  studyYear: number;
+  group: string;
+  phone: string | null;
+  preferencesCount: number;
+  topPreference: string;
+  placementStatus: PlacementStatus;
+  cancelReason: string | null;
+}
 
 export interface PlacementItem {
   id: string;
@@ -64,18 +82,41 @@ export interface PlacementItem {
 
 interface PlacementsTableProps {
   placements: PlacementItem[];
+  unplacedStudents?: UnplacedStudentItem[];
+  activeFilter?: "ALL" | "CONFIRMED" | "PENDING" | "UNPLACED";
+  onFilterChange?: (filter: "ALL" | "CONFIRMED" | "PENDING" | "UNPLACED") => void;
 }
 
-export function PlacementsTable({ placements }: PlacementsTableProps) {
+export function PlacementsTable({
+  placements,
+  unplacedStudents = [],
+  activeFilter,
+  onFilterChange,
+}: PlacementsTableProps) {
+  const [internalFilter, setInternalFilter] = useState<"ALL" | "CONFIRMED" | "PENDING" | "UNPLACED">("ALL");
+  const currentFilter = activeFilter || internalFilter;
+
+  const handleTabChange = (tab: "ALL" | "CONFIRMED" | "PENDING" | "UNPLACED") => {
+    setInternalFilter(tab);
+    onFilterChange?.(tab);
+    setCurrentPage(1);
+  };
+
   const [isPending, startTransition] = useTransition();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
   const [activeActionId, setActiveActionId] = useState<string | null>(null);
 
+  const confirmedCount = placements.filter(
+    (p) => p.status === PlacementStatus.CONFIRMED
+  ).length;
+
   const pendingCount = placements.filter(
     (p) => p.status === PlacementStatus.PENDING_CONFIRMATION
   ).length;
+
+  const unplacedCount = unplacedStudents.length;
 
   const handleConfirm = (placementId: string) => {
     setActiveActionId(placementId);
@@ -151,8 +192,23 @@ export function PlacementsTable({ placements }: PlacementsTableProps) {
     });
   };
 
-  const totalPages = Math.max(1, Math.ceil(placements.length / pageSize));
-  const displayedPlacements = placements.slice(
+  const filteredPlacements = placements.filter((p) => {
+    if (currentFilter === "CONFIRMED") return p.status === PlacementStatus.CONFIRMED;
+    if (currentFilter === "PENDING") return p.status === PlacementStatus.PENDING_CONFIRMATION;
+    return true;
+  });
+
+  const totalPages =
+    currentFilter === "UNPLACED"
+      ? Math.max(1, Math.ceil(unplacedStudents.length / pageSize))
+      : Math.max(1, Math.ceil(filteredPlacements.length / pageSize));
+
+  const displayedPlacements = filteredPlacements.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const displayedUnplaced = unplacedStudents.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
@@ -243,11 +299,11 @@ export function PlacementsTable({ placements }: PlacementsTableProps) {
             Rezultate Plasamente & Alocări
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
-            Total înregistrate: {placements.length} plasamente · {pendingCount} în așteptare de confirmare
+            Total înregistrate: {placements.length} plasamente · {pendingCount} în așteptare de confirmare · {unplacedCount} nealocați
           </p>
         </div>
 
-        {pendingCount > 0 && (
+        {pendingCount > 0 && currentFilter !== "UNPLACED" && (
           <button
             onClick={handleConfirmAll}
             disabled={isPending}
@@ -263,17 +319,163 @@ export function PlacementsTable({ placements }: PlacementsTableProps) {
         )}
       </div>
 
-      {placements.length === 0 ? (
+      {/* ── Bară Filtre Rapide Coordonator (DoD #5) ── */}
+      <div className="px-5 py-3 border-b border-sky-500/20 bg-[#070D19]/40 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs text-slate-400 flex items-center gap-1 font-medium mr-1">
+            <Filter className="w-3.5 h-3.5 text-sky-400" /> Filtru:
+          </span>
+          <button
+            onClick={() => handleTabChange("ALL")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+              currentFilter === "ALL"
+                ? "bg-sky-500 text-slate-950 shadow-[0_0_10px_rgba(14,165,233,0.3)]"
+                : "bg-sky-950/40 text-slate-300 hover:bg-sky-900/40 border border-sky-500/20"
+            }`}
+          >
+            Toate ({placements.length})
+          </button>
+          <button
+            onClick={() => handleTabChange("CONFIRMED")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+              currentFilter === "CONFIRMED"
+                ? "bg-emerald-500 text-slate-950 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+                : "bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/40 border border-emerald-500/20"
+            }`}
+          >
+            Confirmate ({confirmedCount})
+          </button>
+          <button
+            onClick={() => handleTabChange("PENDING")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+              currentFilter === "PENDING"
+                ? "bg-amber-500 text-slate-950 shadow-[0_0_10px_rgba(245,158,11,0.3)]"
+                : "bg-amber-950/30 text-amber-300 hover:bg-amber-900/40 border border-amber-500/20"
+            }`}
+          >
+            În Așteptare ({pendingCount})
+          </button>
+          <button
+            onClick={() => handleTabChange("UNPLACED")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer ${
+              currentFilter === "UNPLACED"
+                ? "bg-rose-500 text-slate-950 shadow-[0_0_10px_rgba(244,63,94,0.3)] font-bold"
+                : "bg-rose-950/40 text-rose-300 hover:bg-rose-900/50 border border-rose-500/30"
+            }`}
+          >
+            <UserX className="w-3.5 h-3.5" />
+            <span>⚠️ Studenți Neplasați ({unplacedCount})</span>
+          </button>
+        </div>
+      </div>
+
+      {currentFilter === "UNPLACED" ? (
+        unplacedStudents.length === 0 ? (
+          <div className="p-12 text-center">
+            <div className="w-12 h-12 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto mb-3">
+              <CheckCircle className="w-6 h-6" />
+            </div>
+            <h3 className="text-sm font-semibold text-white">
+              Toți studenții eligibili au fost plasați cu succes!
+            </h3>
+            <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+              Nu există niciun student cu preferințe exprimate care să fi rămas nealocat.
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-[#070D19]/90 text-rose-300 text-xs uppercase font-semibold border-b border-rose-500/20">
+                <tr>
+                  <th className="py-3.5 px-4">Student</th>
+                  <th className="py-3.5 px-4">Specializare & An</th>
+                  <th className="py-3.5 px-4">Preferințe Exprimate</th>
+                  <th className="py-3.5 px-4">Prima Opțiune Căutată</th>
+                  <th className="py-3.5 px-4">Status</th>
+                  <th className="py-3.5 px-4 text-right">Notă Repartizare</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-rose-500/10">
+                {displayedUnplaced.map((s) => (
+                  <tr key={s.id} className="hover:bg-rose-500/5 transition-colors">
+                    <td className="py-3.5 px-4">
+                      <div className="font-semibold text-white">
+                        {s.firstName} {s.lastName}
+                      </div>
+                      <div className="text-xs text-slate-400">{s.email}</div>
+                      <div className="text-[11px] text-slate-500">Grupa {s.group}</div>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <div className="text-xs font-medium text-slate-200">{s.specialization}</div>
+                      <div className="text-xs text-slate-400">Anul {s.studyYear}</div>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <span className="inline-flex items-center gap-1 font-mono text-xs font-semibold px-2.5 py-0.5 rounded bg-sky-950/40 text-sky-300 border border-sky-500/30">
+                        {s.preferencesCount} opțiuni exprimate
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 max-w-[240px]">
+                      <div className="text-xs font-medium text-slate-300 truncate" title={s.topPreference}>
+                        {s.topPreference}
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-950/60 text-rose-300 border border-rose-500/40">
+                        <UserX className="w-3 h-3 text-rose-400" />
+                        {s.placementStatus === PlacementStatus.REFUSED_BY_STUDENT
+                          ? "Refuz Student"
+                          : s.placementStatus === PlacementStatus.CANCELLED_BY_COMPANY
+                          ? "Anulat Firmă"
+                          : s.placementStatus === PlacementStatus.CANCELLED_BY_COORDINATOR
+                          ? "Anulat Coord."
+                          : "Neplasat"}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 text-right">
+                      <span className="text-xs text-amber-300 font-medium bg-amber-950/40 px-2 py-1 rounded border border-amber-500/30">
+                        Eligibil Realocare Gale-Shapley
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {totalPages > 1 && (
+              <div className="p-4 border-t border-sky-500/15 flex items-center justify-between text-xs text-slate-400 bg-[#070D19]/40">
+                <span>
+                  Pagina {currentPage} din {totalPages}
+                </span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="p-1.5 rounded hover:bg-slate-800 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed text-slate-300"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage === totalPages}
+                    className="p-1.5 rounded hover:bg-slate-800 disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed text-slate-300"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      ) : filteredPlacements.length === 0 ? (
         <div className="p-12 text-center">
           <div className="w-12 h-12 rounded-full bg-sky-950/60 border border-sky-500/30 text-sky-400 flex items-center justify-center mx-auto mb-3">
             <Clock className="w-6 h-6" />
           </div>
           <h3 className="text-sm font-semibold text-white">
-            Niciun plasament înregistrat încă
+            Niciun plasament în această categorie
           </h3>
           <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-            După ce studenții își confirmă preferințele și companiile își evaluează aplicanții,
-            apăsați pe „Rulează Gale-Shapley” pentru a genera repartizarea stabilă.
+            Nu au fost găsite plasamente care să corespundă filtrului selectat.
           </p>
         </div>
       ) : (
