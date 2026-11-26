@@ -134,3 +134,43 @@
 **Decizii luate / ADR**: Securitate RBAC Admin, Twist P14 Audit & Notificări, UI Admin Panel P14
 **Fișiere modificate**: `prisma/schema.prisma`, `AI_LOG.md`, `src/app/page.tsx`, `src/app/admin/layout.tsx`, `src/app/admin/page.tsx`, `src/components/admin/*`, `src/lib/admin*`
 **Status final**: ✅ done
+
+---
+
+### S-008 | 2026-11-25 | Antigravity | Autor: Agent AI & David Vulcu
+**Scop sesiune**: Audit de Securitate, RBAC, Prevenire IDOR și Protecție Producție Demo Login pentru lansarea pe Railway.
+**Realizat**:
+- Audit amănunțit al tuturor rutelor API (`src/app/api/**`) și Server Actions (`src/app/actions/**`).
+- Corectare vulnerabilități IDOR pe fluxul de convenții (`src/app/actions/convention.ts`): verificare strictă că acțiunile `getConventionDetails`, `markConventionSignedByStudent`, `uploadSignedConventionScan`, `generateConventionForPlacement` permit accesul exclusiv titularului student, tutorelui companiei ofertei respective sau coordonatorului/adminului.
+- Corectare verificare IDOR la ștergerea preferințelor studențești (`src/app/actions/student.ts`).
+- Securizare mod de producție (`NEXT_PUBLIC_ENABLE_DEMO_LOGIN="false"`):
+  - Helper server-side `isDemoLoginEnabled()` în `src/lib/auth.ts`.
+  - Rută API dedicată `POST /api/auth/demo` returnează `403 Forbidden` când flag-ul nu este `"true"`.
+  - Protecție server-side în `loginUser` și `switchDemoUserAction`.
+  - Ascundere completă în UI a cardului/butoanelor de autentificare demo 1-click.
+- Suită dedicată de teste de securitate `src/lib/security-rbac.test.ts` (7 teste automate).
+**Decizii luate / ADR**: ADR-008
+**Fișiere modificate**: `src/app/actions/convention.ts`, `src/app/actions/student.ts`, `src/lib/auth.ts`, `src/app/api/auth/demo/route.ts`, `src/components/auth-card.tsx`, `src/lib/security-rbac.test.ts`, `docs/agents/DECISIONS.md`, `docs/agents/CONTRACTS.md`
+**Status final**: ✅ done
+
+---
+
+### S-009 | 2026-11-25 | Antigravity | Autor: Agent AI & David Vulcu
+**Scop sesiune**: Implementare Verificare Obligatorie Email OTP din 6 Cifre pentru Studenți (`@ulbsibiu.ro`).
+**Realizat**:
+- Extindere model Prisma `User`: `emailVerified Boolean @default(false)`, `verificationCodeHash String?`, `verificationCodeExpiresAt DateTime?`.
+- Migrare Prisma aplicată curat: `prisma/migrations/20261125204019_add_email_verification`.
+- Sincronizare `prisma/seed.ts` și `src/app/actions/admin.ts` (`adminCreateUser` setează `emailVerified: true`).
+- Serviciu de email `src/lib/mailer.ts` bazat pe `nodemailer`, cu suport pentru configurare `SMTP_*` și fallback de consolă în dev/test (`[MAILER FALLBACK] Code for <email>: <code>`).
+- Actualizare `.env.example` cu variabilele `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`.
+- Logică auth completă în `src/lib/auth.ts` și Server Actions în `src/app/actions/auth.ts`:
+  - `registerStudent`: hash-uire cod OTP cu `bcryptjs` (salt 10), expirare 15 minute, expediere email, returnare `{ requiresVerification: true, email }` fără emitere sesiune.
+  - `verifyEmailCode`: validare cod, trecere `emailVerified: true`, curățare hash/expirare și logare automată.
+  - `resendVerificationCode`: rate-limiting cu cooldown strict de 60 de secunde (`COOLDOWN_ACTIVE`).
+  - `loginUser`: blocare autentificare dacă `user.emailVerified === false` cu codul `EMAIL_NOT_VERIFIED`.
+- Interfață UI în `src/components/auth-card.tsx` cu formular dedicat introducere OTP 6 cifre și timer de cooldown pentru retrimitere.
+- Suită de teste automate dedicată `src/lib/email-verification.test.ts` (7 teste unitare). Toate cele 10 fișiere de test trecute (47/47 teste).
+- Verificare build complet de producție `npm run build` reușit.
+**Decizii luate / ADR**: ADR-009
+**Fișiere modificate**: `prisma/schema.prisma`, `prisma/migrations/*`, `prisma/seed.ts`, `src/lib/mailer.ts`, `.env.example`, `src/lib/auth.ts`, `src/app/actions/auth.ts`, `src/app/actions/admin.ts`, `src/components/auth-card.tsx`, `src/lib/email-verification.test.ts`, `docs/agents/DECISIONS.md`, `docs/agents/CONTRACTS.md`, `README.md`
+**Status final**: ✅ done

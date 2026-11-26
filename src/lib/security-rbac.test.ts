@@ -35,6 +35,7 @@ describe("Security, RBAC & IDOR Audit Suite", () => {
         firstName: "Student",
         lastName: "Alpha",
         role: UserRole.STUDENT,
+        emailVerified: true,
         isActive: true,
         studentProfile: {
           create: {
@@ -56,6 +57,7 @@ describe("Security, RBAC & IDOR Audit Suite", () => {
         firstName: "Student",
         lastName: "Beta",
         role: UserRole.STUDENT,
+        emailVerified: true,
         isActive: true,
         studentProfile: {
           create: {
@@ -77,6 +79,7 @@ describe("Security, RBAC & IDOR Audit Suite", () => {
         firstName: "Tutore",
         lastName: "Comp1",
         role: UserRole.COMPANY_TUTOR,
+        emailVerified: true,
         isActive: true,
         companyProfile: {
           create: {
@@ -98,6 +101,7 @@ describe("Security, RBAC & IDOR Audit Suite", () => {
         firstName: "Tutore",
         lastName: "Comp2",
         role: UserRole.COMPANY_TUTOR,
+        emailVerified: true,
         isActive: true,
         companyProfile: {
           create: {
@@ -119,6 +123,7 @@ describe("Security, RBAC & IDOR Audit Suite", () => {
         firstName: "Prof",
         lastName: "Coord",
         role: UserRole.COORDINATOR,
+        emailVerified: true,
         isActive: true,
       },
     });
@@ -131,6 +136,7 @@ describe("Security, RBAC & IDOR Audit Suite", () => {
         firstName: "Admin",
         lastName: "Sec",
         role: UserRole.ADMIN,
+        emailVerified: true,
         isActive: true,
       },
     });

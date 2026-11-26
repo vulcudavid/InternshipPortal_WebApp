@@ -233,3 +233,67 @@ Confidențialitatea datelor studenților (GDPR) impune reguli riguroase:
    - Golirea metadatelor private din `StudentProfile` (`headline: null`, `bio: null`, `phone: null`, `cvUrl: null`, link-uri sociale: null).
    - Conservarea structurii anonimizate a plasamentului (`Placement`) pentru a nu periclita integritatea istorică și rapoartele universitare de audit ale algoritmului Gale-Shapley.
    - Suită automată de teste pentru verificarea procesului de anonimizare (`test:gdpr`).
+
+
+## ADR-008: Securizare RBAC, Prevenire IDOR și Protecție de Producție pentru Demo Login
+
+- **Data**: 2026-11-25
+- **Status**: accepted
+- **Autor**: Agent AI & David Vulcu
+
+### 1. Context și Cerințe
+În vederea pregătirii lansării în producție pe platforma Railway, a fost efectuat un audit complet de securitate și autorizare asupra tuturor rutelor API (`src/app/api/**`) și Server Actions (`src/app/actions/**`):
+- **Prevenire IDOR (Insecure Direct Object Reference)**: Oricare utilizator autentificat ar fi putut teoretic trimite ID-uri arbitrare în parametri pentru a accesa convenții străine, modifica preferințe, pontaje sau evaluări ale altor entități.
+- **Protecție Demo Login în Producție**: Flag-ul `NEXT_PUBLIC_ENABLE_DEMO_LOGIN="false"` trebuie să prevină complet autentificarea 1-click atât la nivel de UI (butoanele ascunse) cât și pe server (`403 Forbidden` la orice apel direct al rutei `/api/auth/demo` sau funcției `switchDemoUserAction`).
+
+### 2. Decizia de Arhitectură
+1. **Verificare Strictă a Proprietății (Ownership Checks) în Server Actions și API**:
+   - `src/app/actions/convention.ts`: `getConventionDetails`, `markConventionSignedByStudent`, `uploadSignedConventionScan`, `generateConventionForPlacement` verifică explicit rolul și apartenența:
+     - `STUDENT`: permis doar dacă plasamentul asociat convenției îi aparține (`placement.studentId === currentUser.studentProfile.id`).
+     - `COMPANY_TUTOR`: permis doar dacă oferta asociată plasamentului aparține companiei sale (`placement.offer.companyId === currentUser.companyProfile.id`).
+     - `COORDINATOR` / `ADMIN`: acces global pentru supraveghere academică și audit.
+   - `src/app/actions/student.ts`: `removeStudentPreference` validează că preferința ștearsă aparține strict profilului studentului autentificat.
+   - `src/app/actions/work-log.ts` & `src/app/actions/evaluation.ts`: validare ownership student la creare/editare pontaj și tutore la aprobare sau notare.
+2. **Guvernare Demo Login pe Server**:
+   - Helper centralizat `isDemoLoginEnabled()` în `src/lib/auth.ts` ce verifică valoarea booleană a `NEXT_PUBLIC_ENABLE_DEMO_LOGIN === "true"`.
+   - Endpoint dedicat `POST /api/auth/demo` returnează `403 Forbidden` (`{ error: "Demo login is disabled in production" }`) dacă flag-ul este dezactivat.
+   - În `loginUser` și `switchDemoUserAction`, orice tentativă de login cu credențiale sau rol demo este respinsă automat dacă flag-ul nu este activ.
+3. **Validare Automată prin Teste**:
+   - Suită dedicată de teste de securitate `src/lib/security-rbac.test.ts` ce verifică blocarea tentativelor IDOR pe convenții și preferințe, precum și respingerea demo login-ului când flag-ul este inactiv.
+
+
+## ADR-009: Verificare Obligatorie a Adreselor de Email Studențești prin Cod OTP din 6 Cifre (@ulbsibiu.ro)
+
+- **Data**: 2026-11-25
+- **Status**: accepted
+- **Autor**: Agent AI & David Vulcu
+
+### 1. Context și Cerințe
+Pentru a asigura autenticitatea identității studenților din cadrul Universității „Lucian Blaga” din Sibiu și a preveni crearea de conturi fictive:
+- Doar adresele instituționale `@ulbsibiu.ro` pot înregistra conturi de student.
+- Înregistrarea trebuie condiționată de verificarea unui cod numeric de unică folosință (OTP) din 6 cifre trimis pe email.
+- Utilizatorii creați manual de Administrator sau prin seed trebuie să fie activi și verificați implicit (`emailVerified: true`).
+
+### 2. Decizia de Arhitectură
+1. **Extindere Schemă Bază de Date (`prisma/schema.prisma`)**:
+   - Pe modelul `User` au fost adăugate câmpurile:
+     - `emailVerified Boolean @default(false) @map("email_verified")`
+     - `verificationCodeHash String? @map("verification_code_hash")`
+     - `verificationCodeExpiresAt DateTime? @map("verification_code_expires_at")`
+   - Migrare dedicată: `20261125204019_add_email_verification`.
+2. **Serviciu de Trimitere Email (`src/lib/mailer.ts`)**:
+   - Integrare bibliotecă standard `nodemailer` cu suport pentru variabilele de mediu `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`.
+   - În medii locale sau de test unde `SMTP_HOST` nu este setat, se aplică automat mecanismul de fallback: logarea codului în consolă (`[MAILER FALLBACK] Code for <email>: <code>`) fără blocarea fluxului sau eroare fatală.
+3. **Fluxul Criptografic și de Expirare al Codului OTP**:
+   - La `registerStudent`: generare cod aleatoriu numeric (`crypto.randomInt(100000, 1000000)`), hash-uire securizată cu `bcryptjs` (salt rounds 10), expirare la **15 minute**.
+   - Nu se emite cookie de sesiune la înregistrare; clientul primește `{ requiresVerification: true, email }`.
+   - `verifyEmailCode(email, code)`: compară codul primit cu hash-ul stocat, verifică termenul de expirare, setează `emailVerified: true`, șterge hash-ul și data de expirare, creează sesiunea de autentificare.
+   - `resendVerificationCode(email)`: impune o politică de rate-limiting (cooldown strict de **60 de secunde**) între solicitările de retrimitere (`COOLDOWN_ACTIVE`).
+4. **Protecție la Autentificare (`loginUser`)**:
+   - Dacă `user.emailVerified === false`, autentificarea este refuzată cu codul de eroare `EMAIL_NOT_VERIFIED`, ghidând utilizatorul către formularul de introducere a codului OTP.
+5. **Gestionare Utilizatori Seed și Admin**:
+   - `prisma/seed.ts` setează `emailVerified: true` pentru toți utilizatorii predefiniți.
+   - Server action-ul de creare utilizatori de către admin (`adminCreateUser` în `src/app/actions/admin.ts`) creează conturi cu `emailVerified: true`.
+6. **Validare Automată prin Teste**:
+   - Suită completă de teste unitare în `src/lib/email-verification.test.ts` (7 scenarii: înregistrare student cu cod hash-uit, blocare login fără verificare, verificare cu cod valid/greșit/expirat, retrimitere cod și respectare cooldown de 60 secunde).
+
