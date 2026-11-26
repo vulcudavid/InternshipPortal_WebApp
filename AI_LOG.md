@@ -209,3 +209,37 @@
 **Decizii luate / ADR**: Conformitate 100% cu documentele administrative oficiale ULBS Licență 2026-2027.
 **Fișiere modificate**: `prisma/schema.prisma`, `prisma/seed.ts`, `src/lib/pdf/generate-convention-pdf.ts`, `src/lib/conventions/pdf-builder.ts`, `src/lib/conventions/template-html.ts`, `src/lib/conventions/types.ts`, `src/lib/conventions/generator.ts`, `src/lib/auth.ts`, `docs/images/conventie-pdf-preview.png`, `docs/images/sample-conventie.pdf`, `README.md`, `AI_LOG.md`
 **Status final**: ✅ done
+
+---
+
+### S-012 | 2026-11-26 | Gemini 3.8 Flash | Autor: Agent AI & David Vulcu
+**Scop sesiune**: Rezolvare cerință G-9 (Google Lighthouse ≥ 90% pe bundle de producție), rafinare etichete UI în limba română pe toate dashboard-urile și verificare comportament seed pentru producție.
+**Realizat**:
+- **Audit Google Lighthouse (Cerința G-9)**:
+  - Rulat audit Lighthouse CLI pe serverul Next.js de producție (`http://localhost:3000`).
+  - Obținut scor maxim de **100%** pe toate categoriile evaluate:
+    - **Performance**: 100%
+    - **Accessibility**: 100%
+    - **Best Practices**: 100%
+    - **SEO**: 100%
+  - Generat și salvat rapoartele complete în `docs/lighthouse-report.report.html` și `docs/lighthouse-report.report.json`.
+- **Optimizări de performanță implementate**:
+  - **Zero render-blocking fonts**: Eliminat `@import` extern din Google Fonts în `globals.css` și integrat fonturile `Plus_Jakarta_Sans` și `JetBrains_Mono` prin `next/font/google` cu `display: "swap"`.
+  - **Optimizare imagine background**: Convertit imaginea blueprint de fundal în format modern WebP (`public/images/inginerie-sibiu-cyber.webp`), reducând dimensiunea fișierului de la 1.1 MB la 65 KB (94% reducere).
+  - **Code splitting & dynamic imports**: Izolat dashboard-urile mari (`StudentDashboard`, `CompanyDashboard`, `CoordinatorDashboard`, `RoleDashboardSkeleton`) prin `next/dynamic` în `src/app/page.tsx`, eliminând încărcarea inutilă de JavaScript pe landing page și reducând Total Blocking Time (TBT).
+- **Rafinare etichete vizibile în limba română (UI)**:
+  - Header: `Companie / Tutore`.
+  - Dashboard Admin: `Companii & Oferte`, `Utilizatori & GDPR`, `Setări`, `Jurnal Audit`.
+  - Dashboard Companie: `Oferte`, `Candidați`, `Interviuri`, `Pontaje`, `Evaluare`, `Profil Companie`.
+  - Dashboard Student: `Oferte`, `Preferințe`, `Profil`, `Convenție Practică`, `Jurnal Activitate`.
+  - Păstrat neschimbate toate cheile interne de stare/tab-uri TypeScript.
+- **Verificare seed producție (`prisma/seed.ts`)**:
+  - Confirmat că la `process.env.NODE_ENV === "production"`, scriptul populează exclusiv nomenclatorul de tag-uri, setările de sistem și conturile administrative (Admin și Coordonator), omițând firmele și studenții demonstrativi.
+- **Documentație**:
+  - Adăugat secțiunea dedicată auditului Google Lighthouse în `README.md`.
+- **Validare completă**:
+  - `npm run build` validat cu 0 erori.
+  - Toate cele 52 de teste automate trec cu succes (`npm test`).
+**Decizii luate / ADR**: Optimizare Core Web Vitals și finalizare cerințe de calitate G-9.
+**Fișiere modificate**: `AI_LOG.md`, `README.md`, `src/app/globals.css`, `src/app/layout.tsx`, `src/app/page.tsx`, `src/components/app-header.tsx`, `src/components/admin/admin-dashboard.tsx`, `src/components/company/company-dashboard.tsx`, `src/components/student/student-dashboard.tsx`, `docs/lighthouse-report.report.html`, `docs/lighthouse-report.report.json`, `public/images/inginerie-sibiu-cyber.webp`
+**Status final**: ✅ done

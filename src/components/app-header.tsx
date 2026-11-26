@@ -25,7 +25,7 @@ export function AppHeader({ currentUser }: AppHeaderProps) {
         };
       case "COMPANY_TUTOR":
         return {
-          label: "Firmă / Tutore",
+          label: "Companie / Tutore",
           classes: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.15)]",
         };
       case "COORDINATOR":

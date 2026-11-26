@@ -1,12 +1,22 @@
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import dynamic from "next/dynamic";
 import { AuthCard } from "@/components/auth-card";
 import { AppHeader } from "@/components/app-header";
-import { RoleDashboardSkeleton } from "@/components/role-dashboard-skeleton";
-import { StudentDashboard } from "@/components/student/student-dashboard";
-import { CompanyDashboard } from "@/components/company/company-dashboard";
-import { CoordinatorDashboard } from "@/components/coordinator/coordinator-dashboard";
+
+const StudentDashboard = dynamic(
+  () => import("@/components/student/student-dashboard").then((mod) => mod.StudentDashboard)
+);
+const CompanyDashboard = dynamic(
+  () => import("@/components/company/company-dashboard").then((mod) => mod.CompanyDashboard)
+);
+const CoordinatorDashboard = dynamic(
+  () => import("@/components/coordinator/coordinator-dashboard").then((mod) => mod.CoordinatorDashboard)
+);
+const RoleDashboardSkeleton = dynamic(
+  () => import("@/components/role-dashboard-skeleton").then((mod) => mod.RoleDashboardSkeleton)
+);
 import { getCoordinatorDashboardData } from "@/app/actions/coordinator";
 import { getSystemSettings } from "@/lib/settings";
 import { sanitizeStudentProfileForCompany } from "@/lib/privacy";

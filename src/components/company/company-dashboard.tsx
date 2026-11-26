@@ -176,7 +176,12 @@ export function CompanyDashboard({
           }`}
         >
           <Briefcase className="w-4 h-4 text-sky-400" />
-          <span>Oferte de Practică ({totalOffers})</span>
+          <span>Oferte</span>
+          {totalOffers > 0 && (
+            <span className="px-1.5 py-0.5 rounded-full bg-sky-950 text-sky-300 border border-sky-500/30 text-[10px] font-bold">
+              {totalOffers}
+            </span>
+          )}
         </button>
 
         <button
@@ -188,7 +193,7 @@ export function CompanyDashboard({
           }`}
         >
           <Users className="w-4 h-4 text-sky-400" />
-          <span>Candidați & Clasament Gale-Shapley</span>
+          <span>Candidați</span>
           {totalApplicants > 0 && (
             <span className="px-1.5 py-0.5 rounded-full bg-sky-950 text-sky-300 border border-sky-500/30 text-[10px] font-bold">
               {totalApplicants}
@@ -205,7 +210,12 @@ export function CompanyDashboard({
           }`}
         >
           <Calendar className="w-4 h-4 text-sky-400" />
-          <span>Programare Interviuri ({totalSlots})</span>
+          <span>Interviuri</span>
+          {totalSlots > 0 && (
+            <span className="px-1.5 py-0.5 rounded-full bg-sky-950 text-sky-300 border border-sky-500/30 text-[10px] font-bold">
+              {totalSlots}
+            </span>
+          )}
         </button>
 
         <button
@@ -217,7 +227,7 @@ export function CompanyDashboard({
           }`}
         >
           <CalendarCheck2 className="w-4 h-4 text-sky-400" />
-          <span>Validare Jurnale Ore ({totalInterns} practicanți)</span>
+          <span>Pontaje</span>
           {pendingLogsCount > 0 && (
             <span className="px-1.5 py-0.5 rounded-full bg-amber-500 text-slate-950 font-black text-[10px] animate-pulse">
               {pendingLogsCount} noi
@@ -234,7 +244,7 @@ export function CompanyDashboard({
           }`}
         >
           <Award className="w-4 h-4 text-sky-400" />
-          <span>Evaluare Finală</span>
+          <span>Evaluare</span>
         </button>
 
         <button
@@ -246,7 +256,7 @@ export function CompanyDashboard({
           }`}
         >
           <Building2 className="w-4 h-4 text-sky-400" />
-          <span>Profil Companie & Juridic</span>
+          <span>Profil Companie</span>
         </button>
       </div>
 

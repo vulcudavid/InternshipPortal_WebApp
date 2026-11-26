@@ -260,7 +260,7 @@ export function StudentDashboard({
           }`}
         >
           <Compass className="w-4 h-4 text-sky-400" />
-          <span>Oferte de Practică Recomandate</span>
+          <span>Oferte</span>
           <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-950 text-sky-300 border border-sky-500/30">
             {offers.length}
           </span>
@@ -280,7 +280,7 @@ export function StudentDashboard({
           }`}
         >
           <ListOrdered className="w-4 h-4 text-purple-400" />
-          <span>Preferințele Mele Gale-Shapley</span>
+          <span>Preferințe</span>
           {preferences.length > 0 && (
             <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-950 text-purple-300 border border-purple-500/30">
               {preferences.length}
@@ -302,7 +302,7 @@ export function StudentDashboard({
           }`}
         >
           <User className="w-4 h-4 text-indigo-400" />
-          <span>Profilul Meu & CV</span>
+          <span>Profil</span>
         </button>
 
         {/* TAB 4: STAGIU & CONVENȚIE (Dacă există plasament) */}
@@ -324,15 +324,7 @@ export function StudentDashboard({
             }`}
           >
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>
-              {placement.status === "CONFIRMED"
-                ? "Stagiu Confirmat & Convenție"
-                : placement.status === "PENDING_CONFIRMATION"
-                ? "Plasament Provizoriu"
-                : placement.status === "REFUSED_BY_STUDENT"
-                ? "Plasament Refuzat"
-                : "Stare Plasament"}
-            </span>
+            <span>Convenție Practică</span>
             {placement.status === "CONFIRMED" && (
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
             )}
@@ -360,7 +352,7 @@ export function StudentDashboard({
             }`}
           >
             <CalendarCheck2 className="w-4 h-4 text-sky-400" />
-            <span>Jurnal Ore & Evaluare</span>
+            <span>Jurnal Activitate</span>
             {placement.workLogs && placement.workLogs.some((w: any) => w.status === "PENDING") && (
               <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.8)]" />
             )}

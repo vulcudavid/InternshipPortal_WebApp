@@ -74,7 +74,7 @@ export function AdminDashboard({ user }: AdminDashboardProps) {
           }`}
         >
           <Building2 className="w-4 h-4" />
-          <span>Firme & Oferte</span>
+          <span>Companii & Oferte</span>
         </button>
 
         <button
@@ -98,7 +98,7 @@ export function AdminDashboard({ user }: AdminDashboardProps) {
           }`}
         >
           <Sliders className="w-4 h-4" />
-          <span>Reguli Globale</span>
+          <span>Setări</span>
         </button>
 
         <button
@@ -110,7 +110,7 @@ export function AdminDashboard({ user }: AdminDashboardProps) {
           }`}
         >
           <FileText className="w-4 h-4" />
-          <span>Audit Log</span>
+          <span>Jurnal Audit</span>
         </button>
       </div>
 

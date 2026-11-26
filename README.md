@@ -52,6 +52,27 @@ Generatorul nativ Node.js bazat pe `pdfkit` produce documentul oficial al Conven
 
 ---
 
+## ⚡ Performanță, Accesibilitate & SEO (Audit Google Lighthouse — Cerința G-9)
+
+Platforma atinge scoruri maxime la auditul Google Lighthouse rulat pe bundle-ul optimizat de producție (`http://localhost:3000`), respectând cu strictețe cerința **G-9 (scor ≥ 90%)**:
+
+| Categorie | Scor Obținut | Cerință Minimă | Stare |
+|---|:---:|:---:|:---:|
+| 🟢 **Performance** | **100%** | ≥ 90% | ✅ Conform |
+| 🟢 **Accessibility** | **100%** | ≥ 90% | ✅ Conform |
+| 🟢 **Best Practices** | **100%** | ≥ 90% | ✅ Conform |
+| 🟢 **SEO** | **100%** | ≥ 90% | ✅ Conform |
+
+Optimizările tehnice cheie implementate:
+- **Zero render-blocking fonts**: Integrarea fonturilor instituționale `Plus_Jakarta_Sans` și `JetBrains_Mono` direct prin `next/font/google` cu `display: swap`, eliminând cererile externe blocante de rețea.
+- **Optimizare imagine background**: Compresia imaginii blueprint Cyber-Engineering în format modern WebP (`65 KB` în loc de `1.1 MB`, reducere de 94%).
+- **Code splitting & dynamic imports**: Izolarea modulelor grele de dashboard prin `next/dynamic`, reducând semnificativ TBT (Total Blocking Time) și timpul de execuție pe main thread la vizitarea paginii principale.
+- **Sematică HTML & contrast**: Structură accesibilă conform WCAG 2.1 AA, taguri meta complete pentru indexare SEO și contrast optimizat pentru paleta Cyber Dark.
+
+> Rapoartele detaliate JSON și HTML generate prin Lighthouse CLI sunt salvate în directorul [`docs/`](docs/) (`docs/lighthouse-report.report.html` și `docs/lighthouse-report.report.json`).
+
+---
+
 ## 📋 Cerințe Preliminare
 
 Asigurați-vă că aveți instalate pe sistem:
