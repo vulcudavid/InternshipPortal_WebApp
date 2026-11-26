@@ -243,3 +243,26 @@
 **Decizii luate / ADR**: Optimizare Core Web Vitals și finalizare cerințe de calitate G-9.
 **Fișiere modificate**: `AI_LOG.md`, `README.md`, `src/app/globals.css`, `src/app/layout.tsx`, `src/app/page.tsx`, `src/components/app-header.tsx`, `src/components/admin/admin-dashboard.tsx`, `src/components/company/company-dashboard.tsx`, `src/components/student/student-dashboard.tsx`, `docs/lighthouse-report.report.html`, `docs/lighthouse-report.report.json`, `public/images/inginerie-sibiu-cyber.webp`
 **Status final**: ✅ done
+
+---
+
+### S-013 | 2026-11-26 | Gemini 3.8 Flash | Autor: Agent AI & David Vulcu
+**Scop sesiune**: Calibrare exactă pe 5 pagini a Convenției oficiale de practică ULBS (PDF nativ & HTML preview), curățare landing page / formular de autentificare și finalizare sincronizare pe GitHub.
+**Realizat**:
+- **Calibrare Convenție Oficială PDF (`src/lib/pdf/generate-convention-pdf.ts` & `src/lib/conventions/template-html.ts`)**:
+  - Ajustat layout-ul și pauzele de pagină pentru a garanta încadrarea în exact **5 pagini** (3 pagini Convenția + 1 pagină Anexa 1 + 1 pagină Anexa 2), identic cu fișierul Word oficial ULBS Licență 2026-2027.
+  - Pagina 1: Antet unic curat fără duplicări de titlu; eliminat prefixul duplicat `Str.` prin funcția `formatCompanyAddress`; aliniere inline pentru datele bancare.
+  - Pagina 2-3: ART. 3 cu cratimă en-dash (`01.07.2026 – 30.09.2026`); ART. 7(1) structurat pe două coloane egale (50%-50%) cu ortografierea corectă `Dl/Dna`; resetat cursorul `doc.x = leftMargin` astfel încât ART. 7(2) până la ART. 12 ocupă 100% lățimea paginii; blocuri de semnături pe două coloane stânga-dreapta.
+  - Pagina 4 (Anexa 1): Pct. 3 formatat curat, pct. 5 păstrat pe un singur rând, tabelul de competențe compactat astfel încât întreaga anexă (inclusiv semnăturile) se încadrează pe o singură pagină.
+  - Pagina 5 (Anexa 2): Antet `studenţii anului ${studyYear}`, nume student formatat în Title Case (`Alex Barac`), tabel nominal pe 5 coloane și semnături pe două coloane.
+- **Curățare Landing Page / Formular Autentificare (`src/app/page.tsx`)**:
+  - Eliminat paragraful introductiv redundant referitor la Gale-Shapley și catalogul de competențe.
+  - Eliminat complet blocul „ARHITECTURĂ DE SISTEM” / „Modulele Platformei de Practică” (cele 3 carduri de prezentare module).
+  - Curățat importurile Lucide Icons neutilizate (`Building2`, `GraduationCap`, `ShieldCheck`, `Cpu`, `Layers`).
+  - Centrat formularul de autentificare/înregistrare vertical în viewport (`my-auto`, `justify-center`, `mt-auto` pe footer), eliminând spațiul gol inutil din partea inferioară a ecranului.
+- **Validare completă**:
+  - Toate cele 52 de teste automate trec cu succes (`npm test`).
+  - Build-ul de producție Next.js (`npm run build`) trece cu 0 erori.
+**Decizii luate / ADR**: Conformitate 100% cu șablonul administrativ ULBS și simplificare vizuală a primului ecran pentru utilizatori.
+**Fișiere modificate**: `src/lib/pdf/generate-convention-pdf.ts`, `src/lib/conventions/template-html.ts`, `src/app/page.tsx`, `docs/images/sample-conventie.pdf`, `docs/images/conventie-pdf-preview.png`, `AI_LOG.md`
+**Status final**: ✅ done

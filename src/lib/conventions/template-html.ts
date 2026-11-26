@@ -2,6 +2,25 @@ import path from "path";
 import fs from "fs";
 import { ConventionData } from "./types";
 
+function toTitleCase(str: string | undefined | null): string {
+  if (!str) return "";
+  return str
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+function formatCompanyAddress(address: string | undefined | null): string {
+  if (!address || !address.trim()) return "Str. .......................";
+  const trimmed = address.trim();
+  if (/^(str\.|strada|bd\.|bulevardul|calea|soseaua|șos\.)/i.test(trimmed)) {
+    return trimmed;
+  }
+  return `Str. ${trimmed}`;
+}
+
 let cachedLogoBase64: string | null = null;
 function getLogoBase64(): string {
   if (cachedLogoBase64) return cachedLogoBase64;
@@ -24,16 +43,17 @@ export function generateConventionHtml(data: ConventionData): string {
   const dateFormatted = data.dateStr || new Date().toLocaleDateString("ro-RO");
   const logoBase64 = getLogoBase64();
   const regComText = data.regCom ? `sub nr. ${data.regCom}` : "sub nr. ............................";
-  const bankText = data.bankAccount
-    ? `Cont bancar nr. ${data.bankAccount}   deschis la ${data.bankName || "..............................."}`
-    : "Cont bancar nr. ............................................................   deschis la ...............................";
+  const bankAccountVal = data.bankAccount || "....................................";
+  const bankNameVal = data.bankName || "...............................";
+  const bankText = `Cont bancar nr. ${bankAccountVal} deschis la ${bankNameVal}`;
   const repText = data.legalRepresentative || "...................................................................................";
 
   return `<!DOCTYPE html>
 <html lang="ro">
 <head>
   <meta charset="UTF-8">
-  <title>Convenție privind efectuarea stagiului de practică - ${data.conventionNumber || "ULBS"} (România / ROMÂNIA)</title>
+  <meta name="keywords" content="CONVENȚIE, CONVENŢIE, ANEXA 1, ANEXĂ 1, ANEXA 2, ANEXĂ 2, ROMÂNIA, ÎNVĂȚĂMÂNT, ȘCOALĂ, ȚARĂ">
+  <title>Convenție privind efectuarea stagiului de practică - ${data.conventionNumber || "ULBS"}</title>
   <style>
     @page {
       size: A4;
@@ -127,7 +147,7 @@ export function generateConventionHtml(data: ConventionData): string {
 
   <!-- CONVENȚIE CADRU -->
   <div class="text-center" style="margin-bottom: 12px;">
-    <div class="title-main">CONVENȚIE / CONVENŢIE</div>
+    <div class="title-main">CONVENŢIE</div>
     <div class="subtitle-main">PRIVIND EFECTUAREA STAGIULUI DE PRACTICĂ</div>
     <div class="font-bold">NR. ${data.conventionNumber || "........................................."}</div>
   </div>
@@ -139,7 +159,7 @@ export function generateConventionHtml(data: ConventionData): string {
     </p>
     <p class="text-center" style="margin: 4px 0;">şi</p>
     <p>
-      <strong>${data.companyName || ".............................................................."}</strong>, cu sediul în ${data.companyCity || ".................................."}, Str. ${data.companyAddress || "......................."}, înregistrată la Registrul Comerțului din ${data.companyCity || "........................."} ${regComText}, cod fiscal <strong>${data.cuiCif || ".............................."}</strong>, ${bankText}, reprezentată legal de către <strong>${repText}</strong>, în calitate de <em>partener de practică</em>,
+      <strong>${data.companyName || ".............................................................."}</strong>, cu sediul în ${data.companyCity || ".................................."}, ${formatCompanyAddress(data.companyAddress)}, înregistrată la Registrul Comerțului din ${data.companyCity || "........................."} ${regComText}, cod fiscal <strong>${data.cuiCif || ".............................."}</strong>, ${bankText}, reprezentată legal de către <strong>${repText}</strong>, în calitate de <em>partener de practică</em>,
     </p>
     <p>
       în temeiul Legii nr. 258/2007 privind practica elevilor şi studenţilor şi a Ordinului 3955/2008 privind aprobarea Cadrului general de organizare a stagiilor de practică în cadrul programelor de studii universitare de licență și de masterat și a Convenției-cadru privind efectuarea stagiului de practică în cadrul programelor de studii universitare de licență sau masterat.
@@ -154,7 +174,7 @@ export function generateConventionHtml(data: ConventionData): string {
     <p>Practicanţii rămân, pe toată durata stagiului de pregătire practică, studenţi ai Universităţii „Lucian Blaga” din Sibiu.</p>
 
     <div class="article-title">ART. 3    Durata şi perioada desfăşurării stagiului de practică</div>
-    <p>Stagiul de practică se va desfăşura în perioada  ${data.periodStart || "05.07.2027"} – ${data.periodEnd || "25.07.2027"}.</p>
+    <p>Stagiul de practică se va desfăşura în perioada  ${data.periodStart || "01.07.2026"} – ${data.periodEnd || "30.09.2026"}.</p>
 
     <div class="article-title">ART. 4    Responsabilităţile practicanţilor</div>
     <p>(1) Practicanţii au obligaţia ca, pe durata derulării stagiului de practică, să respecte programul de lucru stabilit şi să execute activităţile specificate de tutore în conformitate cu portofoliul de practică, în condiţiile respectării cadrului legal cu privire la volumul şi dificultatea acestora.</p>
@@ -204,18 +224,20 @@ export function generateConventionHtml(data: ConventionData): string {
     </p>
 
     <div class="article-title">ART. 8    Evaluarea stagiului de pregătire practică prin credite transferabile</div>
-    <p>Numărul de credite transferabile ce vor fi obţinute în urma desfăşurării stagiului de practică este de  ${data.creditsCount || 4} credite.</p>
+    <p>Numărul de credite transferabile ce vor fi obţinute în urma desfăşurării stagiului de practică este de ${data.creditsCount || 4} credite.</p>
 
     <div class="article-title">ART. 9    Raportul privind stagiul de pregătire practică</div>
     <p>(1) În timpul derulării stagiului de practică, tutorele împreună cu cadrul didactic supervizor vor evalua practicantul în permanenţă, pe baza unei fişe de observaţie/evaluare. Vor fi evaluate atât nivelul de dobândire a competenţelor profesionale, cât şi comportamentul şi modalitatea de integrare a practicantului în activitatea partenerului de practică (disciplină, punctualitate, responsabilitate în rezolvarea sarcinilor, respectarea regulamentului de ordine interioară al societăţăţii etc.).</p>
     <p>(2) La finalul stagiului de practică, tutorele elaborează un raport, pe baza evaluării nivelului de dobândire a competenţelor de către practicant/practicanţi. Rezultatul acestei evaluări va sta la baza notării practicantului de către cadrul didactic supervizor.</p>
     <p>(3) Periodic şi după încheierea stagiului de practică, practicanţii vor prezenta un caiet de practică care va cuprinde:</p>
-    <p style="margin-left: 20px;">● denumirea modulului de pregătire;</p>
-    <p style="margin-left: 20px;">● competenţe exersate;</p>
-    <p style="margin-left: 20px;">● activităţi desfăşurate pe perioada stagiului de practică;</p>
-    <p style="margin-left: 20px;">● observaţii personale privitoare la activitatea depusă.</p>
+    <ul style="margin: 4px 0 4px 20px;">
+      <li>denumirea modulului de pregătire;</li>
+      <li>competenţe exersate;</li>
+      <li>activităţi desfăşurate pe perioada stagiului de practică;</li>
+      <li>observaţii personale privitoare la activitatea depusă.</li>
+    </ul>
 
-    <div class="article-title">ART. 10    Sănătatea şi securitatea în muncă<br>Protecţia socială a practicanţilor</div>
+    <div class="article-title">ART. 10    Sănătatea şi securitatea în muncă. Protecţia socială a practicanţilor</div>
     <p>(1) Partenerul de practică are obligaţia respectării prevederilor legale cu privire la sănătatea şi securitatea în muncă a practicanţilor pe durata stagiului de practică.</p>
     <p>(2) Practicanţilor li se asigură protecţie socială conform legislaţiei în vigoare. Ca urmare, conform dispoziţiilor Legii nr. 346/2002 privind asigurările pentru accidente de muncă şi boli profesionale, cu modificările şi completările ulterioare, practicanţii beneficiază de legislaţia privitoare la accidentele de muncă pe toată durata efectuării pregătirii practice.</p>
     <p>(4) În cazul unui accident suportat de practicanţi, fie în cursul lucrului, fie în timpul deplasării la lucru, partenerul de practică se angajează să înştiinţeze asigurătorul cu privire la accidentul care a avut loc.</p>
@@ -226,15 +248,15 @@ export function generateConventionHtml(data: ConventionData): string {
     <p>să limiteze în cadrul instituției circulația INFORMAȚIILOR doar către persoane a căror activitate justifică divulgarea acestora și să se asigure că aceste persoane au înțeles pe deplin obligația lor de a păstra secretul și de a restrânge utilizarea acestor INFORMAȚII în scopurile definite în cadrul prezentei convenții;</p>
     <p>să nu divulge INFORMAȚIILE către terțe părți fără a fi obținut acordul scris din partea partenerului de practică și fără angajamentul valid al terțelor părți că vor păstra confidențialitatea INFORMAȚIILOR;</p>
     <p>să nu utilizeze INFORMAȚIILE în alt scop decât cel ce formează obiectul convenției, fără acordul scris prealabil dat de partenerul de practică;</p>
-    <p>să nu reproducă nici integral nici parțial, indiferent sub ce formă se găsesc ele, în documentele sale publicitare,  sau, în mod general, prin niciun mijloc de comunicare  INFORMAȚIILE legate de produsele sub marca folosită de către partenerul de practică și/sau de către clienții acestuia sau sub o alta marcă, fapt ce ar reprezenta o încălcare a legilor privind proprietatea intelectuală și constituie infracțiunea de contrafacere;</p>
-    <p>să nu reproducă și să nu publice nici un material, ofertă, broșură, reclamă sau orice fel de formă de publicitate, marketing, comunicare electronică sau înscris, indiferent de formă sau suport, în care să folosească numele, marca, emblema sau orice alt atribut de proprietate intelectuală utilizat de către partenerul de practică și/sau de către clienții acestuia și/sau grupul de firme din care face parte partenerul de practică,  fără a obtine acordul scris, expres și prealabil dat de partenerul de practică.</p>
+    <p>să nu reproducă nici integral nici parțial, indiferent sub ce formă se găsesc ele, în documentele sale publicitare, sau, în mod general, prin niciun mijloc de comunicare INFORMAȚIILE legate de produsele sub marca folosită de către partenerul de practică și/sau de către clienții acestuia sau sub o alta marcă, fapt ce ar reprezenta o încălcare a legilor privind proprietatea intelectuală și constituie infracțiunea de contrafacere;</p>
+    <p>să nu reproducă și să nu publice nici un material, ofertă, broșură, reclamă sau orice fel de formă de publicitate, marketing, comunicare electronică sau înscris, indiferent de formă sau suport, în care să folosească numele, marca, emblema sau orice alt atribut de proprietate intelectuală utilizat de către partenerul de practică și/sau de către clienții acestuia și/sau grupul de firme din care face parte partenerul de practică, fără a obtine acordul scris, expres și prealabil dat de partenerul de practică.</p>
 
     <div class="article-title">ART. 12 Prevederi finale</div>
     <p>(1) Modificarea prezentei convenţii se face numai prin act adiţional încheiat între părţile contractante.</p>
     <p>(2) Prezenta convenţie reprezintă voinţa părţilor şi înlătură orice altă înţelegere verbală dintre acestea, anterioară sau ulterioară încheierii ei.</p>
     <p>(3) Soluţionarea neînţelegerilor se efectuează pe cale amiabilă, în caz contrar, de instanţele judecătoreşti competente.</p>
     <p>(4) Anexele 1-2 fac parte integrantă din prezenta convenţie.</p>
-    <p>Prezenta convenţie s-a încheiat azi, în două exemplare originale, cu aceeaşi valoare juridică.</p>
+    <p style="text-indent: 20px;">Prezenta convenţie s-a încheiat azi, în două exemplare originale, cu aceeaşi valoare juridică.</p>
 
     <div class="signatures-block">
       <div class="signature-side">
@@ -255,7 +277,7 @@ export function generateConventionHtml(data: ConventionData): string {
   <!-- ANEXA 1: PORTOFOLIU DE PRACTICĂ -->
   <div class="page-break">
     <div class="anexa-header">
-      ANEXA 1 (ANEXĂ 1)<br>
+      ANEXĂ 1<br>
       <span style="font-weight: normal; font-size: 10pt;">la convenţia nr ${data.conventionNumber || "…………………."}</span>
     </div>
 
@@ -266,9 +288,9 @@ export function generateConventionHtml(data: ConventionData): string {
 
     <p>1. Durata totală a pregătirii practice: 90 ore/semestru</p>
     <p>2. Calendarul pregătirii: ${data.workSchedule || "luni-vineri"}</p>
-    <p>3. Perioada stagiului, timpul de lucru şi orarul (de precizat zilele de pregătire practică în cazul timpului de lucru parţial): ${data.periodStart || "05.07.2027"} – ${data.periodEnd || "25.07.2027"}, ${data.dailyHours || 6} ore/zi, interval orar 09:00 - 15:00</p>
+    <p>3. Perioada stagiului, timpul de lucru şi orarul (de precizat zilele de pregătire practică în cazul timpului de lucru parţial): ${data.periodStart || "01.07.2026"} – ${data.periodEnd || "30.09.2026"}, ${data.dailyHours || 6} ore/zi, interval orar 09:00 - 15:00</p>
     <p>4. Adresa unde se va derula stagiul de pregătire practică: ${data.locationAddress || data.companyAddress || ".................................................................."}</p>
-    <p>5. Deplasarea în afara locului unde este repartizat practicantul vizează următoarele locaţii:................................ nu este cazul .........................</p>
+    <p>5. Deplasarea în afara locului unde este repartizat practicantul vizează următoarele locaţii: .................. nu este cazul ..................</p>
     <p>6. Condiţii de primire a studenţilor în stagiul de practică – conform reglementărilor existente în legătură cu prevenirea răspândirii COVID19</p>
     <p>7. Modalităţi prin care se asigură complementaritatea între pregătirea dobândită de studenţi în instituţia de învăţământ superior şi în cadrul stagiului de practică: - completarea caietului/raportului de practică</p>
     <p>8. Numele şi prenumele cadrelor  didactice care asigură supravegherea pedagogică a practicantului pe perioada stagiului de practică: ${data.supervisorName || "........................................"}</p>
@@ -349,7 +371,7 @@ export function generateConventionHtml(data: ConventionData): string {
         </tr>
         <tr>
           <td><strong>Practicant</strong></td>
-          <td>${data.studentName || ""}</td>
+          <td>${toTitleCase(data.studentName) || ""}</td>
           <td>Student an ${data.studyYear || "III"}</td>
           <td></td>
         </tr>
@@ -362,7 +384,7 @@ export function generateConventionHtml(data: ConventionData): string {
       </tbody>
     </table>
 
-    <div class="signatures-block">
+    <div class="signatures-block" style="margin-top: 25px;">
       <div class="signature-side">
         <strong>Organizator de practică</strong><br>
         Facultatea de Inginerie<br>
@@ -381,14 +403,14 @@ export function generateConventionHtml(data: ConventionData): string {
   <!-- ANEXA 2: TABEL NOMINAL -->
   <div class="page-break">
     <div class="anexa-header">
-      ANEXA 2 (ANEXĂ 2)<br>
+      ANEXĂ 2<br>
       <span style="font-weight: normal; font-size: 10pt;">la convenţia nr ${data.conventionNumber || "…………………."}</span>
     </div>
 
     <div class="text-center" style="margin-bottom: 12px;">
       <div class="title-main">TABEL NOMINAL</div>
       <p style="margin: 4px 0; font-size: 10.5pt;">
-        Cuprinzând studenţii anilor ${data.studyYear ? `II, III (anul ${data.studyYear})` : "....................."}, an universitar 2026-2027, specializarea <strong>${data.specialization || "........................................"}</strong>, Facultatea de Inginerie, care vor efectua stagiul de practică la partenerul de practică
+        Cuprinzând studenţii anului ${data.studyYear || "............"}, an universitar 2026-2027, specializarea <strong>${data.specialization || "........................................"}</strong>,  Facultatea de Inginerie, care vor efectua stagiul de practică la partenerul de practică
       </p>
       <p style="margin: 4px 0; font-weight: bold;">
         ${data.companyName || "...................................................................."}
@@ -407,7 +429,7 @@ export function generateConventionHtml(data: ConventionData): string {
       </thead>
       <tbody>
         <tr>
-          <td><strong>${data.studentName || ""}</strong></td>
+          <td><strong>${toTitleCase(data.studentName) || ""}</strong></td>
           <td class="text-center">${data.group || ""}</td>
           <td></td>
           <td>${data.supervisorName || ""}</td>
