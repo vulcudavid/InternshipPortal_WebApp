@@ -589,18 +589,14 @@ async function main() {
   });
 
   for (const off of allOffers) {
+    await prisma.companyApplicantRank.deleteMany({
+      where: { offerId: off.id },
+    });
     const applicantStudentIds = off.preferences.map((p) => p.studentId);
     let rank = 1;
     for (const sId of applicantStudentIds) {
-      await prisma.companyApplicantRank.upsert({
-        where: {
-          offerId_studentId: {
-            offerId: off.id,
-            studentId: sId,
-          },
-        },
-        update: { rank: rank },
-        create: {
+      await prisma.companyApplicantRank.create({
+        data: {
           offerId: off.id,
           studentId: sId,
           rank: rank,
