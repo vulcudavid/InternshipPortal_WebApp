@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "prisma migrate deploy && next start",
     "lint": "next lint",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
@@ -37,6 +37,7 @@
     "tailwind-merge": "^3.0.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22.13.10",
     "@types/nodemailer": "^8.0.2",
