@@ -309,7 +309,7 @@ export async function verifyEmailCode(email: string, code: string) {
   // Setare sesiune cookie
   try {
     const cookieStore = await cookies();
-    cookieStore.set(SESSION_COOKIE_NAME, signSessionUserId(newUser.id), {
+    cookieStore.set(SESSION_COOKIE_NAME, signSessionUserId(user.id), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
