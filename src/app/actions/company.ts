@@ -78,7 +78,8 @@ export async function upsertInternshipOffer(data: {
   id?: string;
   title: string;
   description: string;
-  primaryDomain: EngineeringDomain;
+  domains?: EngineeringDomain[];
+  primaryDomain?: EngineeringDomain | null;
   slotsTotal: number;
   location: string;
   isRemote: boolean;
@@ -106,8 +107,18 @@ export async function upsertInternshipOffer(data: {
     throw new Error("Data de început trebuie să fie anterioară datei de finalizare.");
   }
 
+  const normalizedDomains = Array.from(
+    new Set(
+      data.domains !== undefined
+        ? data.domains
+        : data.primaryDomain
+          ? [data.primaryDomain]
+          : []
+    )
+  );
+  const fallbackPrimaryDomain = normalizedDomains[0] ?? null;
+
   if (data.id) {
-    // Editare ofertă existentă
     const existing = await prisma.internshipOffer.findUnique({
       where: { id: data.id },
     });
@@ -117,13 +128,13 @@ export async function upsertInternshipOffer(data: {
     }
 
     await prisma.$transaction(async (tx) => {
-      // 1. Actualizare ofertă
       await tx.internshipOffer.update({
         where: { id: data.id },
         data: {
           title: data.title.trim(),
           description: data.description.trim(),
-          primaryDomain: data.primaryDomain,
+          domains: normalizedDomains,
+          primaryDomain: fallbackPrimaryDomain,
           slotsTotal: data.slotsTotal,
           slotsAvailable: Math.max(0, data.slotsTotal - (existing.slotsTotal - existing.slotsAvailable)),
           location: data.location.trim(),
@@ -135,7 +146,6 @@ export async function upsertInternshipOffer(data: {
         },
       });
 
-      // 2. Înlocuire tag-uri asociate
       await tx.offerTag.deleteMany({
         where: { offerId: data.id },
       });
@@ -155,14 +165,14 @@ export async function upsertInternshipOffer(data: {
     revalidatePath("/");
     return { success: true, offerId: data.id };
   } else {
-    // Creare ofertă nouă
     const newOffer = await prisma.$transaction(async (tx) => {
       const created = await tx.internshipOffer.create({
         data: {
           companyId: profile.id,
           title: data.title.trim(),
           description: data.description.trim(),
-          primaryDomain: data.primaryDomain,
+          domains: normalizedDomains,
+          primaryDomain: fallbackPrimaryDomain,
           slotsTotal: data.slotsTotal,
           slotsAvailable: data.slotsTotal,
           location: data.location.trim(),

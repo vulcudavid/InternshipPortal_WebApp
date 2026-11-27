@@ -80,7 +80,8 @@ interface ApplicantRankData {
 interface OfferWithApplicants {
   id: string;
   title: string;
-  primaryDomain: EngineeringDomain;
+  primaryDomain: EngineeringDomain | null;
+  domains?: EngineeringDomain[];
   slotsTotal: number;
   slotsAvailable: number;
   offerTags: OfferTagData[];
@@ -131,10 +132,15 @@ export function ApplicantsManager({ offers, allStudents, companyId }: Applicants
       proficiency: st.proficiency,
     }));
 
+    const offerDomains =
+      selectedOffer.domains && selectedOffer.domains.length > 0
+        ? selectedOffer.domains
+        : selectedOffer.primaryDomain;
+
     return calculateCompatibilityScore(
       student.domain,
       studentSkills,
-      selectedOffer.primaryDomain,
+      offerDomains,
       offerTagInputs
     );
   };

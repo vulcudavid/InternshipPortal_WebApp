@@ -35,32 +35,34 @@ const PROFICIENCY_MULTIPLIER: Record<ProficiencyLevel, number> = {
   ADVANCED: 1.25,
 };
 
-/**
- * Calculează scorul de compatibilitate dintre un student și o ofertă de practică.
- * Ponderea:
- * - 70% acoperirea competențelor obligatorii (isRequired: true)
- * - 20% acoperirea competențelor opționale/dorite (isRequired: false)
- * - 10% potrivirea domeniului principal de inginerie
- */
 export function calculateCompatibilityScore(
   studentDomain: EngineeringDomain,
   studentSkills: StudentSkillInput[],
-  offerPrimaryDomain: EngineeringDomain,
+  offerDomains: EngineeringDomain[] | EngineeringDomain | null | undefined,
   offerTags: OfferTagInput[]
 ): CompatibilityResult {
+  const normalizedDomains: EngineeringDomain[] = Array.isArray(offerDomains)
+    ? offerDomains
+    : offerDomains
+      ? [offerDomains]
+      : [];
+
+  // Dacă tutorele nu a ales niciun profil (lista e goală), oferta este deschisă tuturor profilelor
+  const domainMatch =
+    normalizedDomains.length === 0 || normalizedDomains.includes(studentDomain);
+
+  // Dacă tutorele nu a stabilit niciun tag, compatibilitatea este automat 100%
   if (offerTags.length === 0) {
-    const domainMatch = studentDomain === offerPrimaryDomain;
-    const score = domainMatch ? 75 : 50;
     return {
-      score,
-      percentage: score,
+      score: 100,
+      percentage: 100,
       matchedRequiredTags: [],
       missingRequiredTags: [],
       matchedOptionalTags: [],
       domainMatch,
       breakdown: {
-        requiredScore: 0,
-        optionalScore: 0,
+        requiredScore: 70,
+        optionalScore: 20,
         domainScore: domainMatch ? 10 : 0,
       },
     };
@@ -119,7 +121,6 @@ export function calculateCompatibilityScore(
   const optionalScore = optionalRatio * 20;
 
   // 3. Calcul potrivire domeniu inginerie
-  const domainMatch = studentDomain === offerPrimaryDomain;
   const domainScore = domainMatch ? 10 : 0;
 
   const rawTotal = requiredScore + optionalScore + domainScore;

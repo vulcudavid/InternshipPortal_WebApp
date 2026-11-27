@@ -39,7 +39,8 @@ interface OfferItem {
   id: string;
   title: string;
   description: string;
-  primaryDomain: EngineeringDomain;
+  primaryDomain: EngineeringDomain | null;
+  domains?: EngineeringDomain[];
   slotsTotal: number;
   slotsAvailable: number;
   location: string;
@@ -90,7 +91,7 @@ export function OfferManager({
   // Form State
   const [formTitle, setFormTitle] = useState("");
   const [formDescription, setFormDescription] = useState("");
-  const [formDomain, setFormDomain] = useState<EngineeringDomain>(EngineeringDomain.COMPUTER_SCIENCE_IT);
+  const [formDomains, setFormDomains] = useState<EngineeringDomain[]>([]);
   const [formSlotsTotal, setFormSlotsTotal] = useState(2);
   const [formLocation, setFormLocation] = useState(defaultLocation);
   const [formIsRemote, setFormIsRemote] = useState(false);
@@ -108,7 +109,7 @@ export function OfferManager({
     setEditingOffer(null);
     setFormTitle("");
     setFormDescription("");
-    setFormDomain(EngineeringDomain.COMPUTER_SCIENCE_IT);
+    setFormDomains([]);
     setFormSlotsTotal(2);
     setFormLocation(defaultLocation);
     setFormIsRemote(false);
@@ -125,7 +126,13 @@ export function OfferManager({
     setEditingOffer(offer);
     setFormTitle(offer.title);
     setFormDescription(offer.description);
-    setFormDomain(offer.primaryDomain);
+    const initialDomains =
+      offer.domains && offer.domains.length > 0
+        ? offer.domains
+        : offer.primaryDomain
+          ? [offer.primaryDomain]
+          : [];
+    setFormDomains(initialDomains);
     setFormSlotsTotal(offer.slotsTotal);
     setFormLocation(offer.location);
     setFormIsRemote(offer.isRemote);
@@ -142,6 +149,12 @@ export function OfferManager({
     );
     setErrorMsg(null);
     setModalOpen(true);
+  };
+
+  const toggleDomainSelection = (domain: EngineeringDomain) => {
+    setFormDomains((prev) =>
+      prev.includes(domain) ? prev.filter((d) => d !== domain) : [...prev, domain]
+    );
   };
 
   const toggleTagSelection = (tagId: string) => {
@@ -179,7 +192,7 @@ export function OfferManager({
           id: editingOffer ? editingOffer.id : undefined,
           title: formTitle,
           description: formDescription,
-          primaryDomain: formDomain,
+          domains: formDomains,
           slotsTotal: formSlotsTotal,
           location: formLocation,
           isRemote: formIsRemote,
@@ -282,6 +295,12 @@ export function OfferManager({
             const isActive = offer.status === OfferStatus.ACTIVE;
             const requiredCount = offer.offerTags.filter((t) => t.isRequired).length;
             const optionalCount = offer.offerTags.filter((t) => !t.isRequired).length;
+            const displayDomains =
+              offer.domains && offer.domains.length > 0
+                ? offer.domains
+                : offer.primaryDomain
+                  ? [offer.primaryDomain]
+                  : [];
 
             return (
               <div
@@ -307,9 +326,21 @@ export function OfferManager({
                           />
                           {isActive ? "Activă (Înscrieri deschise)" : "Închisă"}
                         </span>
-                        <span className="text-xs px-2 py-0.5 bg-sky-950/60 text-sky-300 rounded-md font-semibold border border-sky-500/30">
-                          {DOMAIN_LABELS[offer.primaryDomain]}
-                        </span>
+
+                        {displayDomains.length === 0 ? (
+                          <span className="text-xs px-2 py-0.5 bg-emerald-950/60 text-emerald-300 rounded-md font-semibold border border-emerald-500/30">
+                            Toate profilele
+                          </span>
+                        ) : (
+                          displayDomains.map((dom) => (
+                            <span
+                              key={dom}
+                              className="text-xs px-2 py-0.5 bg-sky-950/60 text-sky-300 rounded-md font-semibold border border-sky-500/30"
+                            >
+                              {DOMAIN_LABELS[dom]}
+                            </span>
+                          ))
+                        )}
                       </div>
                       <h3 className="text-base font-bold text-white leading-snug">{offer.title}</h3>
                     </div>
@@ -370,25 +401,35 @@ export function OfferManager({
                   <div className="space-y-1.5 pt-2 border-t border-sky-500/15">
                     <div className="flex items-center justify-between text-[11px] font-semibold text-slate-400">
                       <span>Competențe Cerute ({offer.offerTags.length})</span>
-                      <span>{requiredCount} Obligatorii • {optionalCount} Opționale</span>
+                      {offer.offerTags.length === 0 ? (
+                        <span className="text-emerald-400">Fără cerințe tehnice</span>
+                      ) : (
+                        <span>{requiredCount} Obligatorii • {optionalCount} Opționale</span>
+                      )}
                     </div>
                     <div className="flex flex-wrap gap-1.5 max-h-20 overflow-y-auto">
-                      {offer.offerTags.map((ot) => (
-                        <span
-                          key={ot.tagId}
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium ${
-                            ot.isRequired
-                              ? "bg-rose-950/40 text-rose-300 border border-rose-500/30"
-                              : "bg-[#070D19] text-slate-300 border border-sky-500/20"
-                          }`}
-                        >
-                          <TagIcon className="w-2.5 h-2.5 text-sky-400" />
-                          {ot.tag.name}
-                          <span className="text-[9px] font-bold opacity-75">
-                            {ot.isRequired ? "(Obligatoriu)" : "(Opțional)"}
-                          </span>
+                      {offer.offerTags.length === 0 ? (
+                        <span className="text-[11px] text-slate-400 italic">
+                          Deschis studenților fără experiență prealabilă (100% compatibilitate).
                         </span>
-                      ))}
+                      ) : (
+                        offer.offerTags.map((ot) => (
+                          <span
+                            key={ot.tagId}
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium ${
+                              ot.isRequired
+                                ? "bg-rose-950/40 text-rose-300 border border-rose-500/30"
+                                : "bg-[#070D19] text-slate-300 border border-sky-500/20"
+                            }`}
+                          >
+                            <TagIcon className="w-2.5 h-2.5 text-sky-400" />
+                            {ot.tag.name}
+                            <span className="text-[9px] font-bold opacity-75">
+                              {ot.isRequired ? "(Obligatoriu)" : "(Opțional)"}
+                            </span>
+                          </span>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>
@@ -464,22 +505,50 @@ export function OfferManager({
                   />
                 </div>
 
-                {/* Domeniu Principal */}
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                    Domeniu Ingineresc Principal <span className="text-rose-400">*</span>
-                  </label>
-                  <select
-                    value={formDomain}
-                    onChange={(e) => setFormDomain(e.target.value as EngineeringDomain)}
-                    className="w-full px-3 py-2 text-sm bg-[#070D19] border border-sky-500/30 text-white rounded-xl focus:outline-none focus:border-sky-400"
-                  >
-                    {Object.entries(DOMAIN_LABELS).map(([domainKey, label]) => (
-                      <option key={domainKey} value={domainKey}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
+                {/* Profile / Domenii Studenți (0, 1 sau mai multe) */}
+                <div className="md:col-span-2">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                      Profile / Domenii Studenți ({formDomains.length === 0 ? "Toate profilele" : `${formDomains.length} selectate`})
+                    </label>
+                    {formDomains.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setFormDomains([])}
+                        className="text-[11px] text-sky-400 hover:text-sky-300 underline"
+                      >
+                        Resetează (Toate profilele)
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(DOMAIN_LABELS).map(([domainKey, label]) => {
+                      const domain = domainKey as EngineeringDomain;
+                      const isSelected = formDomains.includes(domain);
+                      return (
+                        <button
+                          key={domainKey}
+                          type="button"
+                          onClick={() => toggleDomainSelection(domain)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition flex items-center gap-1.5 ${
+                            isSelected
+                              ? "bg-sky-500/20 text-sky-200 border-sky-400 shadow-[0_0_12px_rgba(56,189,248,0.2)]"
+                              : "bg-[#070D19] text-slate-400 border-sky-500/25 hover:border-sky-400/50 hover:text-slate-200"
+                          }`}
+                        >
+                          <span
+                            className={`w-2 h-2 rounded-full ${
+                              isSelected ? "bg-sky-400" : "bg-slate-600"
+                            }`}
+                          />
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1.5">
+                    Poți selecta unul sau mai multe profile, sau poți lăsa totul neselectat dacă oferta este deschisă tuturor profilelor.
+                  </p>
                 </div>
 
                 {/* Număr Locuri */}
@@ -514,7 +583,7 @@ export function OfferManager({
                 </div>
 
                 {/* Mod Remote */}
-                <div className="flex items-center gap-2 pt-6">
+                <div className="flex items-center gap-2 pt-2">
                   <input
                     type="checkbox"
                     id="isRemote"
@@ -607,7 +676,7 @@ export function OfferManager({
                       Competențe Cerute ({selectedTags.length} selectate)
                     </label>
                     <p className="text-[11px] text-slate-400">
-                      Tag-urile <strong>Obligatorii</strong> asigură 70% din scorul de compatibilitate; cele <strong>Opționale</strong> aduc 20%.
+                      Opțional: dacă nu selectezi nicio competență, oferta va avea <strong>100% compatibilitate</strong> pentru studenți.
                     </p>
                   </div>
                 </div>
@@ -618,7 +687,7 @@ export function OfferManager({
                     <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                     <input
                       type="text"
-                      placeholder="Caută în catalogul de 41 de competențe..."
+                      placeholder="Caută în catalogul de competențe..."
                       value={tagSearch}
                       onChange={(e) => setTagSearch(e.target.value)}
                       className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#070D19] border border-sky-500/30 text-white rounded-lg focus:outline-none focus:border-sky-400 placeholder-slate-500"

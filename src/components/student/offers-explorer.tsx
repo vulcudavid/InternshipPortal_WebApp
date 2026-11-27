@@ -29,7 +29,8 @@ export interface OfferData {
   id: string;
   title: string;
   description: string;
-  primaryDomain: EngineeringDomain;
+  primaryDomain: EngineeringDomain | null;
+  domains?: EngineeringDomain[];
   slotsTotal: number;
   slotsAvailable: number;
   location: string;
@@ -99,10 +100,15 @@ export function OffersExplorer({
       weight: ot.weight,
     }));
 
+    const offerDomains =
+      offer.domains && offer.domains.length > 0
+        ? offer.domains
+        : offer.primaryDomain;
+
     const compatibility: CompatibilityResult = calculateCompatibilityScore(
       studentDomain,
       studentSkills,
-      offerPrimaryDomain(offer.primaryDomain),
+      offerDomains,
       offerTagInputs
     );
 
@@ -299,41 +305,41 @@ export function OffersExplorer({
                 {offer.description}
               </p>
 
-              {/* Breakdown Competențe Cerute & Potrivire */}
-              <div className="space-y-2 pt-2 border-t border-sky-500/15">
-                <span className="text-[11px] font-bold text-sky-300 uppercase tracking-wider block">
-                  Competențe Cerute de Companie:
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {offer.offerTags.map((ot) => {
-                    const isMatched = comp.matchedRequiredTags.includes(ot.tag.name) ||
-                                     comp.matchedOptionalTags.includes(ot.tag.name);
-                    return (
-                      <span
-                        key={ot.tagId}
-                        className={`text-xs px-2.5 py-1 rounded-lg border flex items-center gap-1 ${
-                          isMatched
-                            ? "bg-emerald-950/40 text-emerald-300 border-emerald-500/40 font-semibold"
-                            : ot.isRequired
-                            ? "bg-rose-950/40 text-rose-300 border-rose-500/40"
-                            : "bg-slate-900/60 text-slate-300 border-slate-700/60"
-                        }`}
-                      >
-                        {isMatched ? (
-                          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                        ) : ot.isRequired ? (
-                          <AlertCircle className="w-3 h-3 text-rose-400" />
-                        ) : null}
-                        <span>{ot.tag.name}</span>
-                        {ot.isRequired && (
-                          <span className="text-[9px] opacity-75 font-normal">(obligatoriu)</span>
-                        )}
-                      </span>
-                    );
-                  })}
+              <div className="flex flex-wrap gap-1.5">
+                  {offer.offerTags.length === 0 ? (
+                    <span className="text-xs px-2.5 py-1 rounded-lg border bg-emerald-950/30 text-emerald-300 border-emerald-500/30">
+                      Fără cerințe tehnice prealabile – deschis tuturor studenților
+                    </span>
+                  ) : (
+                    offer.offerTags.map((ot) => {
+                      const isMatched = comp.matchedRequiredTags.includes(ot.tag.name) ||
+                                       comp.matchedOptionalTags.includes(ot.tag.name);
+                      return (
+                        <span
+                          key={ot.tagId}
+                          className={`text-xs px-2.5 py-1 rounded-lg border flex items-center gap-1 ${
+                            isMatched
+                              ? "bg-emerald-950/40 text-emerald-300 border-emerald-500/40 font-semibold"
+                              : ot.isRequired
+                              ? "bg-rose-950/40 text-rose-300 border-rose-500/40"
+                              : "bg-slate-900/60 text-slate-300 border-slate-700/60"
+                          }`}
+                        >
+                          {isMatched ? (
+                            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                          ) : ot.isRequired ? (
+                            <AlertCircle className="w-3 h-3 text-rose-400" />
+                          ) : null}
+                          <span>{ot.tag.name}</span>
+                          {ot.isRequired && (
+                            <span className="text-[9px] opacity-75 font-normal">(obligatoriu)</span>
+                          )}
+                        </span>
+                      );
+                    })
+                  )}
                 </div>
-              </div>
-
+                
               {/* Sloturi Interviu Disponibile */}
               {offer.interviewSlots && offer.interviewSlots.length > 0 && (
                 <div className="space-y-2 pt-2 border-t border-sky-500/15">

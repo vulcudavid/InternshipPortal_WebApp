@@ -210,7 +210,8 @@ model InternshipOffer {
   company         CompanyProfile         @relation(fields: [companyId], references: [id], onDelete: Cascade)
   title           String
   description     String
-  primaryDomain   EngineeringDomain      @default(COMPUTER_SCIENCE_IT) @map("primary_domain")
+  primaryDomain   EngineeringDomain?     @map("primary_domain")
+  domains         EngineeringDomain[]    @default([])
   slotsTotal      Int                    @default(1) @map("slots_total")
   slotsAvailable  Int                    @default(1) @map("slots_available")
   location        String
