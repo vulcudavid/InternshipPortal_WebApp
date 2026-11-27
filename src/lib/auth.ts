@@ -7,6 +7,44 @@ import { UserRole, EngineeringDomain } from "@prisma/client";
 
 const SESSION_COOKIE_NAME = "web2_session_user_id";
 
+function getAuthSecret(): string {
+  const secret = process.env.AUTH_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("AUTH_SECRET lipsește din variabilele de mediu.");
+    }
+    return "dev-fallback-secret-local";
+  }
+  return secret;
+}
+
+function signSessionUserId(userId: string): string {
+  const sig = crypto
+    .createHmac("sha256", getAuthSecret())
+    .update(userId)
+    .digest("hex");
+  return `${userId}.${sig}`;
+}
+
+function verifySessionCookie(cookieValue: string | undefined): string | null {
+  if (!cookieValue) return null;
+  const dotIndex = cookieValue.lastIndexOf(".");
+  if (dotIndex === -1) return null;
+
+  const userId = cookieValue.slice(0, dotIndex);
+  const sig = cookieValue.slice(dotIndex + 1);
+  const expectedSig = crypto
+    .createHmac("sha256", getAuthSecret())
+    .update(userId)
+    .digest("hex");
+
+  const sigBuf = Buffer.from(sig, "hex");
+  const expectedBuf = Buffer.from(expectedSig, "hex");
+  if (sigBuf.length !== expectedBuf.length) return null;
+
+  return crypto.timingSafeEqual(sigBuf, expectedBuf) ? userId : null;
+}
+
 /**
  * Hash securizat folosind scrypt din modulul nativ Node.js crypto
  */
@@ -191,7 +229,7 @@ export async function registerUser(params: {
   // Setare sesiune în cookie pentru conturile verificate direct
   try {
     const cookieStore = await cookies();
-    cookieStore.set(SESSION_COOKIE_NAME, newUser.id, {
+    cookieStore.set(SESSION_COOKIE_NAME, signSessionUserId(newUser.id), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -271,7 +309,7 @@ export async function verifyEmailCode(email: string, code: string) {
   // Setare sesiune cookie
   try {
     const cookieStore = await cookies();
-    cookieStore.set(SESSION_COOKIE_NAME, updatedUser.id, {
+    cookieStore.set(SESSION_COOKIE_NAME, signSessionUserId(newUser.id), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -398,7 +436,7 @@ export async function loginUser(email: string, password: string) {
 
   try {
     const cookieStore = await cookies();
-    cookieStore.set(SESSION_COOKIE_NAME, user.id, {
+    cookieStore.set(SESSION_COOKIE_NAME, signSessionUserId(user.id), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -430,7 +468,7 @@ export async function logoutUser() {
 export async function getCurrentUser() {
   try {
     const cookieStore = await cookies();
-    const userId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+    const userId = verifySessionCookie(cookieStore.get(SESSION_COOKIE_NAME)?.value);
     if (!userId) return null;
 
     const user = await prisma.user.findUnique({
