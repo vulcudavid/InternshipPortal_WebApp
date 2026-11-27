@@ -17,10 +17,16 @@ export async function POST(request: NextRequest) {
     const { role } = body;
 
     const demoAccounts: Record<string, { email: string; pass: string }> = {
-      STUDENT: { email: "alexandru.radu@student.ulbsibiu.ro", pass: "demo_hash_student" },
-      COMPANY_TUTOR: { email: "recruitment@continental-sibiu.com", pass: "demo_hash_company" },
-      COORDINATOR: { email: "coordonator.practica@ulbsibiu.ro", pass: "demo_hash_coordonator" },
-      ADMIN: { email: "admin@ulbsibiu.ro", pass: "demo_hash_admin" },
+      STUDENT: { email: "alexandru.radu@student.ulbsibiu.ro", pass: "DemoStudent2026!" },
+      COMPANY_TUTOR: { email: "recruitment@continental-sibiu.com", pass: "DemoCompany2026!" },
+      COORDINATOR: {
+        email: "coordonator.practica@ulbsibiu.ro",
+        pass: process.env.COORDINATOR_SEED_PASSWORD || "CoordULBS2026!",
+      },
+      ADMIN: {
+        email: "admin@ulbsibiu.ro",
+        pass: process.env.ADMIN_SEED_PASSWORD || "AdminULBS2026!",
+      },
     };
 
     const creds = demoAccounts[role];

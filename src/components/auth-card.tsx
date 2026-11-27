@@ -369,7 +369,7 @@ export function AuthCard() {
                   {/* 1. Student */}
                   <button
                     type="button"
-                    onClick={() => handleQuickFill("alexandru.radu@student.ulbsibiu.ro", "demo_hash_student")}
+                    onClick={() => handleQuickFill("alexandru.radu@student.ulbsibiu.ro", "DemoStudent2026!")}
                     className="p-2.5 rounded-xl border border-sky-500/30 bg-sky-950/30 hover:bg-sky-900/40 hover:border-sky-400 text-sky-200 transition flex flex-col items-start gap-1 group text-left shadow-[0_0_10px_rgba(14,165,233,0.08)]"
                   >
                     <GraduationCap className="w-4 h-4 text-sky-400 group-hover:scale-110 transition shrink-0" />
@@ -382,7 +382,7 @@ export function AuthCard() {
                   {/* 2. Tutore Firmă */}
                   <button
                     type="button"
-                    onClick={() => handleQuickFill("recruitment@continental-sibiu.com", "demo_hash_company")}
+                    onClick={() => handleQuickFill("recruitment@continental-sibiu.com", "DemoCompany2026!")}
                     className="p-2.5 rounded-xl border border-cyan-500/30 bg-cyan-950/30 hover:bg-cyan-900/40 hover:border-cyan-400 text-cyan-200 transition flex flex-col items-start gap-1 group text-left shadow-[0_0_10px_rgba(6,182,212,0.08)]"
                   >
                     <Building2 className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition shrink-0" />
@@ -395,7 +395,7 @@ export function AuthCard() {
                   {/* 3. Coordonator */}
                   <button
                     type="button"
-                    onClick={() => handleQuickFill("coordonator.practica@ulbsibiu.ro", "demo_hash_coordonator")}
+                    onClick={() => handleQuickFill("coordonator.practica@ulbsibiu.ro", "CoordULBS2026!")}
                     className="p-2.5 rounded-xl border border-indigo-500/30 bg-indigo-950/30 hover:bg-indigo-900/40 hover:border-indigo-400 text-indigo-200 transition flex flex-col items-start gap-1 group text-left shadow-[0_0_10px_rgba(99,102,241,0.08)]"
                   >
                     <ShieldCheck className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition shrink-0" />
@@ -408,7 +408,7 @@ export function AuthCard() {
                   {/* 4. Administrator */}
                   <button
                     type="button"
-                    onClick={() => handleQuickFill("admin@ulbsibiu.ro", "demo_hash_admin")}
+                    onClick={() => handleQuickFill("admin@ulbsibiu.ro", "AdminULBS2026!")}
                     className="p-2.5 rounded-xl border border-amber-500/30 bg-amber-950/30 hover:bg-amber-900/40 hover:border-amber-400 text-amber-200 transition flex flex-col items-start gap-1 group text-left shadow-[0_0_10px_rgba(245,158,11,0.08)]"
                   >
                     <Terminal className="w-4 h-4 text-amber-400 group-hover:scale-110 transition shrink-0" />
